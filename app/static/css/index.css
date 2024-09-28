@@ -5,14 +5,27 @@
 }
 
 .post {
+    overflow: hidden;
     list-style-type: none;
     background-color: red;
-    display: flex;
+    display: inline-flex;
     flex-direction: column;
+    margin-bottom: 16px;
+    border-radius: 8px;
+}
+
+.post img {
+    width: 100%;
 }
 
 .post-info {
+    padding: 8px 12px 12px 12px;
     background-color: lightgreen;
+}
+
+
+.post h3 {
+    margin: 0 0 12px 0;
 }
 
 .post-stats {
