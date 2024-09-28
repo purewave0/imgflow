@@ -1,0 +1,23 @@
+#gallery {
+    columns: 4 200px;
+    gap: 16px;
+    padding-left: 0;
+}
+
+.post {
+    list-style-type: none;
+    background-color: red;
+    display: flex;
+    flex-direction: column;
+}
+
+.post-info {
+    background-color: lightgreen;
+}
+
+.post-stats {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+
