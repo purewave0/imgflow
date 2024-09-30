@@ -2,7 +2,7 @@ import random
 import string
 
 from app.extensions import db
-from app.models.post import Post, PostMedia, PostDescription
+from app.models.post import Post, PostMedia, PostDescription, PostComment
 
 
 _post_id_charset = string.ascii_letters + string.digits # a-z A-Z 0-9
@@ -43,3 +43,23 @@ def create_post(title, media_list):
     db.session.add(post)
     db.session.commit()
     return post
+
+
+def get_posts():
+    return db.session.execute(
+        db.select(
+            Post.post_id,
+            Post.title,
+            Post.score,
+            Post.views
+        )
+    ).all()
+
+
+def get_post_comments(post_id):
+    return db.session.execute(
+        db.select(
+            PostComment.content,
+            PostComment.score,
+        ).where(PostComment.post_id == post_id)
+    ).scalars()
