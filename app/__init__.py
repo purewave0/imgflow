@@ -15,6 +15,9 @@ def create_app(config_class=Config):
         db.create_all()
 
     # Blueprints
+    from app.api import bp as api_bp
+    app.register_blueprint(api_bp, url_prefix='/api')
+
     from app.main import bp as main_bp
     app.register_blueprint(main_bp)
 
@@ -23,6 +26,7 @@ def create_app(config_class=Config):
 
     from app.about import bp as about_bp
     app.register_blueprint(about_bp, url_prefix='/about')
+
 
     @app.route('/test/')
     def test_page():
