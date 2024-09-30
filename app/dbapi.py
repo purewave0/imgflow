@@ -45,30 +45,37 @@ def create_post(title, media_list):
     return post
 
 
+def _rows_to_dicts(rows):
+    return tuple(row._asdict() for row in rows)
+
+
 def get_posts():
-    return db.session.execute(
+    result = db.session.execute(
         db.select(
             Post.post_id,
             Post.title,
             Post.score,
             Post.views
         )
-    ).all()
+    )
+    return _rows_to_dicts(result)
 
 
 def get_post_media(post_id):
-    return db.session.execute(
+    result = db.session.execute(
         db.select(
             PostMedia.media_url,
             PostDescription.content.label('description')
         ).outerjoin(PostDescription).where(PostMedia.post_id == post_id)
-    ).all()
+    )
+    return _rows_to_dicts(result)
 
 
 def get_post_comments(post_id):
-    return db.session.execute(
+    result = db.session.execute(
         db.select(
             PostComment.content,
             PostComment.score,
         ).where(PostComment.post_id == post_id)
-    ).all()
+    )
+    return _rows_to_dicts(result)
