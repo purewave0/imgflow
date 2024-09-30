@@ -56,10 +56,19 @@ def get_posts():
     ).all()
 
 
+def get_post_media(post_id):
+    return db.session.execute(
+        db.select(
+            PostMedia.media_url,
+            PostDescription.content.label('description')
+        ).outerjoin(PostDescription).where(PostMedia.post_id == post_id)
+    ).all()
+
+
 def get_post_comments(post_id):
     return db.session.execute(
         db.select(
             PostComment.content,
             PostComment.score,
         ).where(PostComment.post_id == post_id)
-    ).scalars()
+    ).all()
