@@ -21,7 +21,7 @@ class PostMedia(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     media_url = db.Column(db.String(128), nullable=False)
     description = db.relationship('PostDescription', backref='media', uselist=False)
-    post_id = db.Column(db.Integer, db.ForeignKey('Post.id'))
+    post_id = db.Column(db.Integer, db.ForeignKey('Post.post_id'))
 
     def __repr__(self):
         return f'<Media media_url:"{self.media_url}" id:{self.id} post_id:{self.post_id}>'
@@ -43,7 +43,7 @@ class PostComment(db.Model):
     content = db.Column(db.Text, nullable=False)
     score = db.Column(db.Integer, nullable=False)
     # TODO: replies
-    post_id = db.Column(db.Integer, db.ForeignKey('Post.id'))
+    post_id = db.Column(db.Integer, db.ForeignKey('Post.post_id'))
 
     def __repr__(self):
         return f'<Comment id:{self.id} post_id:{self.post_id} score:{self.score}'
