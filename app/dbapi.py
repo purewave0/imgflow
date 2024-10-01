@@ -71,6 +71,35 @@ def get_post_media(post_id):
     return _rows_to_dicts(result)
 
 
+def get_post_and_media(post_id):
+    post = db.session.execute(
+        db.select(Post)
+        .options(
+            db.selectinload(Post.media).selectinload(PostMedia.description)
+        ).where(Post.post_id == post_id)
+    ).scalars().one_or_none()
+
+    if not post:
+        return None
+
+    media = tuple(
+        {
+            'media_url': media_item.media_url,
+            'description': media_item.description.content
+                if media_item.description else None
+        } for media_item in post.media
+    )
+
+    result = {
+        'post_id': post.post_id,
+        'title': post.title,
+        'score': post.score,
+        'views': post.views,
+        'media': media
+    }
+    return result
+
+
 def get_post_comments(post_id):
     result = db.session.execute(
         db.select(
