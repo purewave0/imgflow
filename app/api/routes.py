@@ -20,3 +20,11 @@ def api_post(post_id):
         return '', 404;
     post = get_post_and_media(post_id)
     return jsonify(post)
+
+
+@bp.route('/posts/<post_id>/comments')
+def api_post_comments(post_id):
+    if len(post_id) != Post.POST_ID_LENGTH:
+        return '', 404;
+    comments = get_post_comments(post_id)
+    return jsonify(comments)
