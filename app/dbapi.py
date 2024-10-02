@@ -120,3 +120,13 @@ def get_post_comments(post_id):
         ).where(PostComment.post_id == post_id)
     )
     return _rows_to_dicts(result)
+
+
+def increment_post_views(post_id):
+    db.session.execute(
+        db.update(Post)
+            .where(Post.post_id == post_id)
+            .values(views=Post.views + 1)
+    )
+    db.session.commit()
+
