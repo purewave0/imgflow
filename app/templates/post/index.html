@@ -15,7 +15,11 @@
 {% block content %}
     <section id="post-section">
         <h2 id="post-title"> {{ post_title }} </h2>
-        <p id="post-created-on"> {{ post_created_on }} </p>
+        <div id="post-stats">
+            <p id="post-views"> {{ post_views }} views </p>
+            <span>·</span>
+            <p id="post-created-on"> {{ post_created_on }} </p>
+        </div>
 
         <div id="media">
             {% for media_item in media %}

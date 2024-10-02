@@ -7,6 +7,14 @@
     margin: 0 auto;
 }
 
+#post-stats {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    column-gap: 4px;
+    margin-bottom: 16px;
+}
+
 #media {
     display: flex;
     flex-direction: column;
