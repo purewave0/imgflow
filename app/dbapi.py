@@ -40,6 +40,7 @@ def create_post(title, media_list):
         thumbnail_url=media[0].media_url, # TODO: generate proper thumbnail
         score=0,
         comments=[],
+        comment_count=0,
         views=0,
     )
     db.session.add(post)
@@ -58,7 +59,8 @@ def get_posts():
             Post.title,
             Post.thumbnail_url,
             Post.score,
-            Post.views
+            Post.comment_count,
+            Post.views,
         )
     )
     return _rows_to_dicts(result)
@@ -98,6 +100,7 @@ def get_post_and_media(post_id):
         'title': post.title,
         'score': post.score,
         'views': post.views,
+        'comment_count': post.comment_count,
         'media': media,
         'thumbnail_url': post.thumbnail_url,
     }

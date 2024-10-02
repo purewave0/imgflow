@@ -11,6 +11,7 @@ class Post(db.Model):
     thumbnail_url = db.Column(db.String(128), nullable=False)
     score = db.Column(db.Integer, nullable=False)
     comments = db.relationship('PostComment', backref='post')
+    comment_count = db.Column(db.Integer, nullable=False)
     views = db.Column(db.Integer, nullable=False)
 
     def __repr__(self):
