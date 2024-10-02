@@ -21,6 +21,9 @@ def create_app(config_class=Config):
     from app.main import bp as main_bp
     app.register_blueprint(main_bp)
 
+    from app.post import bp as post_bp
+    app.register_blueprint(post_bp, url_prefix='/post')
+
     from app.contact import bp as contact_bp
     app.register_blueprint(contact_bp, url_prefix='/contact')
 
