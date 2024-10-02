@@ -8,6 +8,7 @@ class Post(db.Model):
     post_id = db.Column(db.String(POST_ID_LENGTH), unique=True, nullable=False)
     title = db.Column(db.String(128), nullable=True)
     media = db.relationship('PostMedia', backref='post')
+    thumbnail_url = db.Column(db.String(128), nullable=False)
     score = db.Column(db.Integer, nullable=False)
     comments = db.relationship('PostComment', backref='post')
     views = db.Column(db.Integer, nullable=False)
