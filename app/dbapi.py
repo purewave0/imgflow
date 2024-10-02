@@ -31,11 +31,13 @@ def create_post(title, media_list):
             )
         )
 
+
     # TODO: check if failed because of post_id collision
     post = Post(
         post_id=post_id,
         title=title,
         media=media,
+        thumbnail_url=media[0].media_url, # TODO: generate proper thumbnail
         score=0,
         comments=[],
         views=0,
@@ -54,6 +56,7 @@ def get_posts():
         db.select(
             Post.post_id,
             Post.title,
+            Post.thumbnail_url,
             Post.score,
             Post.views
         )
@@ -95,7 +98,8 @@ def get_post_and_media(post_id):
         'title': post.title,
         'score': post.score,
         'views': post.views,
-        'media': media
+        'media': media,
+        'thumbnail_url': post.thumbnail_url,
     }
     return result
 
