@@ -1,11 +1,23 @@
+from datetime import datetime, date
+
 from flask import Flask
+from flask.json.provider import DefaultJSONProvider
 
 from config import Config
 from app.extensions import db
 
 
+# Serialize date(time)s to ISO strings.
+class UpdatedJSONProvider(DefaultJSONProvider):
+    def default(self, o):
+        if isinstance(o, (date, datetime)):
+            return o.isoformat() + 'Z' # Z = UTC timezone
+        return super().default(o)
+
+
 def create_app(config_class=Config):
     app = Flask(__name__)
+    app.json = UpdatedJSONProvider(app)
     app.config.from_object(config_class)
 
     # Extensions
