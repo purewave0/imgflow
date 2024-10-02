@@ -10,5 +10,6 @@ def show_post(post_id):
     return render_template(
         'post/index.html',
         post_title=full_post['title'],
+        post_created_on=full_post['created_on'],
         media=full_post['media'],
     )
