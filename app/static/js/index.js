@@ -1,9 +1,9 @@
-function createPostCard(imageUrl, title, upvotes, comments, views) {
+function createPostCard(thumbnailUrl, title, upvotes, commentCount, views) {
     const post = document.createElement('a');
     post.className = 'post';
 
-    const image = document.createElement('img');
-    image.src = imageUrl;
+    const thumbnail = document.createElement('img');
+    thumbnail.src = thumbnailUrl;
 
     const postInfo = document.createElement('div');
     postInfo.className = 'post-info';
@@ -24,7 +24,7 @@ function createPostCard(imageUrl, title, upvotes, comments, views) {
     const commentsIcon = document.createElement('span');
     commentsIcon.textContent = '💬';
     const commentsValue = document.createElement('span');
-    commentsValue.textContent = comments;
+    commentsValue.textContent = commentCount;
 
     const viewsContainer = document.createElement('div');
     const viewsIcon = document.createElement('span');
@@ -32,7 +32,7 @@ function createPostCard(imageUrl, title, upvotes, comments, views) {
     const viewsValue = document.createElement('span');
     viewsValue.textContent = views;
 
-    post.append(image, postInfo);
+    post.append(thumbnail, postInfo);
     postInfo.append(titleElement, postStats);
     postStats.append(upvotesContainer, commentsContainer, viewsContainer);
 
@@ -42,3 +42,22 @@ function createPostCard(imageUrl, title, upvotes, comments, views) {
 
     return post;
 }
+
+
+document.addEventListener('DOMContentLoaded', () => {
+    const gallery = document.getElementById('gallery');
+
+    Api.fetchPosts().then(async (response) => {
+        const posts = await response.json();
+        for (const post of posts) {
+            postCard = createPostCard(
+                post.thumbnail_url,
+                post.title,
+                post.score,
+                post.comment_count,
+                post.views
+            );
+            gallery.append(postCard);
+        }
+    });
+});
