@@ -58,6 +58,8 @@ def get_posts():
             Post.post_id,
             Post.title,
             Post.thumbnail_url,
+            Post.created_on,
+            Post.updated_on,
             Post.score,
             Post.comment_count,
             Post.views,
@@ -98,6 +100,8 @@ def get_post_and_media(post_id):
     result = {
         'post_id': post.post_id,
         'title': post.title,
+        'created_on': post.created_on,
+        'updated_on': post.updated_on,
         'score': post.score,
         'views': post.views,
         'comment_count': post.comment_count,
@@ -112,6 +116,7 @@ def get_post_comments(post_id):
         db.select(
             PostComment.content,
             PostComment.score,
+            PostComment.created_on,
         ).where(PostComment.post_id == post_id)
     )
     return _rows_to_dicts(result)
