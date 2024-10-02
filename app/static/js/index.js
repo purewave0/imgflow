@@ -1,6 +1,9 @@
-function createPostCard(thumbnailUrl, title, upvotes, commentCount, views) {
+function createPostCard(
+    postId, thumbnailUrl, title, upvotes, commentCount, views
+) {
     const post = document.createElement('a');
     post.className = 'post';
+    post.href = `/post/${postId}`;
 
     const thumbnail = document.createElement('img');
     thumbnail.src = thumbnailUrl;
@@ -51,6 +54,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const posts = await response.json();
         for (const post of posts) {
             postCard = createPostCard(
+                post.post_id,
                 post.thumbnail_url,
                 post.title,
                 post.score,
