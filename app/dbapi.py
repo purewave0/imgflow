@@ -1,21 +1,8 @@
-import random
-import string
-
 from app.extensions import db
 from app.models.post import Post, PostMedia, PostDescription, PostComment
 
 
-_post_id_charset = string.ascii_letters + string.digits # a-z A-Z 0-9
-
-def random_post_id():
-    return ''.join(
-        random.choices(_post_id_charset, k=Post.POST_ID_LENGTH)
-    )
-    
-
 def create_post(title, media_list):
-    post_id = random_post_id()
-
     media = []
     for media_item in media_list:
         description = None
@@ -33,16 +20,8 @@ def create_post(title, media_list):
 
 
     # TODO: check if failed because of post_id collision
-    post = Post(
-        post_id=post_id,
-        title=title,
-        media=media,
-        thumbnail_url=media[0].media_url, # TODO: generate proper thumbnail
-        score=0,
-        comments=[],
-        comment_count=0,
-        views=0,
-    )
+    # TODO: generate proper thumbnail
+    post = Post(title, media, media[0].media_url)
     db.session.add(post)
     db.session.commit()
     return post

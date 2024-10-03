@@ -1,3 +1,6 @@
+import random
+import string
+
 from sqlalchemy.sql import expression, case
 from sqlalchemy.ext.compiler import compiles
 from sqlalchemy.types import Numeric
@@ -14,6 +17,14 @@ def pg_utcnow(element, compiler, **kw):
     return "UTC_TIMESTAMP"
 
 
+_post_id_charset = string.ascii_letters + string.digits # a-z A-Z 0-9
+
+def _random_post_id():
+    return ''.join(
+        random.choices(_post_id_charset, k=Post.POST_ID_LENGTH)
+    )
+
+
 class Post(db.Model):
     __tablename__ = 'Post'
     POST_ID_LENGTH = 8
@@ -28,6 +39,16 @@ class Post(db.Model):
     views = db.Column(db.Integer, nullable=False)
     created_on = db.Column(db.DateTime, server_default=utcnow())
     updated_on = db.Column(db.DateTime, onupdate=utcnow())
+
+    def __init__(self, title, media, thumbnail_url):
+        self.post_id = _random_post_id()
+        self.title = title
+        self.media = media
+        self.thumbnail_url = thumbnail_url
+        self.score = 0
+        self.comments = []
+        self.comment_count = 0
+        self.views = 0
 
     def __repr__(self):
         return f'<Post title:"{self.title}" id:{self.id} post_id:{self.post_id}>'
