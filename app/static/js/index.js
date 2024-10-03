@@ -19,18 +19,21 @@ function createPostCard(
 
     const upvotesContainer = document.createElement('div');
     const upvotesIcon = document.createElement('span');
+    upvotesIcon.className = 'stat-icon'
     upvotesIcon.textContent = '⬆';
     const upvotesValue = document.createElement('span');
     upvotesValue.textContent = upvotes;
 
     const commentsContainer = document.createElement('div');
     const commentsIcon = document.createElement('span');
+    commentsIcon.className = 'stat-icon'
     commentsIcon.textContent = '💬';
     const commentsValue = document.createElement('span');
     commentsValue.textContent = commentCount;
 
     const viewsContainer = document.createElement('div');
     const viewsIcon = document.createElement('span');
+    viewsIcon.className = 'stat-icon'
     viewsIcon.textContent = '👁️';
     const viewsValue = document.createElement('span');
     viewsValue.textContent = views;
