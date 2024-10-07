@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+
+{% block css %}
+    <link rel="stylesheet" href="/static/css/upload.css">
+{% endblock %}
+
+{% block js %}
+    <script src="/static/js/api.js"></script>
+    <script src="/static/js/upload.js"></script>
+{% endblock %}
+
+{% block title %} {{ post_title }} {% endblock %}
+
+{% block content %}
+    <section id="upload-section">
+
+        <form id="upload-container">
+            <div id="media-container">
+                <div id="previews-destination"></div>
+                <label id="upload-more-media" for="media-input">
+                    <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e8eaed"><path d="M440-440H200v-80h240v-240h80v240h240v80H520v240h-80v-240Z"/></svg>
+                    <span>Add media</span>
+                </label>
+
+                <input id="media-input" type="file" hidden>
+                <label id="media-upload-box" for="media-input" accept="image/*">
+                    <div id="upload-helper-text">
+                        <svg id="upload-icon" xmlns="http://www.w3.org/2000/svg" height="40px" viewBox="0 -960 960 960" width="40px" fill="#e8eaed"><path d="M446.67-315.33v-356L332-556.67l-47.33-48L480-800l195.33 195.33-47.33 48-114.67-114.66v356h-66.66ZM226.67-160q-27 0-46.84-19.83Q160-199.67 160-226.67V-362h66.67v135.33h506.66V-362H800v135.33q0 27-19.83 46.84Q760.33-160 733.33-160H226.67Z"/></svg>
+                        <p>Drag and drop or click to upload</p>
+                    </div>
+                    <p id="upload-note">Note: Use files less than 15MB</p>
+                </label>
+            </div>
+
+            <div id="upload-form">
+                <input id="title" name="title" placeholder="Add your title">
+                <div>
+                    <h3>Visibility</h3>
+                    <label>
+                        <input type="checkbox" name="is_public">
+                        Make post public
+                    </label>
+                </div>
+
+                <button id="post-button" type="submit">
+                    Post
+                </button>
+            </div>
+        </form>
+    </section>
+
+{% endblock %}
