@@ -2,6 +2,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const filesMap = [];
 
     const uploadForm = document.getElementById('upload-container');
+    const titleInput = document.getElementById('title');
     const mediaUploadBox = document.getElementById('media-upload-box');
     const mediaInput = document.getElementById('media-input');
     const moreMediaInput = document.getElementById('upload-more-media');
@@ -73,8 +74,9 @@ document.addEventListener('DOMContentLoaded', () => {
             alert('Please upload at least 1 image/video.');
             return;
         }
+        const title = titleInput.value.trim();
         const files = filesMap.map(mapping => mapping.file);
-        console.log('files:', files);
-        console.log('<begin upload here>');
+
+        Api.createPost(title, files);
     });
 });
