@@ -19,7 +19,7 @@ const Api = {
             formData.append('file', file);
         }
 
-        fetch('/api/posts', {
+        return fetch('/api/posts', {
             method: 'POST',
             body: formData
         });

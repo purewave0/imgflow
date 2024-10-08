@@ -68,7 +68,7 @@ document.addEventListener('DOMContentLoaded', () => {
         addMediaToPost(event.target.files[0]);
     });
 
-    uploadForm.addEventListener('submit', (event) => {
+    uploadForm.addEventListener('submit', async (event) => {
         event.preventDefault();
         if (getUploadedImagesAmount() === 0) {
             alert('Please upload at least 1 image/video.');
@@ -77,6 +77,8 @@ document.addEventListener('DOMContentLoaded', () => {
         const title = titleInput.value.trim();
         const files = filesMap.map(mapping => mapping.file);
 
-        Api.createPost(title, files);
+        const result = await Api.createPost(title, files);
+        const newPost = await result.json();
+        document.location.href = `/posts/${newPost.post_id}`;
     });
 });
