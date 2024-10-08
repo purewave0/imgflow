@@ -3,7 +3,7 @@ function createPostCard(
 ) {
     const post = document.createElement('a');
     post.className = 'post';
-    post.href = `/post/${postId}`;
+    post.href = `/posts/${postId}`;
 
     const thumbnail = document.createElement('img');
     thumbnail.src = thumbnailUrl;

@@ -33,8 +33,8 @@ def create_app(config_class=Config):
     from app.main import bp as main_bp
     app.register_blueprint(main_bp)
 
-    from app.post import bp as post_bp
-    app.register_blueprint(post_bp, url_prefix='/post')
+    from app.posts import bp as posts_bp
+    app.register_blueprint(posts_bp, url_prefix='/posts')
 
     from app.upload import bp as upload_bp
     app.register_blueprint(upload_bp, url_prefix='/upload')
