@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+
+{% block css %}
+    <link rel="stylesheet" href="/static/css/post-404.css">
+{% endblock %}
+
+{% block js %}
+{% endblock %}
+
+{% block title %} Not Found {% endblock %}
+
+{% block content %}
+    <section id="error-section">
+        <h1 id="error-title">Oops!</h1>
+        <h2 id="error-subtitle">The post you're looking for doesn't exist.</h2>
+        <p id="error-help">Click the button below to return home.</p>
+        <a id="return-home" href="/">Home</a>
+    </section>
+
+{% endblock %}

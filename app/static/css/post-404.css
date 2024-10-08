@@ -1,0 +1,25 @@
+#error-section {
+    text-align: center;
+}
+
+#error-title {
+    font-size: 36pt;
+}
+
+#error-subtitle {
+    font-size: 16pt;
+}
+
+#error-help {
+    margin-bottom: 24px;
+}
+
+#return-home {
+    margin-top: 24px;
+    background-color: #005bbc;
+    font-size: 16pt;
+    color: white;
+    padding: 8px 16px;
+    border-radius: 4px;
+    text-decoration: none;
+}
