@@ -24,7 +24,16 @@ def create_post(title, media_list):
     post = Post(title, media, media[0].media_url)
     db.session.add(post)
     db.session.commit()
-    return post
+    return {
+        'post_id':       post.post_id,
+        'title':         post.title,
+        'thumbnail_url': post.thumbnail_url,
+        'created_on':    post.created_on,
+        'updated_on':    post.updated_on,
+        'score':         post.score,
+        'comment_count': post.comment_count,
+        'views':         post.views,
+    }
 
 
 def _rows_to_dicts(rows):
