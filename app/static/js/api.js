@@ -11,13 +11,14 @@ const Api = {
         return fetch(`/api/posts/${postId}/comments`);
     },
 
-    createPost(title, mediaFiles, isPublic) {
+    createPost(title, files, isPublic) {
         const formData = new FormData()
         formData.append('title', title);
         formData.append('is_public', isPublic);
-        for (const file of mediaFiles) {
+        for (const file of files) {
             // TODO: description
-            formData.append('file', file);
+            formData.append('media_file', file.media_file);
+            formData.append('description', file.description);
         }
 
         return fetch('/api/posts', {

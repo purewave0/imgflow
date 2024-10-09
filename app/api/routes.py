@@ -36,23 +36,23 @@ def api_posts():
 
     title = request.form.get('title')
     is_public = request.form.get('is_public') == 'true'
-    uploaded_files = request.files.getlist("file")
+    uploaded_files = request.files.getlist("media_file")
+    descriptions = request.form.getlist("description")
 
-    media_urls = []
-    for file in uploaded_files:
+    post_media_list = []
+    for file, description in zip(uploaded_files, descriptions):
         if is_file_allowed(file.filename):
             filename = secure_filename(randomize_filename(file.filename))
             media_destination = os.path.join(MEDIA_UPLOAD_FOLDER, filename)
             file.save(media_destination)
-            media_urls.append(os.path.join('/static/uploads', filename))
+            clean_description = description.strip()
+            post_media_list.append({
+                'media_url': os.path.join('/static/uploads', filename),
+                'description':
+                    clean_description if clean_description else None,
+            })
         else:
             return jsonify({'error': 'wrong_filetype'}), 400
-
-    # TODO: descriptions
-    post_media_list = tuple(
-        {'media_url': media_url, 'description': None}
-        for media_url in media_urls
-    )
 
     new_post = create_post(title, post_media_list, is_public)
     return jsonify(new_post)

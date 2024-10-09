@@ -33,10 +33,6 @@ document.addEventListener('DOMContentLoaded', () => {
         const objectURL = URL.createObjectURL(mediaFile);
         previewContent.src = objectURL;
 
-        filesMap.push(
-            {'object_url': objectURL, 'file': mediaFile}
-        );
-
         deletePreviewButton.addEventListener('click', () => {
             URL.revokeObjectURL(objectURL) // free memory
             previewsDestination.removeChild(preview);
@@ -55,11 +51,20 @@ document.addEventListener('DOMContentLoaded', () => {
         const previewDescription = document.createElement('textarea');
         previewDescription.className = 'preview-description';
         previewDescription.placeholder = 'Add a description';
-        previewDescription.hidden = true;
 
         preview.append(deletePreviewButton, previewContent, previewDescription);
         previewsDestination.append(preview);
         document.body.classList.add('has-uploaded');
+
+        filesMap.push(
+            {
+                'object_url': objectURL,
+                'file': mediaFile,
+                getDescription() {
+                    return previewDescription.value;
+                }
+            }
+        );
 
         return objectURL;
     }
@@ -75,9 +80,16 @@ document.addEventListener('DOMContentLoaded', () => {
             alert('Please upload at least 1 image/video.');
             return;
         }
+
         const title = titleInput.value.trim();
-        const files = filesMap.map(mapping => mapping.file);
         const isPublic = visibilityCheckbox.checked;
+        const files = [];
+        for (const mapping of filesMap) {
+            files.push({
+                'media_file': mapping.file,
+                'description': mapping.getDescription().trim()
+            });
+        }
 
         const result = await Api.createPost(title, files, isPublic);
         const newPost = await result.json();
