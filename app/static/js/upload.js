@@ -19,7 +19,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const preview = document.createElement('div');
         preview.className = 'preview';
 
-        deletePreviewButton = document.createElement('button');
+        const deletePreviewButton = document.createElement('button');
         deletePreviewButton.type = 'button';
         deletePreviewButton.className = 'preview-delete';
         deletePreviewButton.innerHTML = `
@@ -28,7 +28,7 @@ document.addEventListener('DOMContentLoaded', () => {
             </svg><span>Delete</span>
         `;
 
-        previewContent = document.createElement('img');
+        const previewContent = document.createElement('img');
         previewContent.className = 'preview-content';
         const objectURL = URL.createObjectURL(mediaFile);
         previewContent.src = objectURL;
@@ -52,7 +52,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
 
-        previewDescription = document.createElement('textarea');
+        const previewDescription = document.createElement('textarea');
         previewDescription.className = 'preview-description';
         previewDescription.placeholder = 'Add a description';
         previewDescription.hidden = true;
