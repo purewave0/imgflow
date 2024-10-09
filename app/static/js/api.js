@@ -1,5 +1,5 @@
 const Api = {
-    fetchPosts() {
+    fetchPublicPosts() {
         return fetch('/api/posts');
     },
 
@@ -11,9 +11,10 @@ const Api = {
         return fetch(`/api/posts/${postId}/comments`);
     },
 
-    createPost(title, mediaFiles) {
+    createPost(title, mediaFiles, isPublic) {
         const formData = new FormData()
         formData.append('title', title);
+        formData.append('is_public', isPublic);
         for (const file of mediaFiles) {
             // TODO: description
             formData.append('file', file);

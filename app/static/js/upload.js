@@ -7,6 +7,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const mediaInput = document.getElementById('media-input');
     const moreMediaInput = document.getElementById('upload-more-media');
     const previewsDestination = document.getElementById('previews-destination');
+    const visibilityCheckbox = document.getElementById('visibility-checkbox');
 
 
     function getUploadedImagesAmount() {
@@ -76,9 +77,11 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         const title = titleInput.value.trim();
         const files = filesMap.map(mapping => mapping.file);
+        const isPublic = visibilityCheckbox.checked;
 
-        const result = await Api.createPost(title, files);
+        const result = await Api.createPost(title, files, isPublic);
         const newPost = await result.json();
+        // TODO: notification 'post created successfully'
         document.location.href = `/posts/${newPost.post_id}`;
     });
 });

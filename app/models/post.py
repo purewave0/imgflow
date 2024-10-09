@@ -39,8 +39,9 @@ class Post(db.Model):
     views = db.Column(db.Integer, nullable=False)
     created_on = db.Column(db.DateTime, server_default=utcnow())
     updated_on = db.Column(db.DateTime, onupdate=utcnow())
+    is_public = db.Column(db.Boolean, nullable=False, default=False)
 
-    def __init__(self, title, media, thumbnail_url):
+    def __init__(self, title, media, thumbnail_url, is_public):
         self.post_id = _random_post_id()
         self.title = title
         self.media = media
@@ -49,6 +50,7 @@ class Post(db.Model):
         self.comments = []
         self.comment_count = 0
         self.views = 0
+        self.is_public = is_public
 
     def __repr__(self):
         return f'<Post title:"{self.title}" id:{self.id} post_id:{self.post_id}>'

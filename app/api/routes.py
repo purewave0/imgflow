@@ -7,7 +7,7 @@ from werkzeug.utils import secure_filename
 from app.api import bp
 from app.dbapi import (
     create_post,
-    get_posts, get_post_media, get_post_and_media, get_post_comments, 
+    get_public_posts, get_post_media, get_post_and_media, get_post_comments, 
 )
 from app.models.post import Post
 
@@ -31,10 +31,11 @@ def randomize_filename(filename):
 @bp.route('/posts', methods=['GET', 'POST'])
 def api_posts():
     if request.method == 'GET':
-        posts = get_posts()
+        posts = get_public_posts()
         return jsonify(posts)
 
     title = request.form.get('title')
+    is_public = request.form.get('is_public') == 'true'
     uploaded_files = request.files.getlist("file")
 
     media_urls = []
@@ -53,7 +54,7 @@ def api_posts():
         for media_url in media_urls
     )
 
-    new_post = create_post(title, post_media_list)
+    new_post = create_post(title, post_media_list, is_public)
     return jsonify(new_post)
 
 

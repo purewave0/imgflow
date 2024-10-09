@@ -50,7 +50,7 @@ function createPostCard(
 document.addEventListener('DOMContentLoaded', () => {
     const gallery = document.getElementById('gallery');
 
-    Api.fetchPosts().then(async (response) => {
+    Api.fetchPublicPosts().then(async (response) => {
         const posts = await response.json();
         for (const post of posts) {
             postCard = createPostCard(

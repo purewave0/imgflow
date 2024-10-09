@@ -2,7 +2,7 @@ from app.extensions import db
 from app.models.post import Post, PostMedia, PostDescription, PostComment
 
 
-def create_post(title, media_list):
+def create_post(title, media_list, is_public):
     media = []
     for media_item in media_list:
         description = None
@@ -21,7 +21,7 @@ def create_post(title, media_list):
 
     # TODO: check if failed because of post_id collision
     # TODO: generate proper thumbnail
-    post = Post(title, media, media[0].media_url)
+    post = Post(title, media, media[0].media_url, is_public)
     db.session.add(post)
     db.session.commit()
     return {
@@ -33,6 +33,7 @@ def create_post(title, media_list):
         'score':         post.score,
         'comment_count': post.comment_count,
         'views':         post.views,
+        'is_public':     post.is_public,
     }
 
 
@@ -40,7 +41,7 @@ def _rows_to_dicts(rows):
     return tuple(row._asdict() for row in rows)
 
 
-def get_posts():
+def get_public_posts():
     result = db.session.execute(
         db.select(
             Post.post_id,
@@ -51,6 +52,8 @@ def get_posts():
             Post.score,
             Post.comment_count,
             Post.views,
+        ).where(
+            Post.is_public == True
         )
     )
     return _rows_to_dicts(result)
