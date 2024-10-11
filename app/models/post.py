@@ -86,5 +86,9 @@ class PostComment(db.Model):
     # TODO: replies
     post_id = db.Column(db.String(Post.POST_ID_LENGTH), db.ForeignKey('Post.post_id'))
 
+    def __init__(self, content):
+        self.content = content
+        self.score = 0
+
     def __repr__(self):
         return f'<Comment id:{self.id} post_id:{self.post_id} score:{self.score}'

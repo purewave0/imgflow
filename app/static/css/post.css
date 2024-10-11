@@ -1,6 +1,7 @@
 #post-section {
     max-width: 800px;
     margin: 0 auto;
+    background-color: lightblue;
 }
 
 #post-title {
@@ -39,4 +40,152 @@
 
 #post-section img {
     width: 100%;
+}
+
+
+#comments-section {
+    display: flex;
+    flex-direction: column;
+    max-width: 800px;
+    margin: 36px auto 0 auto;
+    background-color: lightyellow;
+    margin-bottom: 200px;
+}
+
+#comments-title {
+    font-size: 18pt;
+}
+
+#comment-box {
+    display: flex;
+    flex-direction: column;
+}
+
+#comment-input {
+    font-family: inherit;
+    font-size: 12pt;
+    resize: none;
+    padding: 16px;
+    border: 1px solid gray;
+    border-radius: 4px;
+}
+
+#send-comment {
+    align-self: end;
+    margin-top: 16px;
+    color: white;
+    font-weight: bold;
+    border: none;
+    font-size: 12pt;
+    border-radius: 4px;
+    background-color: coral;
+    padding: 8px 16px;
+    width: fit-content;
+}
+
+#comments-header {
+    margin-top: 64px;
+    padding-bottom: 8px;
+    border-bottom: 2px solid lightgray;
+    font-size: 14pt;
+    display: flex;
+    flex-direction: row;
+    align-items: center
+}
+
+#comments-count {
+    flex: 1;
+    display: flex;
+    flex-direction: row;
+    align-items: center
+}
+
+#comments-count svg {
+    margin-right: 4px;
+    fill: black;
+}
+
+#comments-sorting {
+    display: flex;
+    flex-direction: row;
+    column-gap: 16px;
+    font-size: 11pt;
+}
+
+#comments-sorting span {
+    cursor: pointer;
+    user-select: none;
+}
+
+#comments-sorting span.selected {
+    color: coral;
+}
+
+#comments {
+    margin-top: 16px;
+    display: flex;
+    flex-direction: column;
+    row-gap: 32px;
+}
+
+.comment {
+    display: flex;
+    flex-direction: column;
+}
+
+.comment-info {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+
+.avatar {
+    height: 36px;
+    width: 36px;
+    border-radius: 100%;
+}
+
+.commenter-username {
+    font-weight: bold;
+    margin-left: 8px;
+}
+
+.comment-info-separator {
+    margin: 0 4px;
+    color: gray;
+}
+
+.comment-datetime {
+    color: gray;
+}
+
+.comment-footer {
+    display: flex;
+    flex-direction: row;
+    column-gap: 16px;
+    color: #777;
+    font-weight: 500;
+}
+
+.comment-footer svg {
+    fill: #777;
+}
+
+.action-section {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    column-gap: 4px;
+}
+
+.action-upvote, .action-downvote {
+    cursor: pointer;
+}
+
+.action-downvote {
+    transform: rotate(180deg);
+}
+
+.action-reply {
+     cursor: pointer;
 }
