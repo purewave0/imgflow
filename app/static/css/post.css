@@ -189,3 +189,11 @@
 .action-reply {
      cursor: pointer;
 }
+
+.comment-replies {
+    margin-top: 16px;
+    margin-left: 48px;
+    display: flex;
+    flex-direction: column;
+    row-gap: 16px;
+}
