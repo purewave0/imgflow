@@ -37,6 +37,24 @@ def create_post(title, media_list, is_public):
     }
 
 
+def comment_on_post(post_id, content):
+    comment = PostComment(content)
+    comment.post_id = post_id
+
+    db.session.add(comment)
+    _increment_post_comment_count(post_id)
+    db.session.commit()
+
+    return {
+        # TODO: return PK id or an uuid?
+        'id': comment.id,
+        'content': comment.content,
+        'score': comment.score,
+        'created_on': comment.created_on,
+        'post_id': comment.post_id,
+    }
+
+
 def _rows_to_dicts(rows):
     return tuple(row._asdict() for row in rows)
 
@@ -121,3 +139,10 @@ def increment_post_views(post_id):
     )
     db.session.commit()
 
+
+def _increment_post_comment_count(post_id):
+    db.session.execute(
+        db.update(Post)
+            .where(Post.post_id == post_id)
+            .values(comment_count=Post.comment_count + 1)
+    )

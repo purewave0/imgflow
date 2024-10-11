@@ -67,7 +67,6 @@ document.addEventListener('DOMContentLoaded', () => {
         const commentWrapper = document.createElement('div');
         commentWrapper.className = 'comment-wrapper';
         commentWrapper.innerHTML = commentStructure;
-        console.log(commentWrapper);
 
         const avatarElement = commentWrapper.querySelector('.commenter-avatar');
         avatarElement.src = avatarUrl;
@@ -102,4 +101,19 @@ document.addEventListener('DOMContentLoaded', () => {
         15
     );
     commentsDestination.append(sampleComment);
+
+    // 'currentPost' comes from the page template
+    Api.fetchPostComments(currentPost.post_id).then(async (response) => {
+        const comments = await response.json();
+        for (const comment of comments) {
+            const commentElement = createComment(
+                '/static/img/cat.png',
+                'Guest',
+                comment.created_on,
+                comment.content,
+                comment.score
+            );
+            commentsDestination.append(commentElement);
+        }
+    });
 });

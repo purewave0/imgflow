@@ -6,7 +6,7 @@ from werkzeug.utils import secure_filename
 
 from app.api import bp
 from app.dbapi import (
-    create_post,
+    create_post, comment_on_post,
     get_public_posts, get_post_media, get_post_and_media, get_post_comments, 
 )
 from app.models.post import Post
@@ -66,9 +66,21 @@ def api_post(post_id):
     return jsonify(post)
 
 
-@bp.route('/posts/<post_id>/comments')
+@bp.route('/posts/<post_id>/comments', methods=['GET', 'POST'])
 def api_post_comments(post_id):
     if len(post_id) != Post.POST_ID_LENGTH:
         return '', 404;
-    comments = get_post_comments(post_id)
-    return jsonify(comments)
+    # TODO: check if post id exists
+
+    if request.method == 'GET':
+        comments = get_post_comments(post_id)
+        return jsonify(comments)
+
+    # TODO: check content length
+    try:
+        content = request.json['content']
+    except KeyError:
+        return jsonify({'error': 'missing_content'}), 404
+
+    comment = comment_on_post(post_id, content)
+    return jsonify(comment), 201
