@@ -171,6 +171,10 @@
     fill: #777;
 }
 
+.comment-score {
+    user-select: none;
+}
+
 .action-section {
     display: flex;
     flex-direction: row;

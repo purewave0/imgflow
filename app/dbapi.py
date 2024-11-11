@@ -1,3 +1,5 @@
+from enum import Enum
+
 from app.extensions import db
 from app.models.post import Post, PostMedia, PostDescription, PostComment
 
@@ -123,6 +125,7 @@ def get_post_and_media(post_id):
 def get_post_comments(post_id):
     result = db.session.execute(
         db.select(
+            PostComment.id,
             PostComment.content,
             PostComment.score,
             PostComment.created_on,
@@ -146,3 +149,24 @@ def _increment_post_comment_count(post_id):
             .where(Post.post_id == post_id)
             .values(comment_count=Post.comment_count + 1)
     )
+
+
+class Vote(Enum):
+    UPVOTE = 1
+    DOWNVOTE = -1
+
+
+def vote_comment(post_id, comment_id, vote):
+    if vote not in Vote:
+        raise TypeError('vote must be of Vote type.')
+
+    # TODO: check if already voted, and if so, undo vote
+
+    db.session.execute(
+        db.update(PostComment)
+            .where(
+                PostComment.post_id == post_id,
+                PostComment.id == comment_id,
+            ).values(score=PostComment.score + vote.value)
+    )
+    db.session.commit()

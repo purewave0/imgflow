@@ -38,7 +38,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Comments
     function createComment(
-        avatarUrl, commenterUsername, isoDatetime, content, score
+        commentId, avatarUrl, commenterUsername, isoDatetime, content, score
     ) {
         const commentStructure = `
             <div class="comment">
@@ -68,6 +68,9 @@ document.addEventListener('DOMContentLoaded', () => {
         commentWrapper.className = 'comment-wrapper';
         commentWrapper.innerHTML = commentStructure;
 
+        const commentElement = commentWrapper.querySelector('.comment');
+        commentElement.dataset.comment_id = commentId;
+
         const avatarElement = commentWrapper.querySelector('.commenter-avatar');
         avatarElement.src = avatarUrl;
 
@@ -89,11 +92,26 @@ document.addEventListener('DOMContentLoaded', () => {
         const scoreElement = commentWrapper.querySelector('.comment-score');
         scoreElement.textContent = score;
 
+        const upvoteButton = commentWrapper.querySelector('.action-upvote');
+        upvoteButton.addEventListener('click', () => {
+            Api.upvoteComment(currentPost.post_id, commentId);
+            scoreElement.textContent =
+                Number(scoreElement.textContent) + 1;
+        });
+
+        const downvoteButton = commentWrapper.querySelector('.action-downvote');
+        downvoteButton.addEventListener('click', () => {
+            Api.downvoteComment(currentPost.post_id, commentId);
+            scoreElement.textContent =
+                Number(scoreElement.textContent) - 1;
+        });
+
         return commentWrapper;
     }
     const commentsDestination = document.getElementById('comments');
 
     const sampleComment = createComment(
+        123,
         '/static/img/cat.png',
         'dynamic_comment',
         '2024-10-11T08:16:00Z',
@@ -107,6 +125,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const comments = await response.json();
         for (const comment of comments) {
             const commentElement = createComment(
+                comment.id,
                 '/static/img/cat.png',
                 'Guest',
                 comment.created_on,
