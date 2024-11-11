@@ -71,6 +71,7 @@
 }
 
 #send-comment {
+    cursor: pointer;
     align-self: end;
     margin-top: 16px;
     color: white;
