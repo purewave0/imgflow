@@ -1,0 +1,6 @@
+Flask
+mariadb
+SQLAlchemy
+Flask-SQLAlchemy
+
+python-dotenv
