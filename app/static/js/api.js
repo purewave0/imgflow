@@ -27,6 +27,18 @@ const Api = {
         });
     },
 
+    commentOnPost(postId, content) {
+        return fetch(`/api/posts/${postId}/comments`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                'content': content,
+            }),
+        });
+    },
+
     upvoteComment(postId, commentId) {
         return fetch(`/api/posts/${postId}/comments/${commentId}/votes`, {
             method: 'POST',

@@ -41,8 +41,8 @@
     <section id="comments-section">
         <h3 id="comments-title">Comments</h3>
         <form id="comment-box">
-            <textarea id="comment-input" name="comment" rows="6" placeholder="Type a comment…"></textarea>
-            <button id="send-comment">Comment</button>
+            <textarea id="comment-input" name="comment" rows="6" required placeholder="Type a comment…"></textarea>
+            <button id="send-comment" type="submit">Comment</button>
         </form>
 
         <div id="comments-header">
@@ -50,7 +50,7 @@
                 <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e8eaed">
                     <path d="M280-240q-17 0-28.5-11.5T240-280v-80h520v-360h80q17 0 28.5 11.5T880-680v600L720-240H280ZM80-280v-560q0-17 11.5-28.5T120-880h520q17 0 28.5 11.5T680-840v360q0 17-11.5 28.5T640-440H240L80-280Z"/>
                 </svg>
-                {{post_comment_count}} Comments
+                <span id="comments-count-value">{{post_comment_count}}</span> Comments
             </span>
             <div id="comments-sorting">
                 <span id="sort-newest" class="selected">Newest</span>

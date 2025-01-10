@@ -120,6 +120,29 @@ document.addEventListener('DOMContentLoaded', () => {
     );
     commentsDestination.append(sampleComment);
 
+    const commentForm = document.getElementById('comment-box');
+    const commentInput = document.getElementById('comment-input');
+    const commentsCountValue = document.getElementById('comments-count-value');
+    commentForm.addEventListener('submit', (event) => {
+        event.preventDefault();
+        Api.commentOnPost(currentPost.post_id, commentInput.value.trim())
+            .then((response) => response.json())
+            .then((new_comment) => {
+                const commentElement = createComment(
+                    new_comment.id,
+                    '/static/img/cat.png',
+                    'Guest',
+                    new_comment.created_on,
+                    new_comment.content,
+                    new_comment.score,
+                );
+                commentsDestination.prepend(commentElement);
+
+                commentsCountValue.textContent =
+                    Number(commentsCountValue.textContent) + 1;
+            });
+    });
+
     // 'currentPost' comes from the page template
     Api.fetchPostComments(currentPost.post_id).then(async (response) => {
         const comments = await response.json();
@@ -132,7 +155,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 comment.content,
                 comment.score
             );
-            commentsDestination.append(commentElement);
+            commentsDestination.prepend(commentElement);
         }
     });
 });

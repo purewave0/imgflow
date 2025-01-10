@@ -102,8 +102,12 @@
 }
 
 #comments-count svg {
-    margin-right: 4px;
+    margin-right: 8px;
     fill: black;
+}
+
+#comments-count-value {
+    margin-right: 4px;
 }
 
 #comments-sorting {
@@ -123,7 +127,7 @@
 }
 
 #comments {
-    margin-top: 16px;
+    margin-top: 32px;
     display: flex;
     flex-direction: column;
     row-gap: 32px;
