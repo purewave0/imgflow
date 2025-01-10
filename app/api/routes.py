@@ -82,7 +82,7 @@ def api_post_comments(post_id):
     try:
         content = request.json['content']
     except KeyError:
-        return jsonify({'error': 'missing_content'}), 404
+        return jsonify({'error': 'missing_content'}), 400
 
     content = content.strip()
     if not content or len(content) > MAX_COMMENT_LENGTH:
