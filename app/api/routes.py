@@ -17,6 +17,8 @@ from app.models.post import Post
 MEDIA_UPLOAD_FOLDER = '/home/will/proj/imgflow/app/static/uploads'
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'webp'}
 
+MAX_COMMENT_LENGTH = 2_000
+
 def is_file_allowed(filename):
     # TODO: stricter file checking
     return '.' in filename and \
@@ -77,11 +79,15 @@ def api_post_comments(post_id):
         comments = get_post_comments(post_id)
         return jsonify(comments)
 
-    # TODO: check content length
     try:
         content = request.json['content']
     except KeyError:
         return jsonify({'error': 'missing_content'}), 404
+
+    content = content.strip()
+    if not content or len(content) > MAX_COMMENT_LENGTH:
+        return jsonify({'error': 'wrong_content_length'}), 400
+
 
     comment = comment_on_post(post_id, content)
     return jsonify(comment), 201
