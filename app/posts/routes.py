@@ -15,6 +15,7 @@ def show_post(post_id):
         'posts/index.html',
         post_id=full_post['post_id'],
         post_title=full_post['title'],
+        post_score=full_post['score'],
         post_comment_count=full_post['comment_count'],
         post_views=full_post['views'] + 1, # because it was just viewed
         post_created_on=full_post['created_on'].isoformat() + 'Z',

@@ -27,6 +27,30 @@ const Api = {
         });
     },
 
+    upvotePost(postId) {
+        return fetch(`/api/posts/${postId}/votes`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                'vote': 'upvote'
+            }),
+        });
+    },
+
+    downvotePost(postId) {
+        return fetch(`/api/posts/${postId}/votes`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                'vote': 'downvote'
+            }),
+        });
+    },
+
     commentOnPost(postId, content) {
         return fetch(`/api/posts/${postId}/comments`, {
             method: 'POST',

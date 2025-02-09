@@ -6,7 +6,7 @@ from werkzeug.utils import secure_filename
 
 from app.api import bp
 from app.dbapi import (
-    create_post, comment_on_post, vote_comment, vote_comment,
+    create_post, vote_post, comment_on_post, vote_comment,
     get_public_posts, get_post_media, get_post_and_media, get_post_comments, 
     Vote,
 )
@@ -67,6 +67,29 @@ def api_post(post_id):
         return '', 404;
     post = get_post_and_media(post_id)
     return jsonify(post)
+
+
+@bp.route('/posts/<post_id>/votes', methods=['POST'])
+def api_vote_post(post_id):
+    if len(post_id) != Post.POST_ID_LENGTH:
+        return '', 404
+
+    try:
+        vote = request.json['vote']
+    except KeyError:
+        return jsonify({'error': 'missing_vote'}), 400
+
+    if vote not in ('upvote', 'downvote'):
+        return jsonify({'error': 'invalid_vote'}), 400
+
+    # TODO: check if post and comment id exist
+    vote_post(
+        post_id,
+        Vote.UPVOTE if vote == 'upvote' else Vote.DOWNVOTE
+    )
+    return '', 204
+
+
 
 
 @bp.route('/posts/<post_id>/comments', methods=['GET', 'POST'])

@@ -9,6 +9,21 @@ document.addEventListener('DOMContentLoaded', () => {
     postCreationDate.title = postCreatedOn
         .toLocaleString(DateTime.DATE_MED_WITH_WEEKDAY)
 
+    const postScore = document.getElementById('post-score');
+
+    const upvotePostButton = document.getElementById('upvote-post');
+    upvotePostButton.addEventListener('click', () => {
+        // 'currentPost' holds this post's info. comes from the page template.
+        Api.upvotePost(currentPost.post_id);
+        postScore.textContent = Number(postScore.textContent) + 1;
+    });
+
+    const downvotePostButton = document.getElementById('downvote-post');
+    downvotePostButton.addEventListener('click', () => {
+        Api.downvotePost(currentPost.post_id);
+        postScore.textContent = Number(postScore.textContent) - 1;
+    });
+
     // Sorting
     const sortingOptions = document.getElementById('comments-sorting').children;
     let currentlySelectedSort = document.getElementById('sort-newest');
@@ -143,7 +158,6 @@ document.addEventListener('DOMContentLoaded', () => {
             });
     });
 
-    // 'currentPost' comes from the page template
     Api.fetchPostComments(currentPost.post_id).then(async (response) => {
         const comments = await response.json();
         for (const comment of comments) {

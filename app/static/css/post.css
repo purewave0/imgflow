@@ -1,6 +1,29 @@
-#post-section {
+#post-wrapper {
+    display: flex;
+    flex-direction: row;
     max-width: 800px;
     margin: 0 auto;
+    column-gap: 24px;
+}
+
+#post-actions {
+    display: flex;
+    flex-direction: column;
+    row-gap: 8px;
+    position: sticky;
+    top: calc(100vh/2 - 100px);
+    height: fit-content;
+    font-size: 18pt;
+    text-align: center;
+}
+
+#post-actions svg {
+    width: 48px;
+    height: 48px;
+}
+
+#post-section {
+    flex: 1;
     background-color: lightblue;
 }
 

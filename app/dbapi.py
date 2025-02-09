@@ -156,6 +156,20 @@ class Vote(Enum):
     DOWNVOTE = -1
 
 
+def vote_post(post_id, vote):
+    if vote not in Vote:
+        raise TypeError('vote must be of Vote type.')
+
+    # TODO: check if already voted, and if so, undo vote
+
+    db.session.execute(
+        db.update(Post)
+            .where(Post.post_id == post_id)
+            .values(score=Post.score + vote.value)
+    )
+    db.session.commit()
+
+
 def vote_comment(post_id, comment_id, vote):
     if vote not in Vote:
         raise TypeError('vote must be of Vote type.')

@@ -18,25 +18,37 @@
 {% block title %} {{ post_title }} {% endblock %}
 
 {% block content %}
-    <section id="post-section">
-        <h2 id="post-title"> {{ post_title }} </h2>
-        <div id="post-stats">
-            <p id="post-views"> {{ post_views }} views </p>
-            <span>·</span>
-            <p id="post-created-on"> {{ post_created_on }} </p>
+    <div id="post-wrapper">
+        <div id="post-actions">
+            <svg id="upvote-post" class="action-upvote" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e8eaed">
+                <path d="M320-120v-320H120l360-440 360 440H640v320H320Z"/>
+            </svg>
+            <span id="post-score">{{ post_score }}</span>
+            <svg id="downvote-post" class="action-downvote" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e8eaed">
+                <path d="M320-120v-320H120l360-440 360 440H640v320H320Z"/>
+            </svg>
         </div>
 
-        <div id="media">
-            {% for media_item in media %}
-            <figure>
-                <img src="{{media_item.media_url}}">
-                {% if media_item['description'] %}
-                <figcaption>{{ media_item['description'] }}</figcaption>
-                {% endif %}
-            </figure>
-        {% endfor %}
-        </div>
-    </section>
+        <section id="post-section">
+            <h2 id="post-title"> {{ post_title }} </h2>
+            <div id="post-stats">
+                <p id="post-views"> {{ post_views }} views </p>
+                <span>·</span>
+                <p id="post-created-on"> {{ post_created_on }} </p>
+            </div>
+
+            <div id="media">
+                {% for media_item in media %}
+                <figure>
+                    <img src="{{media_item.media_url}}">
+                    {% if media_item['description'] %}
+                    <figcaption>{{ media_item['description'] }}</figcaption>
+                    {% endif %}
+                </figure>
+            {% endfor %}
+            </div>
+        </section>
+    </div>
 
     <section id="comments-section">
         <h3 id="comments-title">Comments</h3>
