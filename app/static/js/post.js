@@ -52,8 +52,15 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // Comments
+    let replyForm = null;
     function createComment(
-        commentId, avatarUrl, commenterUsername, isoDatetime, content, score
+        commentId,
+        avatarUrl,
+        commenterUsername,
+        isoDatetime,
+        content,
+        score,
+        repliesCount,
     ) {
         const commentStructure = `
             <div class="comment">
@@ -82,9 +89,9 @@ document.addEventListener('DOMContentLoaded', () => {
         const commentWrapper = document.createElement('div');
         commentWrapper.className = 'comment-wrapper';
         commentWrapper.innerHTML = commentStructure;
+        commentWrapper.dataset.commentId = commentId;
 
         const commentElement = commentWrapper.querySelector('.comment');
-        commentElement.dataset.comment_id = commentId;
 
         const avatarElement = commentWrapper.querySelector('.commenter-avatar');
         avatarElement.src = avatarUrl;
@@ -92,6 +99,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const usernameElement = commentWrapper.querySelector('.commenter-username');
         usernameElement.textContent = commenterUsername;
 
+        commentWrapper.dataset.createdOn = isoDatetime;
         const datetimeElement = commentWrapper.querySelector('.comment-datetime');
         const datetime = DateTime.fromISO(isoDatetime);
         datetimeElement.textContent = datetime.toRelative();
@@ -121,6 +129,195 @@ document.addEventListener('DOMContentLoaded', () => {
                 Number(scoreElement.textContent) - 1;
         });
 
+        function createShowRepliesButton() {
+            const showReplies = document.createElement('div');
+            showReplies.className = 'show-replies';
+            showReplies.innerHTML = `
+                <span class="show-replies-verb verb-show">Show</span>
+                <span class="show-replies-verb verb-hide">Hide</span>
+                <span class="show-replies-count">${repliesCount}</span>
+                <span>replies</span>
+            `;
+            const showRepliesVerb =
+                showReplies.querySelector('.show-replies-verb');
+
+            showReplies.addEventListener('click', async () => {
+                const shouldFetchReplies = !(
+                    'hasFetchedReplies' in commentWrapper.dataset
+                );
+                if (!shouldFetchReplies) {
+                    if (commentWrapper.classList.contains('showing-replies')) {
+                        commentWrapper.classList.remove('showing-replies');
+                    } else {
+                        commentWrapper.classList.add('showing-replies');
+                    }
+                    return;
+                }
+
+                const repliesCountElement =
+                    showReplies.querySelector('.show-replies-count');
+                updateCommentReplies(
+                    currentPost.post_id,
+                    commentId,
+                    commentReplies,
+                    repliesCountElement
+                );
+
+                commentWrapper.dataset.hasFetchedReplies = true;
+
+                if (!commentWrapper.classList.contains('showing-replies')) {
+                    commentWrapper.classList.add('showing-replies');
+                } else {
+                    commentWrapper.classList.remove('showing-replies');
+                }
+            });
+
+            return showReplies;
+        }
+
+        if (repliesCount > 0) {
+            const showReplies = createShowRepliesButton(repliesCount);
+            commentElement.append(showReplies);
+        }
+
+        async function updateCommentReplies(
+            postId, commentId, commentRepliesElement, repliesCountElement
+        ) {
+            const response = await Api.fetchCommentReplies(
+                currentPost.post_id, commentId
+            );
+            const replies = await response.json();
+
+            repliesCountElement.textContent = replies.length;
+
+            // TODO: take into account creation date too, for edited comments
+            const currentRepliesIds = [];
+
+            for (const replyWrapper of commentRepliesElement.children) {
+                currentRepliesIds.push(replyWrapper.dataset.commentId);
+
+                // update relative time
+                const createdOn = replyWrapper.dataset.createdOn;
+                const datetime = DateTime.fromISO(createdOn);
+                const datetimeElement =
+                    replyWrapper.querySelector('.comment-datetime');
+                datetimeElement.textContent = datetime.toRelative();
+                datetimeElement.title = datetime
+                    .toLocaleString(DateTime.DATE_MED_WITH_WEEKDAY);
+            }
+
+
+            for (const reply of replies) {
+                if (currentRepliesIds.includes(String(reply.id))) {
+                    // this reply is already present
+                    continue;
+                }
+
+                const replyElement = createComment(
+                    reply.id,
+                    '/static/img/cat.png',
+                    'Guest',
+                    reply.created_on,
+                    reply.content,
+                    reply.score,
+                    reply.reply_count,
+                );
+
+                commentRepliesElement.prepend(replyElement);
+            }
+        }
+
+        const commentReplies = commentWrapper.querySelector('.comment-replies');
+
+        const replyButton = commentWrapper.querySelector('.action-reply');
+        replyButton.addEventListener('click', () => {
+            if (replyForm) {
+                const isReplyingToThisComment =
+                    replyForm.dataset.replyingTo === String(commentId);
+
+                if (isReplyingToThisComment) {
+                    replyForm.elements[0].focus();
+                    return;
+                }
+
+                replyForm.remove();
+            }
+
+            replyForm = document.createElement('form');
+            replyForm.id = 'reply-form';
+            replyForm.className = 'comment-form';
+            replyForm.dataset.replyingTo = commentId;
+            replyForm.innerHTML = `
+                <textarea id="reply-input" class="comment-input" rows="6" placeholder="Text a reply…">
+                </textarea>
+
+                <div id="reply-footer">
+                    <button id="reply-cancel" class="cancel-comment" type="button">
+                        Cancel
+                    </button>
+
+                    <button id="reply-submit" class="submit-comment" type="submit">
+                        Reply
+                    </button>
+                </div>
+            `;
+
+            const replyInput = replyForm.querySelector('#reply-input');
+            const replyCancel = replyForm.querySelector('#reply-cancel');
+            replyCancel.addEventListener('click', () => {
+                replyForm.remove();
+                replyForm = null;
+            });
+
+            replyForm.addEventListener('submit', async (event) => {
+                event.preventDefault();
+                const response = await Api.replyToComment(
+                    currentPost.post_id,
+                    commentId,
+                    replyInput.value.trim()
+                );
+
+                commentsCountValue.textContent =
+                    Number(commentsCountValue.textContent) + 1;
+
+                let showRepliesButton =
+                    commentWrapper.querySelector('.show-replies');
+
+                replyForm.remove();
+                replyForm = null;
+
+                delete commentWrapper.dataset.hasFetchedReplies;
+
+                if (!showRepliesButton) {
+                    // now there *is* a reply. need to add the button
+                    showRepliesButton = createShowRepliesButton();
+                    commentElement.append(showRepliesButton);
+                    showRepliesButton.click();
+                } else {
+                    const isShowingReplies =
+                        commentWrapper.classList.contains('showing-replies');
+                    if (!isShowingReplies) {
+                        showRepliesButton.click();
+                    } else {
+                        // showing current replies, so hide and show them again
+                        // to trigger a re-update
+                        showRepliesButton.click();
+                        showRepliesButton.click();
+                    }
+                }
+            });
+
+            const showRepliesButton =
+                commentElement.querySelector('.show-replies');
+            if (showRepliesButton) {
+                showRepliesButton.before(replyForm);
+            } else {
+                commentElement.append(replyForm);
+            }
+
+            replyInput.focus();
+        });
+
         return commentWrapper;
     }
     const commentsDestination = document.getElementById('comments');
@@ -131,11 +328,12 @@ document.addEventListener('DOMContentLoaded', () => {
         'dynamic_comment',
         '2024-10-11T08:16:00Z',
         'Hello, this is a test.',
-        15
+        15,
+        0
     );
     commentsDestination.append(sampleComment);
 
-    const commentForm = document.getElementById('comment-box');
+    const commentForm = document.getElementById('comment-form');
     const commentInput = document.getElementById('comment-input');
     const commentsCountValue = document.getElementById('comments-count-value');
     commentForm.addEventListener('submit', (event) => {
@@ -150,6 +348,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     new_comment.created_on,
                     new_comment.content,
                     new_comment.score,
+                    new_comment.reply_count,
                 );
                 commentsDestination.prepend(commentElement);
 
@@ -167,7 +366,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 'Guest',
                 comment.created_on,
                 comment.content,
-                comment.score
+                comment.score,
+                comment.reply_count,
             );
             commentsDestination.prepend(commentElement);
         }

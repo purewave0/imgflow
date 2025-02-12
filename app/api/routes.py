@@ -6,9 +6,9 @@ from werkzeug.utils import secure_filename
 
 from app.api import bp
 from app.dbapi import (
-    create_post, vote_post, comment_on_post, vote_comment,
-    get_public_posts, get_post_media, get_post_and_media, get_post_comments, 
-    Vote,
+    create_post, vote_post, comment_on_post, vote_comment, reply_to_comment,
+    get_comment_replies, get_public_posts, get_post_media, get_post_and_media,
+    get_post_comments, Vote,
 )
 from app.models.post import Post
 
@@ -136,3 +136,27 @@ def api_vote_comment(post_id, comment_id):
         Vote.UPVOTE if vote == 'upvote' else Vote.DOWNVOTE
     )
     return '', 204
+
+
+@bp.route('/posts/<post_id>/comments/<comment_id>/replies', methods=['GET', 'POST'])
+def api_comment_replies(post_id, comment_id):
+    if len(post_id) != Post.POST_ID_LENGTH:
+        return '', 404;
+    # TODO: check if post id and comment id exist
+
+    if request.method == 'GET':
+        replies = get_comment_replies(post_id, comment_id)
+        return jsonify(replies)
+
+    try:
+        content = request.json['content']
+    except KeyError:
+        return jsonify({'error': 'missing_content'}), 400
+
+    content = content.strip()
+    if not content or len(content) > MAX_COMMENT_LENGTH:
+        return jsonify({'error': 'wrong_content_length'}), 400
+
+
+    reply = reply_to_comment(post_id, comment_id, content)
+    return jsonify(reply), 201

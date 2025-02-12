@@ -86,4 +86,20 @@ const Api = {
             }),
         });
     },
+
+    replyToComment(postId, commentId, content) {
+        return fetch(`/api/posts/${postId}/comments/${commentId}/replies`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                'content': content,
+            }),
+        });
+    },
+
+    fetchCommentReplies(postId, commentId) {
+        return fetch(`/api/posts/${postId}/comments/${commentId}/replies`);
+    },
 };

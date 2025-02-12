@@ -81,13 +81,15 @@ class PostComment(db.Model):
     __tablename__ = 'PostComment'
     id = db.Column(db.Integer, primary_key=True)
     content = db.Column(db.Text, nullable=False)
+    parent_id = db.Column(db.Integer, nullable=True)
+    reply_count = db.Column(db.Integer, nullable=False)
     score = db.Column(db.Integer, nullable=False)
     created_on = db.Column(db.DateTime, server_default=utcnow())
-    # TODO: replies
     post_id = db.Column(db.String(Post.POST_ID_LENGTH), db.ForeignKey('Post.post_id'))
 
     def __init__(self, content):
         self.content = content
+        self.reply_count = 0
         self.score = 0
 
     def __repr__(self):

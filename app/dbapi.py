@@ -42,6 +42,7 @@ def create_post(title, media_list, is_public):
 def comment_on_post(post_id, content):
     comment = PostComment(content)
     comment.post_id = post_id
+    comment.parent_id = None
 
     db.session.add(comment)
     _increment_post_comment_count(post_id)
@@ -50,10 +51,35 @@ def comment_on_post(post_id, content):
     return {
         # TODO: return PK id or an uuid?
         'id': comment.id,
+        'parent_id': comment.parent_id,
+        'reply_count': comment.reply_count,
         'content': comment.content,
         'score': comment.score,
         'created_on': comment.created_on,
         'post_id': comment.post_id,
+    }
+
+
+def reply_to_comment(post_id, comment_id, content):
+    reply = PostComment(content)
+    reply.post_id = post_id
+    reply.parent_id = comment_id
+
+    db.session.add(reply)
+    _increment_post_comment_count(post_id)
+    _increment_comment_reply_count(post_id, comment_id)
+    db.session.commit()
+
+    return {
+        # TODO: return PK id or an uuid?
+        'id': reply.id,
+        'parent_id': reply.parent_id,
+        'reply_count': reply.reply_count,
+        'content': reply.content,
+        'score': reply.score,
+        'created_on': reply.created_on,
+        'post_id': reply.post_id,
+        'parent_id': reply.parent_id,
     }
 
 
@@ -127,9 +153,31 @@ def get_post_comments(post_id):
         db.select(
             PostComment.id,
             PostComment.content,
+            PostComment.parent_id,
+            PostComment.reply_count,
             PostComment.score,
             PostComment.created_on,
-        ).where(PostComment.post_id == post_id)
+        ).where(
+            PostComment.post_id == post_id,
+            PostComment.parent_id == None, # don't include replies
+        )
+    )
+    return _rows_to_dicts(result)
+
+
+def get_comment_replies(post_id, comment_id):
+    result = db.session.execute(
+        db.select(
+            PostComment.id,
+            PostComment.content,
+            PostComment.parent_id,
+            PostComment.reply_count,
+            PostComment.score,
+            PostComment.created_on,
+        ).where(
+            PostComment.post_id == post_id,
+            PostComment.parent_id == comment_id,
+        ).order_by(PostComment.created_on.asc())
     )
     return _rows_to_dicts(result)
 
@@ -148,6 +196,18 @@ def _increment_post_comment_count(post_id):
         db.update(Post)
             .where(Post.post_id == post_id)
             .values(comment_count=Post.comment_count + 1)
+    )
+
+
+def _increment_comment_reply_count(post_id, comment_id):
+    db.session.execute(
+        db.update(PostComment)
+            .where(
+                PostComment.id == comment_id,
+                PostComment.post_id == post_id,
+            ).values(
+                reply_count=PostComment.reply_count + 1
+            )
     )
 
 

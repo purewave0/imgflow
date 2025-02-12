@@ -79,12 +79,25 @@
     font-size: 18pt;
 }
 
-#comment-box {
+.comment-form {
     display: flex;
     flex-direction: column;
+    row-gap: 16px;
 }
 
-#comment-input {
+#reply-form {
+    margin-top: 16px;
+    margin-left: 48px;
+}
+
+#reply-footer {
+    display: flex;
+    flex-direction: row;
+    column-gap: 16px;
+    justify-content: end;
+}
+
+.comment-input {
     font-family: inherit;
     font-size: 12pt;
     resize: none;
@@ -93,16 +106,28 @@
     border-radius: 4px;
 }
 
-#send-comment {
+.submit-comment {
     cursor: pointer;
     align-self: end;
-    margin-top: 16px;
     color: white;
     font-weight: bold;
     border: none;
     font-size: 12pt;
     border-radius: 4px;
     background-color: coral;
+    padding: 8px 16px;
+    width: fit-content;
+}
+
+.cancel-comment {
+    cursor: pointer;
+    align-self: end;
+    color: white;
+    font-weight: bold;
+    border: none;
+    font-size: 12pt;
+    border-radius: 4px;
+    background-color: gray;
     padding: 8px 16px;
     width: fit-content;
 }
@@ -222,10 +247,27 @@
      cursor: pointer;
 }
 
+.show-replies {
+    user-select: none;
+    cursor: pointer;
+    margin-top: 16px;
+    margin-left: 48px;
+    color: #777;
+}
+
 .comment-replies {
     margin-top: 16px;
     margin-left: 48px;
     display: flex;
     flex-direction: column;
     row-gap: 16px;
+}
+
+.comment-wrapper:not(.showing-replies) > .comment-replies,
+.comment-wrapper:not(.showing-replies) > .comment > .show-replies > .verb-hide {
+    display: none;
+}
+
+.comment-wrapper.showing-replies > .comment > .show-replies > .verb-show {
+    display: none;
 }
