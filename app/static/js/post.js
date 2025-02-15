@@ -7,7 +7,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     postCreationDate.textContent = postCreatedOn.toRelative();
     postCreationDate.title = postCreatedOn
-        .toLocaleString(DateTime.DATE_MED_WITH_WEEKDAY)
+        .toLocaleString(DateTime.DATETIME_MED_WITH_WEEKDAY)
 
     const postScore = document.getElementById('post-score');
 
@@ -106,7 +106,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const datetime = DateTime.fromISO(isoDatetime);
         datetimeElement.textContent = datetime.toRelative();
         datetimeElement.title = datetime
-            .toLocaleString(DateTime.DATE_MED_WITH_WEEKDAY);
+            .toLocaleString(DateTime.DATETIME_MED_WITH_WEEKDAY);
 
         const contentElement = commentWrapper.querySelector('.comment-content');
         // TODO: markdown interpreting
@@ -205,7 +205,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     replyWrapper.querySelector('.comment-datetime');
                 datetimeElement.textContent = datetime.toRelative();
                 datetimeElement.title = datetime
-                    .toLocaleString(DateTime.DATE_MED_WITH_WEEKDAY);
+                    .toLocaleString(DateTime.DATETIME_MED_WITH_WEEKDAY);
             }
 
 
