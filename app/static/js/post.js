@@ -384,6 +384,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 commentsCountValue.textContent =
                     Number(commentsCountValue.textContent) + 1;
             });
+        commentForm.reset();
     });
 
     loadComments(preferredSorting);
