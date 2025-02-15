@@ -148,9 +148,14 @@ def get_post_and_media(post_id):
     return result
 
 
-def get_post_comments(post_id):
-    result = db.session.execute(
-        db.select(
+class Sorting(Enum):
+    NEWEST = 'newest'
+    MOST_LIKED = 'most-liked'
+    OLDEST = 'oldest'
+
+
+def get_post_comments(post_id, sorting):
+    statement = db.select(
             PostComment.id,
             PostComment.content,
             PostComment.parent_id,
@@ -161,13 +166,26 @@ def get_post_comments(post_id):
             PostComment.post_id == post_id,
             PostComment.parent_id == None, # don't include replies
         )
-    )
+
+    match sorting:
+        case Sorting.NEWEST:
+            statement = statement.order_by(PostComment.created_on.desc())
+        case Sorting.MOST_LIKED:
+            statement = statement.order_by(
+                PostComment.score.desc(),
+                PostComment.created_on.desc(),
+            )
+        case Sorting.OLDEST:
+            statement = statement.order_by(
+                PostComment.created_on.asc(),
+            )
+
+    result = db.session.execute(statement)
     return _rows_to_dicts(result)
 
 
-def get_comment_replies(post_id, comment_id):
-    result = db.session.execute(
-        db.select(
+def get_comment_replies(post_id, comment_id, sorting):
+    statement = db.select(
             PostComment.id,
             PostComment.content,
             PostComment.parent_id,
@@ -177,8 +195,22 @@ def get_comment_replies(post_id, comment_id):
         ).where(
             PostComment.post_id == post_id,
             PostComment.parent_id == comment_id,
-        ).order_by(PostComment.created_on.asc())
-    )
+        )
+
+    match sorting:
+        case Sorting.NEWEST:
+            statement = statement.order_by(PostComment.created_on.desc())
+        case Sorting.MOST_LIKED:
+            statement = statement.order_by(
+                PostComment.score.desc(),
+                PostComment.created_on.desc(),
+            )
+        case Sorting.OLDEST:
+            statement = statement.order_by(
+                PostComment.created_on.asc(),
+            )
+
+    result = db.session.execute(statement)
     return _rows_to_dicts(result)
 
 

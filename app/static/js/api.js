@@ -1,4 +1,16 @@
 const Api = {
+    Preferences: {
+        _SORT_KEY: 'sort',
+
+        getSort() {
+            return localStorage.getItem(this._SORT_KEY);
+        },
+
+        setSort(sort) {
+            return localStorage.setItem(this._SORT_KEY, sort);
+        },
+    },
+
     fetchPublicPosts() {
         return fetch('/api/posts');
     },
@@ -7,8 +19,8 @@ const Api = {
         return fetch(`/api/posts/${postId}`);
     },
 
-    fetchPostComments(postId) {
-        return fetch(`/api/posts/${postId}/comments`);
+    fetchPostComments(postId, sorting) {
+        return fetch(`/api/posts/${postId}/comments?sort=${sorting}`);
     },
 
     createPost(title, files, isPublic) {
@@ -99,7 +111,7 @@ const Api = {
         });
     },
 
-    fetchCommentReplies(postId, commentId) {
-        return fetch(`/api/posts/${postId}/comments/${commentId}/replies`);
+    fetchCommentReplies(postId, commentId, sorting) {
+        return fetch(`/api/posts/${postId}/comments/${commentId}/replies?sort=${sorting}`);
     },
 };

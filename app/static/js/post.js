@@ -25,9 +25,20 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // Sorting
+    let preferredSorting = Api.Preferences.getSort();
+    if (preferredSorting === null) {
+        preferredSorting = 'newest';
+        Api.Preferences.setSort(preferredSorting);
+    }
+
+    let currentlySelectedSort = null;
     const sortingOptions = document.getElementById('comments-sorting').children;
-    let currentlySelectedSort = document.getElementById('sort-newest');
     for (const option of sortingOptions) {
+        if (option.dataset.sort === preferredSorting) {
+            option.classList.add('selected');
+            currentlySelectedSort = option;
+        }
+
         option.addEventListener('click', () => {
             if (option.classList.contains('selected')) {
                 return;
@@ -36,18 +47,9 @@ document.addEventListener('DOMContentLoaded', () => {
             currentlySelectedSort.classList.remove('selected');
             option.classList.add('selected');
             currentlySelectedSort = option;
+            Api.Preferences.setSort(option.dataset.sort);
 
-            switch (option.id) {
-                case 'sort-newest':
-                    // TODO
-                    break;
-                case 'sort-most-liked':
-                    // TODO
-                    break;
-                case 'sort-oldest':
-                    // TODO
-                    break;
-            }
+            loadComments(option.dataset.sort)
         });
     }
 
@@ -184,7 +186,7 @@ document.addEventListener('DOMContentLoaded', () => {
             postId, commentId, commentRepliesElement, repliesCountElement
         ) {
             const response = await Api.fetchCommentReplies(
-                currentPost.post_id, commentId
+                currentPost.post_id, commentId, Api.Preferences.getSort()
             );
             const replies = await response.json();
 
@@ -223,7 +225,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     reply.reply_count,
                 );
 
-                commentRepliesElement.prepend(replyElement);
+                commentRepliesElement.append(replyElement);
             }
         }
 
@@ -320,7 +322,34 @@ document.addEventListener('DOMContentLoaded', () => {
 
         return commentWrapper;
     }
+
     const commentsDestination = document.getElementById('comments');
+
+    function loadComments(sorting) {
+        Api.fetchPostComments(
+            currentPost.post_id,
+            Api.Preferences.getSort()
+        ).then(async (response) => {
+            const comments = await response.json();
+            const fragment = new DocumentFragment();
+
+            for (const comment of comments) {
+                const commentElement = createComment(
+                    comment.id,
+                    '/static/img/cat.png',
+                    'Guest',
+                    comment.created_on,
+                    comment.content,
+                    comment.score,
+                    comment.reply_count,
+                );
+                fragment.append(commentElement);
+            }
+
+            commentsDestination.innerHTML = '';
+            commentsDestination.append(fragment);
+        });
+    }
 
     const sampleComment = createComment(
         123,
@@ -357,19 +386,5 @@ document.addEventListener('DOMContentLoaded', () => {
             });
     });
 
-    Api.fetchPostComments(currentPost.post_id).then(async (response) => {
-        const comments = await response.json();
-        for (const comment of comments) {
-            const commentElement = createComment(
-                comment.id,
-                '/static/img/cat.png',
-                'Guest',
-                comment.created_on,
-                comment.content,
-                comment.score,
-                comment.reply_count,
-            );
-            commentsDestination.prepend(commentElement);
-        }
-    });
+    loadComments(preferredSorting);
 });
