@@ -389,6 +389,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 commentsCountValue.textContent =
                     Number(commentsCountValue.textContent) + 1;
             });
+
+        if (document.body.classList.contains('no-comments')) {
+            document.body.classList.remove('no-comments');
+        }
         commentForm.reset();
     });
 
