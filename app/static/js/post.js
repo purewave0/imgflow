@@ -270,6 +270,14 @@ document.addEventListener('DOMContentLoaded', () => {
             `;
 
             const replyInput = replyForm.querySelector('#reply-input');
+            replyInput.addEventListener('input', () => {
+                if (!replyInput.value.trim()) {
+                    replyInput.setCustomValidity('Reply should not be empty.');
+                    replyInput.reportValidity();
+                } else {
+                    replyInput.setCustomValidity('');
+                }
+            });
             const replyCancel = replyForm.querySelector('#reply-cancel');
             replyCancel.addEventListener('click', () => {
                 replyForm.remove();
@@ -367,11 +375,23 @@ document.addEventListener('DOMContentLoaded', () => {
     );
     commentsDestination.append(sampleComment);
 
+
     const commentForm = document.getElementById('comment-form');
     const commentInput = document.getElementById('comment-input');
     const commentsCountValue = document.getElementById('comments-count-value');
+
+    commentInput.addEventListener('input', () => {
+        if (!commentInput.value.trim()) {
+            commentInput.setCustomValidity('Comment should not be empty.');
+            commentInput.reportValidity();
+        } else {
+            commentInput.setCustomValidity('');
+        }
+    });
+
     commentForm.addEventListener('submit', (event) => {
         event.preventDefault();
+
         Api.commentOnPost(currentPost.post_id, commentInput.value.trim())
             .then((response) => response.json())
             .then((new_comment) => {
