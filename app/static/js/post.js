@@ -53,6 +53,11 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    if (currentPost.comment_count === 0) {
+        document.body.classList.add('no-comments');
+    }
+
+
     // Comments
     let replyForm = null;
     function createComment(

@@ -10,6 +10,7 @@
     <script>
         const currentPost = {
             'post_id': {{ post_id|tojson }},
+            'comment_count': {{ post_comment_count|tojson }},
         };
     </script>
     <script src="/static/js/post.js"></script>
@@ -71,7 +72,14 @@
             </div>
         </div>
 
-        <div id="comments"></div>
+        <div id="comments-wrapper">
+            <div id="comments"></div>
+            <div id="empty-comments">
+                <img id="empty-comments-icon" src="/static/icons/empty-comments.svg">
+                <h3>No comments yet</h3>
+                <p>Get the conversation started!</p>
+            </div>
+        </div>
     </section>
 
 {% endblock %}

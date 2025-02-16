@@ -271,3 +271,30 @@
 .comment-wrapper.showing-replies > .comment > .show-replies > .verb-show {
     display: none;
 }
+
+#comments-wrapper {
+    position: relative;
+    min-height: 250px;
+}
+
+#empty-comments {
+    text-align: center;
+    position: absolute;
+    top: 64px;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    height: fit-content;
+}
+
+#empty-comments h3 {
+    margin-top: 8px;
+}
+
+body.no-comments #comments-sorting {
+    display: none;
+}
+
+body:not(.no-comments) #empty-comments {
+    display: none;
+}
