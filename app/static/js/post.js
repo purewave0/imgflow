@@ -58,6 +58,12 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
 
+    const markdownRenderer = new marked.Renderer();
+    // don't interpret images
+    markdownRenderer.image = function (text) {
+        return text.raw;
+    };
+
     // Comments
     let replyForm = null;
     function createComment(
@@ -114,10 +120,17 @@ document.addEventListener('DOMContentLoaded', () => {
             .toLocaleString(DateTime.DATETIME_MED_WITH_WEEKDAY);
 
         const contentElement = commentWrapper.querySelector('.comment-content');
-        // TODO: markdown interpreting
-        const contentParagraph = document.createElement('p');
-        contentParagraph.textContent = content;
-        contentElement.append(contentParagraph);
+        contentElement.innerHTML = DOMPurify.sanitize(
+            marked.parse(
+                // remove the most common zerowidth characters from the beginning
+                content.replace(/^[\u200B\u200C\u200D\u200E\u200F\uFEFF]/,""),
+                { renderer: markdownRenderer }
+            )
+        );
+
+        //const contentParagraph = document.createElement('p');
+        //contentParagraph.textContent = content;
+        //contentElement.append(contentParagraph);
 
         const scoreElement = commentWrapper.querySelector('.comment-score');
         scoreElement.textContent = score;
