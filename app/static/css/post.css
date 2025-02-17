@@ -212,6 +212,10 @@
     color: gray;
 }
 
+.comment-content {
+    overflow-wrap: break-word;
+}
+
 .comment-footer {
     display: flex;
     flex-direction: row;
