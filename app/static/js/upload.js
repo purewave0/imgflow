@@ -71,8 +71,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
     mediaInput.addEventListener('change', (event) => {
-        // TODO: support multiple files
-        addMediaToPost(event.target.files[0]);
+        for (const file of event.target.files) {
+            addMediaToPost(file);
+        }
     });
 
     uploadForm.addEventListener('submit', async (event) => {
@@ -129,7 +130,8 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     mediaContainer.addEventListener('drop', (event) => {
-        // TODO: support multiple files
-        addMediaToPost(event.dataTransfer.files[0]);
+        for (const file of event.dataTransfer.files) {
+            addMediaToPost(file);
+        }
     });
 });
