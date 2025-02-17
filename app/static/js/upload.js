@@ -71,6 +71,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
     mediaInput.addEventListener('change', (event) => {
+        // TODO: support multiple files
         addMediaToPost(event.target.files[0]);
     });
 
@@ -95,5 +96,40 @@ document.addEventListener('DOMContentLoaded', () => {
         const newPost = await result.json();
         // TODO: notification 'post created successfully'
         document.location.href = `/posts/${newPost.post_id}`;
+    });
+
+    const dragDropEvents = [
+        'drag',
+        'dragstart',
+        'dragend',
+        'dragover',
+        'dragenter',
+        'dragleave',
+        'drop',
+    ];
+    const mediaContainer = document.getElementById('media-container');
+    for (const eventName of dragDropEvents) {
+        mediaContainer.addEventListener(eventName, (event) => {
+            // prevent unwanted behaviors
+            event.preventDefault();
+            event.stopPropagation();
+        });
+    }
+
+    for (const eventName of ['dragover', 'dragenter']) {
+        mediaContainer.addEventListener(eventName, () => {
+            mediaUploadBox.classList.add('dragging-over');
+        });
+    }
+
+    for (const eventName of ['dragleave', 'dragend', 'drop']) {
+        mediaContainer.addEventListener(eventName, () => {
+            mediaUploadBox.classList.remove('dragging-over');
+        });
+    }
+
+    mediaContainer.addEventListener('drop', (event) => {
+        // TODO: support multiple files
+        addMediaToPost(event.dataTransfer.files[0]);
     });
 });

@@ -81,6 +81,11 @@ body {
     border-radius: 4px;
     border: 2px #bbb dashed;
     cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+#media-upload-box.dragging-over {
+    background-color: #c5e2fc;
 }
 
 body.has-uploaded #media-upload-box {
