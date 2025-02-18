@@ -31,6 +31,12 @@
 
 .post h3 {
     margin: 0 0 12px 0;
+    /* show at most 2 lines of title */
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+            line-clamp: 2;
+    -webkit-box-orient: vertical;
 }
 
 .post-stats {
