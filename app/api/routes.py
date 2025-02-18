@@ -17,7 +17,9 @@ from app.models.post import Post
 MEDIA_UPLOAD_FOLDER = '/home/will/proj/imgflow/app/static/uploads'
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'webp'}
 
+MAX_TITLE_LENGTH = 128
 MAX_COMMENT_LENGTH = 2_000
+
 
 def is_file_allowed(filename):
     # TODO: stricter file checking
@@ -30,7 +32,6 @@ def randomize_filename(filename):
     return uuid.uuid4().hex + extension
 
 
-
 @bp.route('/posts', methods=['GET', 'POST'])
 def api_posts():
     if request.method == 'GET':
@@ -38,6 +39,9 @@ def api_posts():
         return jsonify(posts)
 
     title = request.form.get('title')
+    if len(title) > MAX_TITLE_LENGTH:
+        return jsonify({'error': 'wrong_title_length'}), 400
+
     is_public = request.form.get('is_public') == 'true'
     uploaded_files = request.files.getlist("media_file")
     descriptions = request.form.getlist("description")

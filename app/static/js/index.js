@@ -13,6 +13,7 @@ function createPostCard(
 
     const titleElement = document.createElement('h3');
     titleElement.textContent = title;
+    titleElement.title = title;
 
     const postStats = document.createElement('div');
     postStats.className = 'post-stats';
