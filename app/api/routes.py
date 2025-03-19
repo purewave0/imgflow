@@ -13,8 +13,7 @@ from app.dbapi import (
 from app.models.post import Post
 
 
-# TODO: not explicitly write the full path
-MEDIA_UPLOAD_FOLDER = '/home/will/proj/imgflow/app/static/uploads'
+MEDIA_UPLOAD_FOLDER = 'app/static/uploads'
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'webp'}
 
 MAX_TITLE_LENGTH = 128
