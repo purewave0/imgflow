@@ -51,6 +51,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const previewDescription = document.createElement('textarea');
         previewDescription.className = 'preview-description';
         previewDescription.placeholder = 'Add a description';
+        previewDescription.maxLength = 2_000;
 
         preview.append(deletePreviewButton, previewContent, previewDescription);
         previewsDestination.append(preview);

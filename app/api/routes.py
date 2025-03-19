@@ -18,6 +18,7 @@ ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'webp'}
 
 MAX_TITLE_LENGTH = 128
 MAX_COMMENT_LENGTH = 2_000
+MAX_DESCRIPTION_LENGTH = 2_000
 
 
 def is_file_allowed(filename):
@@ -47,15 +48,19 @@ def api_posts():
 
     post_media_list = []
     for file, description in zip(uploaded_files, descriptions):
+        clean_description = description.strip() or None
+        if (
+            clean_description and len(clean_description) > MAX_DESCRIPTION_LENGTH
+        ):
+            return jsonify({'error': 'wrong_description_length'}), 400
+
         if is_file_allowed(file.filename):
             filename = secure_filename(randomize_filename(file.filename))
             media_destination = os.path.join(MEDIA_UPLOAD_FOLDER, filename)
             file.save(media_destination)
-            clean_description = description.strip()
             post_media_list.append({
                 'media_url': os.path.join('/static/uploads', filename),
-                'description':
-                    clean_description if clean_description else None,
+                'description': clean_description,
             })
         else:
             return jsonify({'error': 'wrong_filetype'}), 400
