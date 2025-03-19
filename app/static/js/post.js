@@ -64,6 +64,22 @@ document.addEventListener('DOMContentLoaded', () => {
         return text.raw;
     };
 
+    function parsePurifyMarkdown(content) {
+        return DOMPurify.sanitize(
+            marked.parse(
+                // remove the most common zerowidth characters from the beginning
+                content.replace(/^[\u200B\u200C\u200D\u200E\u200F\uFEFF]/,''),
+                { renderer: markdownRenderer }
+            )
+        );
+    }
+
+    // Media items descriptions
+    const descriptions = document.querySelectorAll('figcaption')
+    for (const description of descriptions) {
+        description.innerHTML = parsePurifyMarkdown(description.innerHTML);
+    }
+
     // Comments
     let replyForm = null;
     function createComment(
@@ -120,13 +136,7 @@ document.addEventListener('DOMContentLoaded', () => {
             .toLocaleString(DateTime.DATETIME_MED_WITH_WEEKDAY);
 
         const contentElement = commentWrapper.querySelector('.comment-content');
-        contentElement.innerHTML = DOMPurify.sanitize(
-            marked.parse(
-                // remove the most common zerowidth characters from the beginning
-                content.replace(/^[\u200B\u200C\u200D\u200E\u200F\uFEFF]/,""),
-                { renderer: markdownRenderer }
-            )
-        );
+        contentElement.innerHTML = parsePurifyMarkdown(content)
 
         //const contentParagraph = document.createElement('p');
         //contentParagraph.textContent = content;
