@@ -3,6 +3,7 @@ import uuid
 
 from flask import jsonify, request
 from werkzeug.utils import secure_filename
+from PIL import Image
 
 from app.api import bp
 from app.dbapi import (
@@ -13,8 +14,11 @@ from app.dbapi import (
 from app.models.post import Post
 
 
-MEDIA_UPLOAD_FOLDER = 'app/static/uploads'
+UPLOADS_MEDIA_PATH      = 'app/static/uploads/media'
+UPLOADS_THUMBNAILS_PATH = 'app/static/uploads/thumbnails'
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'webp'}
+
+MAX_THUMBNAIL_SIZE = (256, 256)
 
 MAX_TITLE_LENGTH = 128
 MAX_COMMENT_LENGTH = 2_000
@@ -30,6 +34,12 @@ def is_file_allowed(filename):
 def randomize_filename(filename):
     _, extension = os.path.splitext(filename)
     return uuid.uuid4().hex + extension
+
+
+def thumbnail_from_file(file):
+    image = Image.open(file)
+    image.thumbnail(MAX_THUMBNAIL_SIZE)
+    return image
 
 
 @bp.route('/posts', methods=['GET', 'POST'])
@@ -56,10 +66,17 @@ def api_posts():
 
         if is_file_allowed(file.filename):
             filename = secure_filename(randomize_filename(file.filename))
-            media_destination = os.path.join(MEDIA_UPLOAD_FOLDER, filename)
+
+            media_destination = os.path.join(UPLOADS_MEDIA_PATH, filename)
             file.save(media_destination)
+
+            thumbnail_destination = os.path.join(UPLOADS_THUMBNAILS_PATH, filename)
+            thumbnail = thumbnail_from_file(file)
+            thumbnail.save(thumbnail_destination)
+
             post_media_list.append({
-                'media_url': os.path.join('/static/uploads', filename),
+                'media_url': os.path.join('/static/uploads/media', filename),
+                'thumbnail_url': os.path.join('/static/uploads/thumbnails', filename),
                 'description': clean_description,
             })
         else:

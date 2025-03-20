@@ -3,4 +3,6 @@ mariadb
 SQLAlchemy
 Flask-SQLAlchemy
 
+Pillow
+
 python-dotenv

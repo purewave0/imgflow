@@ -22,8 +22,7 @@ def create_post(title, media_list, is_public):
 
 
     # TODO: check if failed because of post_id collision
-    # TODO: generate proper thumbnail
-    post = Post(title, media, media[0].media_url, is_public)
+    post = Post(title, media, media_list[0]['thumbnail_url'], is_public)
     db.session.add(post)
     db.session.commit()
     return {
