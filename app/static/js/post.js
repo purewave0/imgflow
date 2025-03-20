@@ -278,8 +278,7 @@ document.addEventListener('DOMContentLoaded', () => {
             replyForm.className = 'comment-form';
             replyForm.dataset.replyingTo = commentId;
             replyForm.innerHTML = `
-                <textarea id="reply-input" class="comment-input" rows="6" maxlength="2000" placeholder="Text a reply…">
-                </textarea>
+                <textarea id="reply-input" class="comment-input" rows="6" maxlength="2000" placeholder="Text a reply…"></textarea>
 
                 <div id="reply-footer">
                     <button id="reply-cancel" class="cancel-comment" type="button">
