@@ -291,9 +291,17 @@
     bottom: 0;
     left: 0;
     height: fit-content;
+    color: var(--color-text-secondary);
+}
+
+#empty-comments svg {
+    fill: var(--color-text-secondary);
+    height: 72px;
+    width: 72px;
 }
 
 #empty-comments h3 {
+    font-size: 16pt;
     margin-top: 8px;
 }
 
