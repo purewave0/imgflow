@@ -67,13 +67,7 @@
     margin: 0 auto;
 }
 
-#gallery {
-    columns: 5 200px;
-    gap: 16px;
-}
-
 .post {
-    width: 300px;
     overflow: hidden;
     background-color: var(--color-foreground);
     display: inline-flex;

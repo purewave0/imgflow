@@ -49,10 +49,28 @@ function createPostCard(
 
 
 document.addEventListener('DOMContentLoaded', () => {
-    const gallery = document.getElementById('gallery');
+    const galleryElement = document.getElementById('gallery');
+
+    const gallery = new Macy({
+        container: '#gallery',
+        columns: 5,
+        trueOrder: true,
+        margin: { x: 16, y: 16, },
+    });
+
+    function runOnceAllImagesLoad(images, func) {
+        Promise.all(
+            images
+                .filter(img => !img.complete)
+                .map(
+                    img => new Promise(resolve => { img.onload = img.onerror = resolve; })
+                )
+        ).then(func);
+    }
 
     function addPostsToGallery(posts) {
         const fragment = new DocumentFragment();
+        const images = [];
         for (const post of posts) {
             postCard = createPostCard(
                 post.post_id,
@@ -62,10 +80,18 @@ document.addEventListener('DOMContentLoaded', () => {
                 post.comment_count,
                 post.views
             );
+
+            const image = postCard.firstElementChild;
+            images.push(image)
+
             fragment.append(postCard);
         }
 
-        gallery.append(fragment);
+        galleryElement.append(fragment);
+
+        runOnceAllImagesLoad(images, () => {
+            gallery.recalculate(true, true);
+        });
     }
 
     const POSTS_PER_PAGE = 20;
@@ -82,14 +108,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (hasReachedBottom && !isFetching) {
             isFetching = true;
-            const nextPage = Number(gallery.dataset.currentPage) + 1;
+            const nextPage = Number(galleryElement.dataset.currentPage) + 1;
             fetchAndAddPosts(nextPage);
         }
     }
 
     function fetchAndAddPosts(page) {
         Api.fetchPublicPostsByPage(page).then(async (response) => {
-            gallery.dataset.currentPage = page;
+            galleryElement.dataset.currentPage = page;
             // TODO: loading
             const posts = await response.json();
             addPostsToGallery(posts);
