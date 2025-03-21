@@ -11,8 +11,8 @@ const Api = {
         },
     },
 
-    fetchPublicPosts() {
-        return fetch('/api/posts');
+    fetchPublicPostsByPage(page) {
+        return fetch(`/api/posts?page=${page}`);
     },
 
     fetchPost(postId) {

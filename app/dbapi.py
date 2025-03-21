@@ -4,6 +4,8 @@ from app.extensions import db
 from app.models.post import Post, PostMedia, PostDescription, PostComment
 
 
+POSTS_PER_PAGE = 20
+
 def create_post(title, media_list, is_public):
     media = []
     for media_item in media_list:
@@ -19,7 +21,6 @@ def create_post(title, media_list, is_public):
                 description=description
             )
         )
-
 
     # TODO: check if failed because of post_id collision
     post = Post(title, media, media_list[0]['thumbnail_url'], is_public)
@@ -86,7 +87,7 @@ def _rows_to_dicts(rows):
     return tuple(row._asdict() for row in rows)
 
 
-def get_public_posts():
+def get_public_posts_by_page(page):
     result = db.session.execute(
         db.select(
             Post.post_id,
@@ -99,6 +100,10 @@ def get_public_posts():
             Post.views,
         ).where(
             Post.is_public == True
+        ).limit(
+            POSTS_PER_PAGE
+        ).offset(
+            page*POSTS_PER_PAGE
         )
     )
     return _rows_to_dicts(result)

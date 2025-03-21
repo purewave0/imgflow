@@ -51,8 +51,8 @@ function createPostCard(
 document.addEventListener('DOMContentLoaded', () => {
     const gallery = document.getElementById('gallery');
 
-    Api.fetchPublicPosts().then(async (response) => {
-        const posts = await response.json();
+    function addPostsToGallery(posts) {
+        const fragment = new DocumentFragment();
         for (const post of posts) {
             postCard = createPostCard(
                 post.post_id,
@@ -62,7 +62,50 @@ document.addEventListener('DOMContentLoaded', () => {
                 post.comment_count,
                 post.views
             );
-            gallery.append(postCard);
+            fragment.append(postCard);
         }
-    });
+
+        gallery.append(fragment);
+    }
+
+    const POSTS_PER_PAGE = 20;
+    // amount of pixels from the bottom that, once reached, triggers a fetch
+    const SCROLL_FETCH_THRESHOLD = 400;
+
+    let isFetching = false;
+
+    function handleScroll() {
+        const hasReachedBottom = (
+            (window.innerHeight + window.scrollY)
+            >= (document.documentElement.scrollHeight - SCROLL_FETCH_THRESHOLD)
+        );
+
+        if (hasReachedBottom && !isFetching) {
+            isFetching = true;
+            const nextPage = Number(gallery.dataset.currentPage) + 1;
+            fetchAndAddPosts(nextPage);
+        }
+    }
+
+    function fetchAndAddPosts(page) {
+        Api.fetchPublicPostsByPage(page).then(async (response) => {
+            gallery.dataset.currentPage = page;
+            // TODO: loading
+            const posts = await response.json();
+            addPostsToGallery(posts);
+
+            const isFullPage = posts.length >= POSTS_PER_PAGE;
+            if (!isFullPage) {
+                // no more posts to fetch
+                window.removeEventListener(
+                    'scroll', handleScroll, { passive: true }
+                );
+            }
+            isFetching = false;
+        });
+    }
+
+    // TODO: skeleton loading
+    fetchAndAddPosts(0);
+    window.addEventListener('scroll', handleScroll, { passive: true });
 });

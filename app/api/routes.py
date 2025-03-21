@@ -8,7 +8,7 @@ from PIL import Image
 from app.api import bp
 from app.dbapi import (
     create_post, vote_post, comment_on_post, vote_comment, reply_to_comment,
-    get_comment_replies, get_public_posts, get_post_media, get_post_and_media,
+    get_comment_replies, get_public_posts_by_page, get_post_media, get_post_and_media,
     get_post_comments, Vote, Sorting
 )
 from app.models.post import Post
@@ -45,7 +45,13 @@ def thumbnail_from_file(file):
 @bp.route('/posts', methods=['GET', 'POST'])
 def api_posts():
     if request.method == 'GET':
-        posts = get_public_posts()
+        page = request.args.get('page') or 0
+        try:
+            page = int(page)
+        except ValueError:
+            return jsonify({'error': 'invalid_page'}), 400
+
+        posts = get_public_posts_by_page(page)
         return jsonify(posts)
 
     title = request.form.get('title')
