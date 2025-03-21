@@ -119,3 +119,25 @@
     margin-right: 4px;
     fill: var(--color-text-secondary);
 }
+
+#gallery-end {
+    display: flex;
+    flex-direction: column;
+    color: var(--color-text-secondary);
+    align-items: center;
+    margin: 64px 0;
+    user-select: none;
+}
+
+#gallery-end h3 {
+    font-size: 16pt;
+    margin: 0;
+}
+
+#gallery-end p {
+    margin-top: 16px;
+}
+
+#gallery[data-current-page="0"] ~ #gallery-end {
+    display: none;
+}
