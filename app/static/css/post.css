@@ -20,11 +20,11 @@
 #post-actions svg {
     width: 48px;
     height: 48px;
+    fill: var(--color-text-secondary);
 }
 
 #post-section {
     flex: 1;
-    background-color: lightblue;
 }
 
 #post-title {
@@ -71,7 +71,6 @@
     flex-direction: column;
     max-width: 800px;
     margin: 36px auto 0 auto;
-    background-color: lightyellow;
     margin-bottom: 200px;
 }
 
@@ -98,15 +97,18 @@
 }
 
 .comment-input {
+    color: var(--color-text-primary);
     font-family: inherit;
     font-size: 12pt;
     resize: none;
     padding: 16px;
-    border: 1px solid gray;
+    border: 1px solid var(--color-background-border);
     border-radius: 4px;
+    outline: none;
 }
 
 .submit-comment {
+    background-color: var(--color-secondary);
     cursor: pointer;
     align-self: end;
     color: white;
@@ -114,7 +116,6 @@
     border: none;
     font-size: 12pt;
     border-radius: 4px;
-    background-color: coral;
     padding: 8px 16px;
     width: fit-content;
 }
@@ -135,7 +136,7 @@
 #comments-header {
     margin-top: 64px;
     padding-bottom: 8px;
-    border-bottom: 2px solid lightgray;
+    border-bottom: 2px solid var(--color-background-border);
     font-size: 14pt;
     display: flex;
     flex-direction: row;
@@ -151,7 +152,7 @@
 
 #comments-count svg {
     margin-right: 8px;
-    fill: black;
+    fill: var(--color-text-secondary);
 }
 
 #comments-count-value {
@@ -171,7 +172,8 @@
 }
 
 #comments-sorting span.selected {
-    color: coral;
+    color: var(--color-secondary);
+    font-weight: bold;
 }
 
 #comments {
@@ -205,11 +207,11 @@
 
 .comment-info-separator {
     margin: 0 4px;
-    color: gray;
+    color: var(--color-text-secondary);
 }
 
 .comment-datetime {
-    color: gray;
+    color: var(--color-text-secondary);
 }
 
 .comment-content {
@@ -220,12 +222,12 @@
     display: flex;
     flex-direction: row;
     column-gap: 16px;
-    color: #777;
+    color: var(--color-text-secondary);
     font-weight: 500;
 }
 
 .comment-footer svg {
-    fill: #777;
+    fill: var(--color-text-secondary);
 }
 
 .comment-score {
@@ -256,7 +258,7 @@
     cursor: pointer;
     margin-top: 16px;
     margin-left: 48px;
-    color: #777;
+    color: var(--color-text-secondary);
 }
 
 .comment-replies {

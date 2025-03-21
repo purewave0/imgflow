@@ -52,6 +52,7 @@ document.addEventListener('DOMContentLoaded', () => {
         previewDescription.className = 'preview-description';
         previewDescription.placeholder = 'Add a description';
         previewDescription.maxLength = 2_000;
+        previewDescription.rows = 3;
 
         preview.append(deletePreviewButton, previewContent, previewDescription);
         previewsDestination.append(preview);

@@ -2,4 +2,115 @@ body {
     font-family: Fira Sans, sans-serif;
     margin: 0;
     padding: 0;
+
+    /* colors */
+    --color-background: #eaeef4;
+    --color-background-border: #c7cbd3;
+    --color-foreground: #ffffff;
+
+    --color-background-hover: #e1e2ff;
+
+    /* TODO: figure out actual color scheme */
+    --color-primary: #5a5ff2;
+    --color-secondary: #0db077;
+    --color-delete: #ec3751;
+
+    --color-text-primary: #301f55;
+    --color-text-secondary: #697599;
+
+    /* dimensions*/
+    --content-width: 1600px;
+    --content-width-narrow: 1200px;
+
+    background-color: var(--color-background);
+    color: var(--color-text-primary);
+}
+
+a {
+    text-decoration: none;
+}
+
+.page {
+    margin-bottom: 48px;
+}
+
+.button {
+    padding: 8px 24px;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    width: fit-content;
+}
+
+.icon-button {
+    padding: 8px 24px 8px 16px;
+    column-gap: 4px;
+}
+
+header {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    z-index: 99;
+    background-color: var(--color-foreground);
+    box-shadow:
+        rgba(0, 0, 0, 0.05) 0px 6px 24px 0px,
+        rgba(0, 0, 0, 0.06) 0px 0px 0px 1px;
+    position: sticky;
+    top: 0;
+}
+
+#header-content {
+    display: flex;
+    flex-direction: row;
+    width: var(--content-width);
+    justify-content: space-between;
+    padding: 12px 24px;
+}
+
+#header-logo img {
+    /* for the temporary logo only */
+    position: relative;
+    top: 3px;
+}
+
+#header-search {
+    width: 50%;
+    position: relative;
+}
+
+#header-search input {
+    background-color: var(--color-background);
+    border-radius: 64px;
+    box-sizing: border-box;
+    padding: 0 64px 0 24px;
+    font-size: 14pt;
+    outline: none;
+    width: 100%;
+    height: 100%;
+    border: none;
+}
+
+#header-search svg {
+    position: absolute;
+    top: 0;
+    right: 16px;
+    bottom: 0;
+    margin: auto;
+    width: 32px;
+    height: 32px;
+    fill: var(--color-text-secondary);
+}
+
+#header-upload {
+    background-color: var(--color-primary);
+    color: white;
+    font-size: 14pt;
+}
+
+.content {
+    margin-top: 32px;
 }
