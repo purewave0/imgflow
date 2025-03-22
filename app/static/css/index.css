@@ -100,10 +100,13 @@
     border-radius: 8px;
     color: initial;
     box-shadow: rgba(0, 0, 0, 0.16) 0px 1px 4px;
+    max-height: 512px;
 }
 
 .post img {
     width: 100%;
+    height: 100%;
+    object-fit: cover;
 }
 
 .post-info {
