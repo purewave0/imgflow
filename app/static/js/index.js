@@ -49,6 +49,8 @@ function createPostCard(
 
 
 document.addEventListener('DOMContentLoaded', () => {
+
+
     const galleryElement = document.getElementById('gallery');
 
     const gallery = new Macy({
@@ -109,12 +111,12 @@ document.addEventListener('DOMContentLoaded', () => {
         if (hasReachedBottom && !isFetching) {
             isFetching = true;
             const nextPage = Number(galleryElement.dataset.currentPage) + 1;
-            fetchAndAddPosts(nextPage);
+            fetchAndAddPosts(nextPage, Api.Preferences.getPostSorting());
         }
     }
 
-    function fetchAndAddPosts(page) {
-        Api.fetchPublicPostsByPage(page).then(async (response) => {
+    function fetchAndAddPosts(page, sorting) {
+        Api.fetchPublicPostsByPage(page, sorting).then(async (response) => {
             galleryElement.dataset.currentPage = page;
             // TODO: loading
             const posts = await response.json();
@@ -131,7 +133,41 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    // Sorting
+    let preferredSorting = Api.Preferences.getPostSorting();
+    if (preferredSorting === null) {
+        preferredSorting = 'newest';
+        Api.Preferences.setPostSorting(preferredSorting);
+    }
+
+    let currentlySelectedSorting = null;
+    const sortingOptions = document.getElementById('posts-sorting').children;
+    for (const option of sortingOptions) {
+        if (option.dataset.sort === preferredSorting) {
+            option.classList.add('selected');
+            currentlySelectedSorting = option;
+        }
+
+        option.addEventListener('click', () => {
+            if (option.classList.contains('selected')) {
+                return;
+            }
+
+            currentlySelectedSorting.classList.remove('selected');
+            option.classList.add('selected');
+            currentlySelectedSorting = option;
+            Api.Preferences.setPostSorting(option.dataset.sort);
+
+            // need to reload it all
+            window.removeEventListener('scroll', handleScroll, { passive: true });
+            galleryElement.innerHTML = '';
+            fetchAndAddPosts(0, Api.Preferences.getPostSorting())
+            // also re-add the scrolling
+            window.addEventListener('scroll', handleScroll, { passive: true });
+        });
+    }
+
     // TODO: skeleton loading
-    fetchAndAddPosts(0);
+    fetchAndAddPosts(0, preferredSorting);
     window.addEventListener('scroll', handleScroll, { passive: true });
 });

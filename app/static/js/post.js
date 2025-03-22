@@ -25,18 +25,18 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // Sorting
-    let preferredSorting = Api.Preferences.getSort();
+    let preferredSorting = Api.Preferences.getCommentSorting();
     if (preferredSorting === null) {
         preferredSorting = 'newest';
-        Api.Preferences.setSort(preferredSorting);
+        Api.Preferences.setCommentSorting(preferredSorting);
     }
 
-    let currentlySelectedSort = null;
+    let currentlySelectedSorting = null;
     const sortingOptions = document.getElementById('comments-sorting').children;
     for (const option of sortingOptions) {
         if (option.dataset.sort === preferredSorting) {
             option.classList.add('selected');
-            currentlySelectedSort = option;
+            currentlySelectedSorting = option;
         }
 
         option.addEventListener('click', () => {
@@ -44,10 +44,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 return;
             }
 
-            currentlySelectedSort.classList.remove('selected');
+            currentlySelectedSorting.classList.remove('selected');
             option.classList.add('selected');
-            currentlySelectedSort = option;
-            Api.Preferences.setSort(option.dataset.sort);
+            currentlySelectedSorting = option;
+            Api.Preferences.setCommentSorting(option.dataset.sort);
 
             loadComments(option.dataset.sort)
         });
@@ -214,7 +214,7 @@ document.addEventListener('DOMContentLoaded', () => {
             postId, commentId, commentRepliesElement, repliesCountElement
         ) {
             const response = await Api.fetchCommentReplies(
-                currentPost.post_id, commentId, Api.Preferences.getSort()
+                currentPost.post_id, commentId, Api.Preferences.getCommentSorting()
             );
             const replies = await response.json();
 
@@ -363,7 +363,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function loadComments(sorting) {
         Api.fetchPostComments(
             currentPost.post_id,
-            Api.Preferences.getSort()
+            Api.Preferences.getCommentSorting()
         ).then(async (response) => {
             const comments = await response.json();
             const fragment = new DocumentFragment();

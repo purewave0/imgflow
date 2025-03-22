@@ -87,9 +87,13 @@ def _rows_to_dicts(rows):
     return tuple(row._asdict() for row in rows)
 
 
-def get_public_posts_by_page(page):
-    result = db.session.execute(
-        db.select(
+class PostSorting(Enum):
+    NEWEST = 'newest'
+    TOP = 'top'
+
+
+def get_public_posts_by_page(page, sorting):
+    statement = db.select(
             Post.post_id,
             Post.title,
             Post.thumbnail_url,
@@ -100,12 +104,24 @@ def get_public_posts_by_page(page):
             Post.views,
         ).where(
             Post.is_public == True
-        ).limit(
+        )
+
+    match sorting:
+        case PostSorting.NEWEST:
+            statement = statement.order_by(Post.created_on.desc())
+        case PostSorting.TOP:
+            statement = statement.order_by(
+                Post.score.desc(),
+                Post.created_on.desc(),
+            )
+
+    statement = statement.limit(
             POSTS_PER_PAGE
         ).offset(
             page*POSTS_PER_PAGE
         )
-    )
+
+    result = db.session.execute(statement)
     return _rows_to_dicts(result)
 
 
@@ -152,7 +168,7 @@ def get_post_and_media(post_id):
     return result
 
 
-class Sorting(Enum):
+class CommentSorting(Enum):
     NEWEST = 'newest'
     MOST_LIKED = 'most-liked'
     OLDEST = 'oldest'
@@ -172,14 +188,14 @@ def get_post_comments(post_id, sorting):
         )
 
     match sorting:
-        case Sorting.NEWEST:
+        case CommentSorting.NEWEST:
             statement = statement.order_by(PostComment.created_on.desc())
-        case Sorting.MOST_LIKED:
+        case CommentSorting.MOST_LIKED:
             statement = statement.order_by(
                 PostComment.score.desc(),
                 PostComment.created_on.desc(),
             )
-        case Sorting.OLDEST:
+        case CommentSorting.OLDEST:
             statement = statement.order_by(
                 PostComment.created_on.asc(),
             )
@@ -202,14 +218,14 @@ def get_comment_replies(post_id, comment_id, sorting):
         )
 
     match sorting:
-        case Sorting.NEWEST:
+        case CommentSorting.NEWEST:
             statement = statement.order_by(PostComment.created_on.desc())
-        case Sorting.MOST_LIKED:
+        case CommentSorting.MOST_LIKED:
             statement = statement.order_by(
                 PostComment.score.desc(),
                 PostComment.created_on.desc(),
             )
-        case Sorting.OLDEST:
+        case CommentSorting.OLDEST:
             statement = statement.order_by(
                 PostComment.created_on.asc(),
             )

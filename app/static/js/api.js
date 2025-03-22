@@ -1,18 +1,28 @@
 const Api = {
     Preferences: {
-        _SORT_KEY: 'sort',
+        _COMMENT_SORTING_KEY: 'comment-sorting',
 
-        getSort() {
-            return localStorage.getItem(this._SORT_KEY);
+        getCommentSorting() {
+            return localStorage.getItem(this._COMMENT_SORTING_KEY);
         },
 
-        setSort(sort) {
-            return localStorage.setItem(this._SORT_KEY, sort);
+        setCommentSorting(sorting) {
+            return localStorage.setItem(this._COMMENT_SORTING_KEY, sorting);
+        },
+
+        _POST_SORTING_KEY: 'post-sorting',
+
+        getPostSorting() {
+            return localStorage.getItem(this._POST_SORTING_KEY);
+        },
+
+        setPostSorting(sorting) {
+            return localStorage.setItem(this._POST_SORTING_KEY, sorting);
         },
     },
 
-    fetchPublicPostsByPage(page) {
-        return fetch(`/api/posts?page=${page}`);
+    fetchPublicPostsByPage(page, sorting) {
+        return fetch(`/api/posts?page=${page}&sort=${sorting}`);
     },
 
     fetchPost(postId) {

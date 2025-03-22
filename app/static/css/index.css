@@ -61,10 +61,34 @@
     color: var(--color-secondary);
 }
 
+/* -- gallery -- */
 
 #gallery-section {
     max-width: var(--content-width);
     margin: 0 auto;
+}
+
+#gallery-header {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+}
+
+#posts-sorting {
+    display: flex;
+    flex-direction: row;
+    column-gap: 16px;
+}
+
+#posts-sorting span {
+    cursor: pointer;
+    user-select: none;
+}
+
+#posts-sorting span.selected {
+    color: var(--color-secondary);
+    font-weight: bold;
 }
 
 .post {
