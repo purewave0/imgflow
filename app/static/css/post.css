@@ -1,7 +1,7 @@
 #post-wrapper {
     display: flex;
     flex-direction: row;
-    max-width: 800px;
+    max-width: var(--content-width-narrow);
     margin: 0 auto;
     column-gap: 24px;
 }
@@ -69,7 +69,7 @@
 #comments-section {
     display: flex;
     flex-direction: column;
-    max-width: 800px;
+    max-width: var(--content-width-narrow);
     margin: 36px auto 0 auto;
     margin-bottom: 200px;
 }
