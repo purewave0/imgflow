@@ -9,7 +9,7 @@ from app.api import bp
 from app.dbapi import (
     create_post, vote_post, comment_on_post, vote_comment, reply_to_comment,
     get_comment_replies, get_public_posts_by_page, get_post_media, get_post_and_media,
-    get_post_comments, Vote, PostSorting, CommentSorting
+    get_post_comments_by_page, Vote, PostSorting, CommentSorting
 )
 from app.models.post import Post
 
@@ -135,12 +135,18 @@ def api_post_comments(post_id):
     # TODO: check if post id exists
 
     if request.method == 'GET':
+        page = request.args.get('page') or 0
+        try:
+            page = int(page)
+        except ValueError:
+            return jsonify({'error': 'invalid_page'}), 400
+
         try:
             sorting = CommentSorting(request.args.get('sort'))
         except ValueError:
             return jsonify({'error': 'invalid_sort'}), 400
 
-        comments = get_post_comments(post_id, sorting)
+        comments = get_post_comments_by_page(post_id, page, sorting)
         return jsonify(comments)
 
     try:

@@ -29,8 +29,8 @@ const Api = {
         return fetch(`/api/posts/${postId}`);
     },
 
-    fetchPostComments(postId, sorting) {
-        return fetch(`/api/posts/${postId}/comments?sort=${sorting}`);
+    fetchPostCommentsByPage(postId, page, sorting) {
+        return fetch(`/api/posts/${postId}/comments?page=${page}&sort=${sorting}`);
     },
 
     createPost(title, files, isPublic) {

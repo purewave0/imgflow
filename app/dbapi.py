@@ -5,6 +5,7 @@ from app.models.post import Post, PostMedia, PostDescription, PostComment
 
 
 POSTS_PER_PAGE = 20
+COMMENTS_PER_PAGE = 30
 
 def create_post(title, media_list, is_public):
     media = []
@@ -174,7 +175,7 @@ class CommentSorting(Enum):
     OLDEST = 'oldest'
 
 
-def get_post_comments(post_id, sorting):
+def get_post_comments_by_page(post_id, page, sorting):
     statement = db.select(
             PostComment.id,
             PostComment.content,
@@ -199,6 +200,12 @@ def get_post_comments(post_id, sorting):
             statement = statement.order_by(
                 PostComment.created_on.asc(),
             )
+
+    statement = statement.limit(
+            COMMENTS_PER_PAGE
+        ).offset(
+            page*COMMENTS_PER_PAGE
+        )
 
     result = db.session.execute(statement)
     return _rows_to_dicts(result)

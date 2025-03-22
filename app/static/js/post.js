@@ -49,7 +49,10 @@ document.addEventListener('DOMContentLoaded', () => {
             currentlySelectedSorting = option;
             Api.Preferences.setCommentSorting(option.dataset.sort);
 
-            loadComments(option.dataset.sort)
+            // need to reload it all
+            commentsDestination.innerHTML = '';
+            delete commentsDestination.dataset.allCommentsFetched;
+            fetchAndAddComments(0, option.dataset.sort)
         });
     }
 
@@ -360,43 +363,56 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const commentsDestination = document.getElementById('comments');
 
-    function loadComments(sorting) {
-        Api.fetchPostComments(
-            currentPost.post_id,
-            Api.Preferences.getCommentSorting()
-        ).then(async (response) => {
-            const comments = await response.json();
-            const fragment = new DocumentFragment();
+    function addComments(comments) {
+        const fragment = new DocumentFragment();
 
-            for (const comment of comments) {
-                const commentElement = createComment(
-                    comment.id,
-                    '/static/img/cat.png',
-                    'Guest',
-                    comment.created_on,
-                    comment.content,
-                    comment.score,
-                    comment.reply_count,
-                );
-                fragment.append(commentElement);
-            }
+        for (const comment of comments) {
+            const commentElement = createComment(
+                comment.id,
+                '/static/img/cat.png',
+                'Guest',
+                comment.created_on,
+                comment.content,
+                comment.score,
+                comment.reply_count,
+            );
+            fragment.append(commentElement);
+        }
 
-            commentsDestination.innerHTML = '';
-            commentsDestination.append(fragment);
-        });
+        commentsDestination.append(fragment);
     }
 
-    const sampleComment = createComment(
-        123,
-        '/static/img/cat.png',
-        'dynamic_comment',
-        '2024-10-11T08:16:00Z',
-        'Hello, this is a test.',
-        15,
-        0
-    );
-    commentsDestination.append(sampleComment);
 
+    const COMMENTS_PER_PAGE = 30;
+
+    function fetchNextPage() {
+        const nextPage = Number(commentsDestination.dataset.currentPage) + 1;
+        fetchAndAddComments(nextPage, Api.Preferences.getCommentSorting());
+    }
+
+    const viewMoreButton = document.getElementById('comments-view-more');
+    viewMoreButton.addEventListener('click', fetchNextPage);
+
+    function fetchAndAddComments(page, sorting) {
+        commentsDestination.classList.add('loading');
+        // TODO: actual loading indicators
+        Api.fetchPostCommentsByPage(
+            currentPost.post_id,
+            page,
+            Api.Preferences.getCommentSorting()
+        ).then(async (response) => {
+            commentsDestination.dataset.currentPage = page;
+            const comments = await response.json();
+            addComments(comments);
+
+            const isFullPage = comments.length >= COMMENTS_PER_PAGE;
+            if (!isFullPage) {
+                // no more comments to fetch
+                commentsDestination.dataset.allCommentsFetched = true;
+            }
+            commentsDestination.classList.remove('loading');
+        });
+    }
 
     const commentForm = document.getElementById('comment-form');
     const commentInput = document.getElementById('comment-input');
@@ -438,5 +454,5 @@ document.addEventListener('DOMContentLoaded', () => {
         commentForm.reset();
     });
 
-    loadComments(preferredSorting);
+    fetchAndAddComments(0, preferredSorting);
 });
