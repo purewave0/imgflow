@@ -20,4 +20,5 @@ def show_post(post_id):
         post_views=full_post['views'] + 1, # because it was just viewed
         post_created_on=full_post['created_on'].isoformat() + 'Z',
         media=full_post['media'],
+        flows=full_post['flows'],
     )

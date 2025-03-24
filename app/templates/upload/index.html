@@ -42,6 +42,16 @@
                     </label>
                 </div>
 
+                <div>
+                    <h3>Flows</h3>
+                    <label>
+                        Add up to 3 flows to categorize your post (optional)
+                        <!-- TODO: suggestions + preview + autocomplete of what is typed-->
+                        <input id="flows-input" type="text" name="flows" minlength="3" maxlength="50" pattern=".{2,}" title="At least 2 characters" placeholder="Add flows…">
+                    </label>
+                    <ul id="flows"></ul>
+                </div>
+
                 <button id="post-button" class="button" type="submit">
                     Post
                 </button>

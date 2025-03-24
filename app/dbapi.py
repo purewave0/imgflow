@@ -1,13 +1,13 @@
 from enum import Enum
 
 from app.extensions import db
-from app.models.post import Post, PostMedia, PostDescription, PostComment
+from app.models.post import Post, PostMedia, PostDescription, PostComment, Flow
 
 
 POSTS_PER_PAGE = 20
 COMMENTS_PER_PAGE = 30
 
-def create_post(title, media_list, is_public):
+def create_post(title, media_list, is_public, flow_names):
     media = []
     for media_item in media_list:
         description = None
@@ -23,10 +23,26 @@ def create_post(title, media_list, is_public):
             )
         )
 
+    flows = []
+    if is_public:
+        for flow_name in flow_names:
+            flow = _get_flow(flow_name)
+            if flow:
+                _increment_flow_post_count(flow.id)
+            else:
+                # new flow: let's create it
+                flow = Flow(name=flow_name)
+                flow.post_count += 1
+                db.session.add(flow)
+
+            flows.append(flow)
+
     # TODO: check if failed because of post_id collision
-    post = Post(title, media, media_list[0]['thumbnail_url'], is_public)
+    post = Post(title, media, media_list[0]['thumbnail_url'], is_public, flows)
+
     db.session.add(post)
     db.session.commit()
+
     return {
         'post_id':       post.post_id,
         'title':         post.title,
@@ -37,6 +53,7 @@ def create_post(title, media_list, is_public):
         'comment_count': post.comment_count,
         'views':         post.views,
         'is_public':     post.is_public,
+        'flows':         tuple(flow.name for flow in post.flows),
     }
 
 
@@ -155,6 +172,13 @@ def get_post_and_media(post_id):
         } for media_item in post.media
     )
 
+    flows = tuple(
+        {
+            'name': flow.name,
+            'post_count': flow.post_count
+        } for flow in post.flows
+    )
+
     result = {
         'post_id': post.post_id,
         'title': post.title,
@@ -165,6 +189,7 @@ def get_post_and_media(post_id):
         'comment_count': post.comment_count,
         'media': media,
         'thumbnail_url': post.thumbnail_url,
+        'flows': flows,
     }
     return result
 
@@ -303,3 +328,76 @@ def vote_comment(post_id, comment_id, vote):
             ).values(score=PostComment.score + vote.value)
     )
     db.session.commit()
+
+
+# -- flows --
+
+def _get_flow(name):
+    # this returns a Flow OBJECT; for use within this module
+    result = db.session.execute(
+        db.select(
+            Flow
+        ).where(
+            Flow.name == name
+        )
+    ).scalar()
+
+    return result
+
+
+def get_flow(name):
+    # this returns a dict with columns from the Flow
+    result = db.session.execute(
+        db.select(
+            Flow.name,
+            Flow.post_count,
+        ).where(
+            Flow.name == name
+        )
+    ).mappings().one_or_none()
+
+    if result is None:
+        return None
+
+    return dict(result)
+
+
+def _increment_flow_post_count(flow_id):
+    db.session.execute(
+        db.update(Flow)
+            .where(Flow.id == flow_id)
+            .values(post_count=Flow.post_count + 1)
+    )
+
+
+def get_public_posts_in_flow_by_page(flow_name, page):
+    statement = db.select(
+            Post.post_id,
+            Post.title,
+            Post.thumbnail_url,
+            Post.created_on,
+            Post.updated_on,
+            Post.score,
+            Post.comment_count,
+            Post.views,
+        ).where(
+            Post.is_public == True
+        )
+
+    match sorting:
+        case PostSorting.NEWEST:
+            statement = statement.order_by(Post.created_on.desc())
+        case PostSorting.TOP:
+            statement = statement.order_by(
+                Post.score.desc(),
+                Post.created_on.desc(),
+            )
+
+    statement = statement.limit(
+            POSTS_PER_PAGE
+        ).offset(
+            page*POSTS_PER_PAGE
+        )
+
+    result = db.session.execute(statement)
+    return _rows_to_dicts(result)

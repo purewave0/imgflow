@@ -78,29 +78,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    uploadForm.addEventListener('submit', async (event) => {
-        event.preventDefault();
-        if (getUploadedImagesAmount() === 0) {
-            alert('Please upload at least 1 image/video.');
-            return;
-        }
-
-        const title = titleInput.value.trim();
-        const isPublic = visibilityCheckbox.checked;
-        const files = [];
-        for (const mapping of filesMap) {
-            files.push({
-                'media_file': mapping.file,
-                'description': mapping.getDescription().trim()
-            });
-        }
-
-        const result = await Api.createPost(title, files, isPublic);
-        const newPost = await result.json();
-        // TODO: notification 'post created successfully'
-        document.location.href = `/posts/${newPost.post_id}`;
-    });
-
     const dragDropEvents = [
         'drag',
         'dragstart',
@@ -136,4 +113,138 @@ document.addEventListener('DOMContentLoaded', () => {
             addMediaToPost(file);
         }
     });
+
+    const flowsDestination = document.getElementById('flows');
+    function createFlow(flowName) {
+        const flow = document.createElement('li');
+        flow.className = 'flow';
+        flow.innerHTML = `
+            <span class="flow-name"></span>
+            <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#ffffff"><path d="m256-200-56-56 224-224-224-224 56-56 224 224 224-224 56 56-224 224 224 224-56 56-224-224-224 224Z"/></svg>
+        `;
+        const nameElement = flow.querySelector('.flow-name');
+        nameElement.textContent = flowName;
+
+        return flow;
+    }
+
+    function trimCharacter(string, character) {
+        let start = 0;
+        let end = string.length;
+
+        while(start < end && string[start] === character)
+            ++start;
+
+        while(end > start && string[end-1] === character)
+            --end;
+
+        return (
+            (start > 0 || end < string.length)
+                ? string.substring(start, end)
+                : string
+        );
+    }
+
+
+    const flowsInput = document.getElementById('flows-input');
+    flowsInput.addEventListener('input', (event) => {
+        flowsInput.value = flowsInput.value
+            .trimStart() // user is still typing, it may be a space before a word
+            .replaceAll(' ', '-') // preparing it for the next step
+            .replace(/-+/g, '-') // collapse hyphens into a single hyphen
+            .toLowerCase();
+    });
+
+    flowsInput.addEventListener('change', (event) => {
+        // user isn't typing anymore, so we can trim hyphens from the end now
+        flowsInput.value = trimCharacter(flowsInput.value, '-')
+    });
+
+    function alreadyAddedFlow(flowName) {
+        for (const flow of flowsDestination.children) {
+            const name = flow.firstElementChild.textContent;
+            if (name === flowName) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    let flowCount = 0;
+    const MAX_FLOWS = 3;
+
+    flowsInput.addEventListener('keydown', (event) => {
+        if (event.key === "Enter") {
+            // avoid submitting the whole form
+            event.stopPropagation();
+            event.preventDefault();
+
+            flowsInput.value = trimCharacter(flowsInput.value, '-')
+
+            const value = flowsInput.value;
+            if (!value) {
+                return;
+            }
+
+            flowsInput.setCustomValidity('');
+            if (!flowsInput.validity.valid) {
+                flowsInput.reportValidity();
+                return;
+            }
+
+            if (alreadyAddedFlow(value)) {
+                flowsInput.setCustomValidity("You've already added this flow.");
+                flowsInput.reportValidity();
+                return;
+            }
+
+            const flow = createFlow(value);
+            flowsDestination.append(flow);
+            ++flowCount;
+
+            if (flowCount >= MAX_FLOWS) {
+                flowsInput.disabled = true;
+            }
+
+            flow.addEventListener('click', () => {
+                flow.remove();
+                --flowCount;
+                flowsInput.disabled = false;
+            });
+
+            flowsInput.value = '';
+        }
+    });
+
+    uploadForm.addEventListener('submit', async (event) => {
+        event.preventDefault();
+        if (getUploadedImagesAmount() === 0) {
+            // TODO: proper notification
+            alert('Please upload at least 1 image/video.');
+            return;
+        }
+
+        const title = titleInput.value.trim();
+        const isPublic = visibilityCheckbox.checked;
+        const files = [];
+        for (const mapping of filesMap) {
+            files.push({
+                'media_file': mapping.file,
+                'description': mapping.getDescription().trim()
+            });
+        }
+
+        const flows = [];
+        for (const flow of flowsDestination.children) {
+            flows.push(flow.firstElementChild.textContent);
+        }
+
+        const result = await Api.createPost(title, files, isPublic, flows);
+        const newPost = await result.json();
+        // TODO: notification 'post created successfully'
+        document.location.href = `/posts/${newPost.post_id}`;
+    });
+
+
 });

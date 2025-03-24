@@ -9,9 +9,10 @@ from app.api import bp
 from app.dbapi import (
     create_post, vote_post, comment_on_post, vote_comment, reply_to_comment,
     get_comment_replies, get_public_posts_by_page, get_post_media, get_post_and_media,
-    get_post_comments_by_page, Vote, PostSorting, CommentSorting
+    get_post_comments_by_page, Vote, PostSorting, CommentSorting,
+    get_flow
 )
-from app.models.post import Post
+from app.models.post import Post, Flow
 
 
 UPLOADS_MEDIA_PATH      = 'app/static/uploads/media'
@@ -37,6 +38,7 @@ def randomize_filename(filename):
 
 
 def thumbnail_from_file(file):
+    # TODO: handle invalid image
     image = Image.open(file)
     image.thumbnail(MAX_THUMBNAIL_SIZE)
     return image
@@ -64,6 +66,22 @@ def api_posts():
         return jsonify({'error': 'wrong_title_length'}), 400
 
     is_public = request.form.get('is_public') == 'true'
+
+    flows = []
+    if is_public:
+        raw_flows = request.form.getlist("flow")
+        if len(raw_flows) > Post.MAX_FLOWS_PER_POST:
+            return jsonify({'error': 'too_many_flows'}), 400
+
+        for flow_name in raw_flows:
+            # TODO: regex validation of the name (no whitespace, only hyphens; ...)
+
+            if len(flow_name) > Flow.MAX_NAME_LENGTH:
+                return jsonify({'error': 'wrong_name_length'}), 400
+
+            flows.append(flow_name)
+
+
     uploaded_files = request.files.getlist("media_file")
     descriptions = request.form.getlist("description")
 
@@ -93,7 +111,7 @@ def api_posts():
         else:
             return jsonify({'error': 'wrong_filetype'}), 400
 
-    new_post = create_post(title, post_media_list, is_public)
+    new_post = create_post(title, post_media_list, is_public, flows)
     return jsonify(new_post)
 
 
@@ -212,3 +230,16 @@ def api_comment_replies(post_id, comment_id):
 
     reply = reply_to_comment(post_id, comment_id, content)
     return jsonify(reply), 201
+
+# -- flows --
+
+@bp.route('/flows/<flow_name>')
+def api_flow(flow_name):
+    if len(flow_name) > Flow.MAX_NAME_LENGTH:
+        return jsonify(None), 404
+
+    flow = get_flow(flow_name)
+    if not flow:
+        return jsonify(None), 404
+
+    return jsonify(flow)

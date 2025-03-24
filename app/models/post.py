@@ -28,6 +28,7 @@ def _random_post_id():
 class Post(db.Model):
     __tablename__ = 'Post'
     POST_ID_LENGTH = 8
+    MAX_FLOWS_PER_POST = 3
     id = db.Column(db.Integer, primary_key=True)
     post_id = db.Column(db.String(POST_ID_LENGTH), unique=True, nullable=False)
     title = db.Column(db.String(128), nullable=True)
@@ -40,8 +41,9 @@ class Post(db.Model):
     created_on = db.Column(db.DateTime, server_default=utcnow())
     updated_on = db.Column(db.DateTime, onupdate=utcnow())
     is_public = db.Column(db.Boolean, nullable=False, default=False)
+    flows = db.relationship('Flow', secondary='PostFlow', backref='posts')
 
-    def __init__(self, title, media, thumbnail_url, is_public):
+    def __init__(self, title, media, thumbnail_url, is_public, flows):
         self.post_id = _random_post_id()
         self.title = title
         self.media = media
@@ -51,6 +53,7 @@ class Post(db.Model):
         self.comment_count = 0
         self.views = 0
         self.is_public = is_public
+        self.flows = flows
 
     def __repr__(self):
         return f'<Post title:"{self.title}" id:{self.id} post_id:{self.post_id}>'
@@ -94,3 +97,21 @@ class PostComment(db.Model):
 
     def __repr__(self):
         return f'<Comment id:{self.id} post_id:{self.post_id} score:{self.score}'
+
+
+class Flow(db.Model):
+    __tablename__ = 'Flow'
+    MAX_NAME_LENGTH = 50
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(MAX_NAME_LENGTH), unique=True, nullable=False)
+    post_count = db.Column(db.Integer, nullable=False)
+
+    def __init__(self, name):
+        self.name = name
+        self.post_count = 0
+
+
+class PostFlow(db.Model):
+    __tablename__ = 'PostFlow'
+    post_id = db.Column(db.Integer, db.ForeignKey('Post.id'), primary_key=True)
+    flow_id = db.Column(db.Integer, db.ForeignKey('Flow.id'), primary_key=True)

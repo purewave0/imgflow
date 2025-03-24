@@ -50,6 +50,16 @@
                 </figure>
             {% endfor %}
             </div>
+
+            <ul id="flows">
+                {% for flow in flows %}
+                <li class="flow">
+                    <a href="/flows/{{flow.name}}">
+                        {{flow.name}}
+                    </a>
+                </li>
+                {% endfor %}
+            </ul>
         </section>
     </div>
 

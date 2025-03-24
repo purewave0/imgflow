@@ -33,10 +33,14 @@ const Api = {
         return fetch(`/api/posts/${postId}/comments?page=${page}&sort=${sorting}`);
     },
 
-    createPost(title, files, isPublic) {
+    createPost(title, files, isPublic, flows) {
         const formData = new FormData()
         formData.append('title', title);
         formData.append('is_public', isPublic);
+        for (const flow of flows) {
+            formData.append('flow', flow)
+        }
+
         for (const file of files) {
             // TODO: description
             formData.append('media_file', file.media_file);

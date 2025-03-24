@@ -39,6 +39,9 @@ def create_app(config_class=Config):
     from app.upload import bp as upload_bp
     app.register_blueprint(upload_bp, url_prefix='/upload')
 
+    from app.flows import bp as flows_bp
+    app.register_blueprint(flows_bp, url_prefix='/flows')
+
     from app.contact import bp as contact_bp
     app.register_blueprint(contact_bp, url_prefix='/contact')
 

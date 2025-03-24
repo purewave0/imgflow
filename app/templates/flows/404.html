@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+
+{% block css %}
+    <link rel="stylesheet" href="/static/css/flows-404.css">
+{% endblock %}
+
+{% block js %}
+{% endblock %}
+
+{% block title %} Not Found {% endblock %}
+
+{# TODO: suggest creating a post with the desired flow #}
+
+{% block content %}
+    <section id="error-section">
+        <h1 id="error-title">Oops!</h1>
+        <h2 id="error-subtitle">The flow you're looking for doesn't exist (yet!)</h2>
+        <p id="error-help">Click the button below to return home.</p>
+        <a id="return-home" class="button" href="/">Home</a>
+    </section>
+
+{% endblock %}

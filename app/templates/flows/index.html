@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+
+{% block css %}
+    <link rel="stylesheet" href="/static/css/flow.css">
+{% endblock %}
+
+{% block js %}
+    <script src="/static/js/lib/macy.min.js"></script>
+    <script src="/static/js/api.js"></script>
+    <script src="/static/js/flow.js"></script>
+{% endblock %}
+
+{% block title %} Flows {% endblock %}
+
+{% block content %}
+
+    <section id="flow-banner">
+        <h2>{{ flow_name }}</h2>
+        <p>{{ flow_post_count }} posts</p>
+    </section>
+
+    <section id="gallery-section" class="page">
+        <div id="gallery-header">
+            <div id="posts-sorting">
+                <span id="sort-newest" data-sort="newest">Newest</span>
+                <span id="sort-top" data-sort="top">Top</span>
+            </div>
+        </div>
+
+        <div id="gallery"></div>
+
+        <div id="gallery-end">
+            <h3>You've scrolled through it all!</h3>
+            <p>Time for a coffee break.</p>
+        </div>
+    </section>
+
+{% endblock %}
