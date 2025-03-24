@@ -1,11 +1,15 @@
 from enum import Enum
 
 from app.extensions import db
-from app.models.post import Post, PostMedia, PostDescription, PostComment, Flow
+from app.models.post import (
+    Post, PostMedia, PostDescription, PostComment, Flow, PostFlow
+)
 
 
 POSTS_PER_PAGE = 20
 COMMENTS_PER_PAGE = 30
+FLOWS_IN_OVERVIEW = 8
+
 
 def create_post(title, media_list, is_public, flow_names):
     media = []
@@ -371,6 +375,8 @@ def _increment_flow_post_count(flow_id):
 
 
 def get_public_posts_in_flow_by_page(flow_name, page):
+    pass
+
     statement = db.select(
             Post.post_id,
             Post.title,
@@ -381,7 +387,8 @@ def get_public_posts_in_flow_by_page(flow_name, page):
             Post.comment_count,
             Post.views,
         ).where(
-            Post.is_public == True
+            Post.is_public == True,
+            # TODO
         )
 
     match sorting:
@@ -401,3 +408,41 @@ def get_public_posts_in_flow_by_page(flow_name, page):
 
     result = db.session.execute(statement)
     return _rows_to_dicts(result)
+
+
+def thumbnail_by_flow(flow):
+    top_post_thumbnail_from_flow = db.session.execute(
+        db.select(
+            Post.thumbnail_url
+        ).join(
+            Post.flows
+        ).order_by(
+            Post.score.desc(),
+            Post.created_on.desc(),
+        ).where(
+            Flow.id == flow.id
+        ).limit(1)
+    ).scalar()
+
+    return top_post_thumbnail_from_flow
+
+
+def get_flows_overview():
+    # TODO: expand upon this algorithm
+    top_flows = db.session.execute(
+        db.select(
+            Flow
+        ).order_by(
+            Flow.post_count.desc(),
+            Flow.name.asc(),
+        ).limit(FLOWS_IN_OVERVIEW)
+    ).scalars().all()
+
+    overview = tuple(
+        {
+            'name': flow.name,
+            'thumbnail_url': thumbnail_by_flow(flow)
+        } for flow in top_flows
+    )
+
+    return overview

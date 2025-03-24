@@ -21,6 +21,10 @@ const Api = {
         },
     },
 
+    fetchFlowsOverview() {
+        return fetch(`/api/flows?overview=1`);
+    },
+
     fetchPublicPostsByPage(page, sorting) {
         return fetch(`/api/posts?page=${page}&sort=${sorting}`);
     },

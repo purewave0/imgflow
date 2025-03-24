@@ -9,12 +9,14 @@
     flex-direction: row;
     column-gap: 24px;
     padding-left: 0;
+    height: 160px;
+    overflow-y: scroll; /* TODO: proper slider */
+    padding-bottom: 8px; /* for the scrollbar */
 }
 
 .flow {
     list-style-type: none;
     position: relative;
-    height: 160px;
     border-radius: 16px;
     box-shadow: rgba(0, 0, 0, 0.16) 0px 1px 4px;
     transition: box-shadow 0.3s ease;
@@ -22,7 +24,7 @@
 
 .flow a {
     display: block;
-    width: 100%;
+    width: 200px;
     height: 100%;
 }
 
@@ -32,33 +34,31 @@
     object-fit: cover;
     border-radius: 16px;
     position: relative;
-    transition: transform 0.3s ease;
+    background-color: white;
+    filter: brightness(0.6);
+    transition: filter 0.3s ease;
 }
 
 .flow:hover a img {
-    transform: translateY(-12px);
+    filter: brightness(0.4);
 }
 
 .flow a h3 {
-    background-color: var(--color-foreground);
-    margin: 0;
-    padding: 24px 16px;
     position: absolute;
+    margin: auto;
+    top: 0;
     right: 0;
-    bottom: -1px; /* avoid bug where 1px of the image below is visible */
+    bottom: 0px;
     left: 0;
-    color: var(--color-text-primary);
+    height: fit-content;
+    color: white;
     border-bottom-left-radius: 16px;
     border-bottom-right-radius: 16px;
+    font-size: 16pt;
     text-align: center;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
-    transition: color 0.2s ease;
-}
-
-.flow:hover a h3 {
-    color: var(--color-secondary);
 }
 
 /* -- gallery -- */

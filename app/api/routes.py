@@ -10,7 +10,7 @@ from app.dbapi import (
     create_post, vote_post, comment_on_post, vote_comment, reply_to_comment,
     get_comment_replies, get_public_posts_by_page, get_post_media, get_post_and_media,
     get_post_comments_by_page, Vote, PostSorting, CommentSorting,
-    get_flow
+    get_flow, get_flows_overview
 )
 from app.models.post import Post, Flow
 
@@ -243,3 +243,11 @@ def api_flow(flow_name):
         return jsonify(None), 404
 
     return jsonify(flow)
+
+@bp.route('/flows')
+def api_flows():
+    is_overview = bool(request.args.get('overview'))
+    if is_overview:
+        return jsonify(get_flows_overview())
+    # TODO: by pages
+    return jsonify('TODO')
