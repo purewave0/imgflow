@@ -21,9 +21,15 @@ const Api = {
         },
     },
 
+
+    // -- flows --
+
     fetchFlowsOverview() {
         return fetch(`/api/flows?overview=1`);
     },
+
+
+    // -- posts --
 
     fetchPublicPostsByPage(page, sorting) {
         return fetch(`/api/posts?page=${page}&sort=${sorting}`);
@@ -132,4 +138,11 @@ const Api = {
     fetchCommentReplies(postId, commentId, sorting) {
         return fetch(`/api/posts/${postId}/comments/${commentId}/replies?sort=${sorting}`);
     },
+
+
+    // -- flows & posts --
+
+    fetchPublicPostsInFlowByPage(flowName, page, sorting) {
+        return fetch(`/api/flows/${flowName}/posts?page=${page}&sort=${sorting}`);
+    }
 };

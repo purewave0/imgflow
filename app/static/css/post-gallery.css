@@ -1,0 +1,54 @@
+/*
+ * gallery.css - card-style image posts organized in a masonry layout.
+ */
+
+ 
+.post {
+    overflow: hidden;
+    background-color: var(--color-foreground);
+    display: inline-flex;
+    flex-direction: column;
+    margin-bottom: 24px;
+    border-radius: 8px;
+    color: initial;
+    box-shadow: rgba(0, 0, 0, 0.16) 0px 1px 4px;
+    max-height: 512px;
+}
+
+.post img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.post-info {
+    padding: 8px 12px 12px 12px;
+}
+
+
+.post h3 {
+    margin: 0 0 12px 0;
+    /* show at most 2 lines of title */
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+            line-clamp: 2;
+    -webkit-box-orient: vertical;
+}
+
+.post-stats {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+
+.post-stat {
+    display: flex;
+    align-items: center;
+    color: var(--color-text-secondary);
+}
+
+.post-stat svg {
+    margin-right: 4px;
+    fill: var(--color-text-secondary);
+}

@@ -1,31 +1,3 @@
-function createFlowCard(flowName, thumbnailUrl) {
-    const flow = document.createElement('li');
-    flow.className = 'flow';
-    flow.href = `/flows/${flowName}`;
-    flow.innerHTML = `
-        <a class="flow-link">
-            <img class="flow-thumbnail">
-            <h3 class="flow-name"></h3>
-        </a>
-    `;
-
-    const flowLink = flow.querySelector('.flow-link');
-    // TODO: limit characters in flow creation!!
-    flowLink.href = `/flows/${flowName}`;
-
-    const thumbnail = flow.querySelector('.flow-thumbnail');
-    thumbnail.src = thumbnailUrl;
-    thumbnail.alt = flowName;
-
-    const title = flow.querySelector('.flow-name');
-    title.textContent = flowName;
-
-    title.parentElement.title = flowName; // in case the title gets ellipsized
-
-    return flow;
-}
-
-
 document.addEventListener('DOMContentLoaded', () => {
 
     const POSTS_PER_PAGE = 20;
@@ -42,7 +14,9 @@ document.addEventListener('DOMContentLoaded', () => {
         containerId: 'gallery',
         postsPerPage: POSTS_PER_PAGE,
         fetchDataByPage: (page) => {
-            return Api.fetchPublicPostsByPage(page, Api.Preferences.getPostSorting())
+            return Api.fetchPublicPostsInFlowByPage(
+                currentFlow.name, page, Api.Preferences.getPostSorting()
+            )
         }
     });
 
@@ -68,14 +42,4 @@ document.addEventListener('DOMContentLoaded', () => {
             gallery.reloadAll();
         });
     }
-
-    const flowsDestination = document.getElementById('flows');
-    Api.fetchFlowsOverview().then(async (response) => {
-        const overview = await response.json();
-        for (const flow of overview) {
-            const flowCard = createFlowCard(flow.name, flow.thumbnail_url);
-            flowsDestination.append(flowCard);
-        }
-    });
-
 });

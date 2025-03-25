@@ -10,7 +10,7 @@ from app.dbapi import (
     create_post, vote_post, comment_on_post, vote_comment, reply_to_comment,
     get_comment_replies, get_public_posts_by_page, get_post_media, get_post_and_media,
     get_post_comments_by_page, Vote, PostSorting, CommentSorting,
-    get_flow, get_flows_overview
+    get_flow, get_flows_overview, get_public_posts_in_flow_by_page
 )
 from app.models.post import Post, Flow
 
@@ -231,7 +231,17 @@ def api_comment_replies(post_id, comment_id):
     reply = reply_to_comment(post_id, comment_id, content)
     return jsonify(reply), 201
 
+
 # -- flows --
+
+@bp.route('/flows')
+def api_flows():
+    is_overview = bool(request.args.get('overview'))
+    if is_overview:
+        return jsonify(get_flows_overview())
+    # TODO: by pages
+    return jsonify('TODO')
+
 
 @bp.route('/flows/<flow_name>')
 def api_flow(flow_name):
@@ -242,12 +252,31 @@ def api_flow(flow_name):
     if not flow:
         return jsonify(None), 404
 
+    # don't return the ID
+    del flow['id']
+
     return jsonify(flow)
 
-@bp.route('/flows')
-def api_flows():
-    is_overview = bool(request.args.get('overview'))
-    if is_overview:
-        return jsonify(get_flows_overview())
-    # TODO: by pages
-    return jsonify('TODO')
+
+@bp.route('/flows/<flow_name>/posts')
+def api_posts_in_flow(flow_name):
+    page = request.args.get('page') or 0
+    try:
+        page = int(page)
+    except ValueError:
+        return jsonify({'error': 'invalid_page'}), 400
+
+    try:
+        sorting = PostSorting(request.args.get('sort'))
+    except ValueError:
+        return jsonify({'error': 'invalid_sort'}), 400
+
+    if len(flow_name) > Flow.MAX_NAME_LENGTH:
+        return jsonify(None), 404
+
+    flow = get_flow(flow_name)
+    if not flow:
+        return jsonify(None), 404
+
+    posts = get_public_posts_in_flow_by_page(flow['id'], page, sorting)
+    return jsonify(posts)

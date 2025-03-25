@@ -1,0 +1,79 @@
+.content {
+    margin: 0;
+}
+
+#flow-banner {
+    background-color: #0b092d;
+    height: 300px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding-bottom: 36px;
+    color: white;
+}
+
+#flow-name {
+    font-size: 36pt;
+    margin-bottom: 24px;
+}
+
+#flow-page-count {
+    margin-top: 0;
+    font-size: 14pt;
+}
+
+
+/* -- gallery -- */
+
+#gallery-section {
+    max-width: var(--content-width);
+    margin: 0 auto;
+}
+
+#gallery-header {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    margin: 24px 0;
+}
+
+#posts-sorting {
+    display: flex;
+    flex-direction: row;
+    column-gap: 16px;
+}
+
+#posts-sorting span {
+    cursor: pointer;
+    user-select: none;
+}
+
+#posts-sorting span.selected {
+    color: var(--color-secondary);
+    font-weight: bold;
+}
+
+#gallery-end {
+    display: flex;
+    flex-direction: column;
+    color: var(--color-text-secondary);
+    align-items: center;
+    margin: 64px 0;
+    user-select: none;
+}
+
+#gallery-end h3 {
+    font-size: 16pt;
+    margin: 0;
+}
+
+#gallery-end p {
+    margin-top: 16px;
+}
+
+#gallery[data-current-page="0"] ~ #gallery-end,
+#gallery:not(.all-content-fetched) ~ #gallery-end {
+    display: none;
+}

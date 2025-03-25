@@ -1,13 +1,20 @@
 {% extends 'base.html' %}
 
 {% block css %}
+    <link rel="stylesheet" href="/static/css/post-gallery.css">
     <link rel="stylesheet" href="/static/css/flow.css">
 {% endblock %}
 
 {% block js %}
     <script src="/static/js/lib/macy.min.js"></script>
+    <script src="/static/js/post-gallery.js"></script>
     <script src="/static/js/api.js"></script>
     <script src="/static/js/flow.js"></script>
+    <script>
+        const currentFlow = {
+            'name': {{ flow_name|tojson }},
+        };
+    </script>
 {% endblock %}
 
 {% block title %} Flows {% endblock %}
@@ -15,8 +22,8 @@
 {% block content %}
 
     <section id="flow-banner">
-        <h2>{{ flow_name }}</h2>
-        <p>{{ flow_post_count }} posts</p>
+        <h2 id="flow-name">{{ flow_name }}</h2>
+        <p id="flow-page-count">{{ flow_post_count }} posts in this flow</p>
     </section>
 
     <section id="gallery-section" class="page">

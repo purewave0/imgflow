@@ -353,6 +353,7 @@ def get_flow(name):
     # this returns a dict with columns from the Flow
     result = db.session.execute(
         db.select(
+            Flow.id,
             Flow.name,
             Flow.post_count,
         ).where(
@@ -374,9 +375,7 @@ def _increment_flow_post_count(flow_id):
     )
 
 
-def get_public_posts_in_flow_by_page(flow_name, page):
-    pass
-
+def get_public_posts_in_flow_by_page(flow_id, page, sorting):
     statement = db.select(
             Post.post_id,
             Post.title,
@@ -386,9 +385,11 @@ def get_public_posts_in_flow_by_page(flow_name, page):
             Post.score,
             Post.comment_count,
             Post.views,
+        ).join(
+            Post.flows
         ).where(
-            Post.is_public == True,
-            # TODO
+            Flow.id == flow_id,
+            # no need to filter for public posts: only public posts can be in a flow
         )
 
     match sorting:
