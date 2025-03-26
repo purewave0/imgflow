@@ -21,7 +21,6 @@ ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'webp'}
 
 MAX_THUMBNAIL_SIZE = (256, 256)
 
-MAX_TITLE_LENGTH = 128
 MAX_COMMENT_LENGTH = 2_000
 MAX_DESCRIPTION_LENGTH = 2_000
 
@@ -62,7 +61,7 @@ def api_posts():
         return jsonify(posts)
 
     title = request.form.get('title')
-    if len(title) > MAX_TITLE_LENGTH:
+    if len(title) > Post.MAX_TITLE_LENGTH:
         return jsonify({'error': 'wrong_title_length'}), 400
 
     is_public = request.form.get('is_public') == 'true'
