@@ -125,19 +125,20 @@ class Gallery {
     #fetchAndAddPostsByPage(page) {
         this.#container.dataset.currentPage = page;
 
-        this.#fetchDataByPage(page).then(async (response) => {
-            const posts = await response.json();
-            this.#addPosts(posts);
+        this.#fetchDataByPage(page)
+            .then((response) => response.json())
+            .then((posts) => {
+                this.#addPosts(posts);
 
-            const isFullPage = posts.length >= this.#postsPerPage;
-            if (!isFullPage) {
-                // no more posts to fetch
-                window.removeEventListener(
-                    'scroll', this.#scrollHandler, { passive: true }
-                );
-                this.#container.classList.add('all-content-fetched')
-            }
-        });
+                const isFullPage = posts.length >= this.#postsPerPage;
+                if (!isFullPage) {
+                    // no more posts to fetch
+                    window.removeEventListener(
+                        'scroll', this.#scrollHandler, { passive: true }
+                    );
+                    this.#container.classList.add('all-content-fetched')
+                }
+            });
     }
 
     reloadAll() {

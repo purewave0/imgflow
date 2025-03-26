@@ -70,12 +70,12 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     const flowsDestination = document.getElementById('flows');
-    Api.fetchFlowsOverview().then(async (response) => {
-        const overview = await response.json();
-        for (const flow of overview) {
-            const flowCard = createFlowCard(flow.name, flow.thumbnail_url);
-            flowsDestination.append(flowCard);
-        }
-    });
-
+    Api.fetchFlowsOverview()
+        .then((response) => response.json())
+        .then((overview) => {
+            for (const flow of overview) {
+                const flowCard = createFlowCard(flow.name, flow.thumbnail_url);
+                flowsDestination.append(flowCard);
+            }
+        });
 });

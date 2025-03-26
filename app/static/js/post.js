@@ -400,9 +400,10 @@ document.addEventListener('DOMContentLoaded', () => {
             currentPost.post_id,
             page,
             Api.Preferences.getCommentSorting()
-        ).then(async (response) => {
+        ).then(
+            (response) => response.json()
+        ).then((comments) => {
             commentsDestination.dataset.currentPage = page;
-            const comments = await response.json();
             addComments(comments);
 
             const isFullPage = comments.length >= COMMENTS_PER_PAGE;
