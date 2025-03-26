@@ -24,7 +24,10 @@ def create_post(title, media_list, is_public, flow_names):
             must not exceed Post.MAX_FLOWS_PER_POST.
 
     Returns:
-        The newly created Post's columns as a dict.
+        The newly created Post's columns as a dict; the 'flows' column,
+        however, will be 'flow_names' instead, containing the names of the
+        Flows this post is in.
+
     """
     media = []
     for media_item in media_list:
@@ -72,7 +75,6 @@ def create_post(title, media_list, is_public, flow_names):
         'views':         post.views,
         'is_public':     post.is_public,
         'flow_names':    tuple(flow.name for flow in post.flows),
-        'flows':         tuple(flow.name for flow in post.flows),
     }
 
 
