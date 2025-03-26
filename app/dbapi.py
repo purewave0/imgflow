@@ -2,7 +2,7 @@ from enum import Enum
 
 from app.extensions import db
 from app.models.post import (
-    Post, PostMedia, PostDescription, PostComment, Flow, PostFlow
+    Post, PostMedia, PostComment, Flow, PostFlow
 )
 
 
@@ -18,7 +18,7 @@ def create_post(title, media_list, is_public, flow_names):
         title: The title of the post. Must not exceed Post.MAX_NAME_LENGTH
             characters.
         media_list: Collection of dicts containing the media's URL
-            ('media_url') and, optionally, a description ('description').
+            ('media_url') and a description ('description') of optional value.
         is_public: If True, the post will show up on public feeds.
         flow_names: Collection of Flows the post will be in. Its length
             must not exceed Post.MAX_FLOWS_PER_POST.
@@ -31,16 +31,12 @@ def create_post(title, media_list, is_public, flow_names):
     """
     media = []
     for media_item in media_list:
-        description = None
-        if media_item['description']:
-            description = PostDescription(
-                content=media_item['description']
-            )
+        description = media_item['description']
 
         media.append(
             PostMedia(
                 media_url=media_item['media_url'],
-                description=description
+                description=(description if description else None)
             )
         )
 
@@ -196,12 +192,12 @@ def get_public_posts_by_page(page, sorting):
 
 
 def get_post_media(post_id):
-    """Return the URL and description of all of a Post's media as dicts."""
+    """Return all of a Post's media as dicts."""
     result = db.session.execute(
         db.select(
             PostMedia.media_url,
-            PostDescription.content.label('description')
-        ).outerjoin(PostDescription).where(PostMedia.post_id == post_id)
+            PostMedia.description,
+        ).where(PostMedia.post_id == post_id)
     )
     return _rows_to_dicts(result)
 
@@ -211,7 +207,7 @@ def get_post_and_media(post_id):
     post = db.session.execute(
         db.select(Post)
         .options(
-            db.selectinload(Post.media).selectinload(PostMedia.description)
+            db.selectinload(Post.media)
         ).where(Post.post_id == post_id)
     ).scalars().one_or_none()
 
@@ -221,7 +217,7 @@ def get_post_and_media(post_id):
     media = tuple(
         {
             'media_url': media_item.media_url,
-            'description': media_item.description.content
+            'description': media_item.description
                 if media_item.description else None
         } for media_item in post.media
     )

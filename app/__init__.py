@@ -23,7 +23,7 @@ def create_app(config_class=Config):
     # Extensions
     db.init_app(app)
     with app.app_context():
-        from app.models.post import Post, PostMedia, PostDescription, PostComment
+        from app.models.post import Post, PostMedia, PostComment, Flow, PostFlow
         db.create_all()
 
     # Blueprints
