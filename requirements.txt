@@ -6,3 +6,4 @@ Flask-SQLAlchemy
 Pillow
 
 python-dotenv
+regex

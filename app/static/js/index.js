@@ -10,7 +10,6 @@ function createFlowCard(flowName, thumbnailUrl) {
     `;
 
     const flowLink = flow.querySelector('.flow-link');
-    // TODO: limit characters in flow creation!!
     flowLink.href = `/flows/${flowName}`;
 
     const thumbnail = flow.querySelector('.flow-thumbnail');

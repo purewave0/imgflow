@@ -92,6 +92,7 @@ class PostComment(db.Model):
 
 class Flow(db.Model):
     __tablename__ = 'Flow'
+    MIN_NAME_LENGTH = 2
     MAX_NAME_LENGTH = 50
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(MAX_NAME_LENGTH), unique=True, nullable=False)

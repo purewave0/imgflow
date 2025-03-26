@@ -4,6 +4,7 @@ import uuid
 from flask import jsonify, request
 from werkzeug.utils import secure_filename
 from PIL import Image
+import regex
 
 from app.api import bp
 from app.dbapi import (
@@ -14,6 +15,14 @@ from app.dbapi import (
 )
 from app.models.post import Post, Flow
 
+
+flow_regex_pattern = regex.compile(r"""
+    [
+        \p{L} # letters (from any language)
+        \p{N} # numbers
+        \-    # hyphen
+    ]{2,50}   # between 2 to 50 characters
+""", regex.VERBOSE)
 
 UPLOADS_MEDIA_PATH      = 'app/static/uploads/media'
 UPLOADS_THUMBNAILS_PATH = 'app/static/uploads/thumbnails'
@@ -68,15 +77,20 @@ def api_posts():
 
     flows = []
     if is_public:
-        raw_flows = request.form.getlist("flow")
+        raw_flows = request.form.getlist('flow')
         if len(raw_flows) > Post.MAX_FLOWS_PER_POST:
             return jsonify({'error': 'too_many_flows'}), 400
 
         for flow_name in raw_flows:
-            # TODO: regex validation of the name (no whitespace, only hyphens; ...)
+            name_length = len(flow_name)
+            if (
+                Flow.MIN_NAME_LENGTH > name_length
+                or name_length > Flow.MAX_NAME_LENGTH
+            ):
+                return jsonify({'error': 'wrong_flow_name_length'}), 400
 
-            if len(flow_name) > Flow.MAX_NAME_LENGTH:
-                return jsonify({'error': 'wrong_name_length'}), 400
+            if not flow_regex_pattern.fullmatch(flow_name):
+                return jsonify({'error': 'invalid_flow_name'}), 400
 
             flows.append(flow_name)
 
@@ -270,7 +284,11 @@ def api_posts_in_flow(flow_name):
     except ValueError:
         return jsonify({'error': 'invalid_sort'}), 400
 
-    if len(flow_name) > Flow.MAX_NAME_LENGTH:
+    name_length = len(flow_name)
+    if (
+        Flow.MIN_NAME_LENGTH > name_length
+        or name_length > Flow.MAX_NAME_LENGTH
+    ):
         return jsonify(None), 404
 
     flow = get_flow(flow_name)
