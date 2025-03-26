@@ -9,9 +9,11 @@ class Gallery {
 
     #container;
     #macy;
+
     #isFetching = false;
     #fetchDataByPage = null;
     #postsPerPage;
+    #bodyNoPostsClassname;
 
     #scrollHandler = null;
 
@@ -23,10 +25,10 @@ class Gallery {
             trueOrder: true,
             margin: { x: 16, y: 16, },
         });
+        this.#bodyNoPostsClassname = options.bodyNoPostsClassname;
 
         this.#fetchDataByPage = options.fetchDataByPage;
         this.#postsPerPage = options.postsPerPage;
-
 
         // ensure the method gets the correct 'this' value when triggered
         this.#scrollHandler = this.#onScroll.bind(this);
@@ -109,7 +111,7 @@ class Gallery {
             );
 
             const image = postCard.firstElementChild;
-            images.push(image)
+            images.push(image);
 
             fragment.append(postCard);
         }
@@ -128,6 +130,12 @@ class Gallery {
         this.#fetchDataByPage(page)
             .then((response) => response.json())
             .then((posts) => {
+                if (page === 0 && posts.length === 0) {
+                    document.body.classList.add(this.#bodyNoPostsClassname);
+                    return;
+                }
+                document.body.classList.remove(this.#bodyNoPostsClassname);
+
                 this.#addPosts(posts);
 
                 const isFullPage = posts.length >= this.#postsPerPage;

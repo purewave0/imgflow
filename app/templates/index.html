@@ -33,10 +33,31 @@
 
         <div id="gallery"></div>
 
+
         <div id="gallery-end">
             <h3>You've scrolled through it all!</h3>
             <p>Time for a coffee break.</p>
         </div>
     </section>
+
+    <div id="empty-gallery">
+        <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e3e3e3">
+            <path d="M345-377h391L609-548 506-413l-68-87-93 123Zm-85 177q-24 0-42-18t-18-42v-560q0-24 18-42t42-18h560q24 0 42 18t18 42v560q0 24-18 42t-42 18H260ZM140-80q-24 0-42-18t-18-42v-620h60v620h620v60H140Z"/>
+        </svg>
+        <h3>No posts (yet!)</h3>
+        <p>
+            It seems no one has shared posts yet.
+            <br>
+            Be the first to upload your images and videos!
+        </p>
+
+        <a id="upload-redirect" class="button icon-button button-new-post" href="/upload">
+            <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#ffffff">
+                <path d="M440-440H200v-80h240v-240h80v240h240v80H520v240h-80v-240Z"/>
+            </svg>
+            <span>New post</span>
+        </a>
+
+    </div>
 
 {% endblock %}

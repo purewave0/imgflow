@@ -65,6 +65,7 @@
 /* -- gallery -- */
 
 #gallery-section {
+    position: relative;
     max-width: var(--content-width);
     margin: 0 auto;
 }
@@ -112,5 +113,47 @@
 
 #gallery[data-current-page="0"] ~ #gallery-end,
 #gallery:not(.all-content-fetched) ~ #gallery-end {
+    display: none;
+}
+
+#empty-gallery {
+    user-select: none;
+    position: absolute;
+    top: 256px;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    height: fit-content;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    row-gap: 24px;
+    color: var(--color-text-secondary);
+}
+
+#empty-gallery * {
+    margin: 0;
+}
+
+#empty-gallery > svg {
+    fill: var(--color-text-secondary);
+    height: 128px;
+    width: 128px;
+}
+
+#empty-gallery > h3 {
+    font-size: 16pt;
+}
+
+#empty-gallery #upload-redirect {
+}
+
+body.no-posts #flows-section,
+body.no-posts #gallery-section {
+    display: none;
+}
+
+body:not(.no-posts) #empty-gallery {
     display: none;
 }
