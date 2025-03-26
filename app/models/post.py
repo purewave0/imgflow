@@ -28,10 +28,11 @@ def _random_post_id():
 class Post(db.Model):
     __tablename__ = 'Post'
     POST_ID_LENGTH = 8
+    MAX_TITLE_LENGTH = 128
     MAX_FLOWS_PER_POST = 3
     id = db.Column(db.Integer, primary_key=True)
     post_id = db.Column(db.String(POST_ID_LENGTH), unique=True, nullable=False)
-    title = db.Column(db.String(128), nullable=True)
+    title = db.Column(db.String(MAX_TITLE_LENGTH), nullable=True)
     media = db.relationship('PostMedia', backref='post')
     thumbnail_url = db.Column(db.String(128), nullable=False)
     score = db.Column(db.Integer, nullable=False)

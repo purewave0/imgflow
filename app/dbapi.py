@@ -12,6 +12,20 @@ FLOWS_IN_OVERVIEW = 8
 
 
 def create_post(title, media_list, is_public, flow_names):
+    """Create a post in the database.
+
+    Args:
+        title: The title of the post. Must not exceed Post.MAX_NAME_LENGTH
+            characters.
+        media_list: Collection of dicts containing the media's URL
+            ('media_url') and, optionally, a description ('description').
+        is_public: If True, the post will show up on public feeds.
+        flow_names: Collection of Flows the post will be in. Its length
+            must not exceed Post.MAX_FLOWS_PER_POST.
+
+    Returns:
+        The newly created Post's columns as a dict.
+    """
     media = []
     for media_item in media_list:
         description = None
@@ -57,11 +71,21 @@ def create_post(title, media_list, is_public, flow_names):
         'comment_count': post.comment_count,
         'views':         post.views,
         'is_public':     post.is_public,
+        'flow_names':    tuple(flow.name for flow in post.flows),
         'flows':         tuple(flow.name for flow in post.flows),
     }
 
 
 def comment_on_post(post_id, content):
+    """Comment on a post.
+
+    Args:
+        post_id: The ID of the post.
+        content: The comment's content. Supports Markdown.
+
+    Returns:
+        The newly created PostComment's columns as a dict.
+    """
     comment = PostComment(content)
     comment.post_id = post_id
     comment.parent_id = None
@@ -83,6 +107,16 @@ def comment_on_post(post_id, content):
 
 
 def reply_to_comment(post_id, comment_id, content):
+    """Reply to a comment on a post.
+
+    Args:
+        post_id: The ID of the post.
+        comment_id: The ID of the comment.
+        content: The reply's content. Supports Markdown.
+
+    Returns:
+        The newly created PostComment's columns as a dict.
+    """
     reply = PostComment(content)
     reply.post_id = post_id
     reply.parent_id = comment_id
@@ -101,20 +135,32 @@ def reply_to_comment(post_id, comment_id, content):
         'score': reply.score,
         'created_on': reply.created_on,
         'post_id': reply.post_id,
-        'parent_id': reply.parent_id,
     }
 
 
 def _rows_to_dicts(rows):
+    """Convert the given Rows from a SQLAlchemy query into a tuple of dicts."""
     return tuple(row._asdict() for row in rows)
 
 
 class PostSorting(Enum):
+    """Sorting options when fetching posts.
+
+    Attributes:
+        NEWEST: Sorts posts by most recently created first.
+        TOP: Sorts posts by highest score first.
+    """
     NEWEST = 'newest'
     TOP = 'top'
 
 
 def get_public_posts_by_page(page, sorting):
+    """Return a sorted and paginated collection of Posts as dicts.
+
+    Attributes:
+        page: The page to fetch.
+        sorting: The PostSorting option to use.
+    """
     statement = db.select(
             Post.post_id,
             Post.title,
@@ -148,6 +194,7 @@ def get_public_posts_by_page(page, sorting):
 
 
 def get_post_media(post_id):
+    """Return the URL and description of all of a Post's media as dicts."""
     result = db.session.execute(
         db.select(
             PostMedia.media_url,
@@ -158,6 +205,7 @@ def get_post_media(post_id):
 
 
 def get_post_and_media(post_id):
+    """Return a Post and all of its media (their URL and description) as dicts."""
     post = db.session.execute(
         db.select(Post)
         .options(
@@ -199,12 +247,28 @@ def get_post_and_media(post_id):
 
 
 class CommentSorting(Enum):
+    """Sorting options when fetching comments.
+
+    Attributes:
+        NEWEST: Sorts comments by most recently created first.
+        MOST-LIKED: Sorts posts by highest score first.
+        OLDEST: Sorts comments by most recently created last.
+    """
     NEWEST = 'newest'
     MOST_LIKED = 'most-liked'
     OLDEST = 'oldest'
 
 
 def get_post_comments_by_page(post_id, page, sorting):
+    """Return a sorted and paginated collection of a Post's comments as dicts.
+
+    Only top-level comments are included; replies are not.
+
+    Args:
+        post_id: The ID of the Post.
+        page: The page to fetch.
+        sorting: The CommentSorting option to use.
+    """
     statement = db.select(
             PostComment.id,
             PostComment.content,
@@ -241,6 +305,15 @@ def get_post_comments_by_page(post_id, page, sorting):
 
 
 def get_comment_replies(post_id, comment_id, sorting):
+    """Return a sorted collection of a comment's replies as dicts.
+
+    Only top-level replies are included; replies to those replies are not.
+
+    Args:
+        post_id: The ID of the post.
+        comment_id: The ID of the comment.
+        sorting: The CommentSorting option to use.
+    """
     statement = db.select(
             PostComment.id,
             PostComment.content,
@@ -271,6 +344,7 @@ def get_comment_replies(post_id, comment_id, sorting):
 
 
 def increment_post_views(post_id):
+    """Increase a post's view count by 1."""
     db.session.execute(
         db.update(Post)
             .where(Post.post_id == post_id)
@@ -280,6 +354,7 @@ def increment_post_views(post_id):
 
 
 def _increment_post_comment_count(post_id):
+    """Increase a post's comment count by 1."""
     db.session.execute(
         db.update(Post)
             .where(Post.post_id == post_id)
@@ -288,6 +363,7 @@ def _increment_post_comment_count(post_id):
 
 
 def _increment_comment_reply_count(post_id, comment_id):
+    """Increase a comment's reply count by 1."""
     db.session.execute(
         db.update(PostComment)
             .where(
@@ -300,11 +376,18 @@ def _increment_comment_reply_count(post_id, comment_id):
 
 
 class Vote(Enum):
+    """Type of vote."""
     UPVOTE = 1
     DOWNVOTE = -1
 
 
 def vote_post(post_id, vote):
+    """Vote on a post.
+
+    Args:
+        post_id: The ID of the post
+        vote: The type of vote
+    """
     if vote not in Vote:
         raise TypeError('vote must be of Vote type.')
 
@@ -319,6 +402,13 @@ def vote_post(post_id, vote):
 
 
 def vote_comment(post_id, comment_id, vote):
+    """Vote on a comment.
+
+    Args:
+        post_id: The ID of the post
+        comment_id: The ID of the comment
+        vote: The type of vote
+    """
     if vote not in Vote:
         raise TypeError('vote must be of Vote type.')
 
@@ -337,7 +427,7 @@ def vote_comment(post_id, comment_id, vote):
 # -- flows --
 
 def _get_flow(name):
-    # this returns a Flow OBJECT; for use within this module
+    """Return a Flow object by name."""
     result = db.session.execute(
         db.select(
             Flow
@@ -350,7 +440,7 @@ def _get_flow(name):
 
 
 def get_flow(name):
-    # this returns a dict with columns from the Flow
+    """Return a Flow as a dict by name."""
     result = db.session.execute(
         db.select(
             Flow.id,
@@ -368,6 +458,7 @@ def get_flow(name):
 
 
 def _increment_flow_post_count(flow_id):
+    """Increase a flow's post count by 1."""
     db.session.execute(
         db.update(Flow)
             .where(Flow.id == flow_id)
@@ -376,6 +467,10 @@ def _increment_flow_post_count(flow_id):
 
 
 def get_public_posts_in_flow_by_page(flow_id, page, sorting):
+    """Return a sorted and paginated collection of posts in a flow as dicts.
+
+    All returned posts are public, as private posts can't be added to flows.
+    """
     statement = db.select(
             Post.post_id,
             Post.title,
@@ -389,7 +484,6 @@ def get_public_posts_in_flow_by_page(flow_id, page, sorting):
             Post.flows
         ).where(
             Flow.id == flow_id,
-            # no need to filter for public posts: only public posts can be in a flow
         )
 
     match sorting:
@@ -412,6 +506,11 @@ def get_public_posts_in_flow_by_page(flow_id, page, sorting):
 
 
 def thumbnail_by_flow(flow):
+    """Return the thumbnail URL of a flow.
+
+    The thumbnail of a flow is the thumbnail of the highest-scored post in that
+    flow.
+    """
     top_post_thumbnail_from_flow = db.session.execute(
         db.select(
             Post.thumbnail_url
@@ -429,6 +528,12 @@ def thumbnail_by_flow(flow):
 
 
 def get_flows_overview():
+    """Return FLOWS_IN_OVERVIEW flows, ordered by highest post count first.
+
+    Returns:
+        A collection of dicts, each with the flow's name ('name') and its
+        thumbnail ('thumbnail_url'; see thumbnail_by_flow())
+    """
     # TODO: expand upon this algorithm
     top_flows = db.session.execute(
         db.select(
