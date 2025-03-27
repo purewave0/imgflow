@@ -19,14 +19,15 @@
 .flow {
     list-style-type: none;
     position: relative;
+    width: 200px;
     border-radius: 16px;
     box-shadow: rgba(0, 0, 0, 0.16) 0px 1px 4px;
     transition: box-shadow 0.3s ease;
+    flex-shrink: 0; /* make them overflow the parent */
 }
 
 .flow a {
     display: block;
-    width: 200px;
     height: 100%;
 }
 
@@ -183,10 +184,8 @@ body:not([data-gallery-state="no-posts"]) #empty-gallery {
 #flows-skeleton .flow {
     background-color: var(--color-skeleton-start);
     animation: skeleton-loading 1s linear infinite alternate;
-    width: 200px;
     box-shadow: none;
     transition: none;
-    flex-shrink: 0; /* make them overflow the parent */
 }
 
 
