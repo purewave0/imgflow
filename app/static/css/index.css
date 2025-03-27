@@ -156,6 +156,50 @@ body:not([data-gallery-state="no-posts"]) #empty-gallery {
 }
 
 
+/* -- skeleton -- */
+
+@keyframes skeleton-loading {
+  0% {
+    background-color: var(--color-skeleton-start);
+  }
+  100% {
+    background-color: var(--color-skeleton-end);
+  }
+}
+
+
+/* -- flows skeleton -- */
+
+#flows-skeleton {
+    display: flex;
+    flex-direction: row;
+    column-gap: 24px;
+    padding-left: 0;
+    height: 160px;
+    overflow-x: scroll; /* TODO: proper slider */
+    padding-bottom: 8px; /* for the scrollbar */
+}
+
+#flows-skeleton .flow {
+    background-color: var(--color-skeleton-start);
+    animation: skeleton-loading 1s linear infinite alternate;
+    width: 200px;
+    box-shadow: none;
+    transition: none;
+    flex-shrink: 0; /* make them overflow the parent */
+}
+
+
+body[data-flows-state="fetch"] #flows {
+    display: none;
+}
+
+body:not([data-flows-state="fetch"]) #flows-skeleton {
+    display: none;
+}
+
+
+
 /* -- gallery skeleton & loading -- */
 
 #gallery-skeleton {
@@ -179,15 +223,6 @@ body:not([data-gallery-state="no-posts"]) #empty-gallery {
 
 #gallery-skeleton .post:nth-child(3n+2) {
     height: 384px;
-}
-
-@keyframes skeleton-loading {
-  0% {
-    background-color: var(--color-skeleton-start);
-  }
-  100% {
-    background-color: var(--color-skeleton-end);
-  }
 }
 
 body:not([data-gallery-state="first-fetch"]) #gallery-skeleton {

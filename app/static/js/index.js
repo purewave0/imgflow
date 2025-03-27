@@ -68,6 +68,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     const flowsDestination = document.getElementById('flows');
+    document.body.dataset.flowsState = 'fetch';
     Api.fetchFlowsOverview()
         .then((response) => response.json())
         .then((overview) => {
@@ -75,5 +76,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 const flowCard = createFlowCard(flow.name, flow.thumbnail_url);
                 flowsDestination.append(flowCard);
             }
+            document.body.dataset.flowsState = '';
         });
 });
