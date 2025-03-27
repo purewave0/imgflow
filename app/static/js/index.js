@@ -67,15 +67,34 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    function runOnceAllImagesLoad(images, func) {
+        Promise.all(
+            images
+                .filter(img => !img.complete)
+                .map(
+                    img => new Promise(resolve => {
+                        img.onload = img.onerror = resolve;
+                    })
+                )
+        ).then(func);
+    }
+
     const flowsDestination = document.getElementById('flows');
     document.body.dataset.flowsState = 'fetch';
     Api.fetchFlowsOverview()
         .then((response) => response.json())
         .then((overview) => {
+            const thumbnails = [];
+
             for (const flow of overview) {
                 const flowCard = createFlowCard(flow.name, flow.thumbnail_url);
+                const thumbnail = flowCard.querySelector('.flow-thumbnail');
+                thumbnails.push(thumbnail);
                 flowsDestination.append(flowCard);
             }
-            document.body.dataset.flowsState = '';
+
+            runOnceAllImagesLoad(thumbnails, () => {
+                document.body.dataset.flowsState = 'all-flows-fetched';
+            });
         });
 });
