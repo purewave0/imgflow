@@ -13,7 +13,21 @@ class Gallery {
     #isFetching = false;
     #fetchDataByPage = null;
     #postsPerPage;
-    #bodyNoPostsClassname;
+
+    #states = {
+        FIRST_FETCH:       'first-fetch',
+        NO_POSTS:          'no-posts',
+        SUBSEQUENT_FETCH:  'subsequent-fetch',
+        ALL_POSTS_FETCHED: 'all-posts-fetched',
+    };
+
+    get #state() {
+        return document.body.dataset.galleryState;
+    }
+
+    set #state(state) {
+        document.body.dataset.galleryState = state;
+    }
 
     #scrollHandler = null;
 
@@ -25,7 +39,6 @@ class Gallery {
             trueOrder: true,
             margin: { x: 16, y: 16, },
         });
-        this.#bodyNoPostsClassname = options.bodyNoPostsClassname;
 
         this.#fetchDataByPage = options.fetchDataByPage;
         this.#postsPerPage = options.postsPerPage;
@@ -34,7 +47,6 @@ class Gallery {
         this.#scrollHandler = this.#onScroll.bind(this);
         window.addEventListener('scroll', this.#scrollHandler, { passive: true });
 
-        // TODO: skeleton loading
         this.#fetchAndAddPostsByPage(0);
     }
 
@@ -121,22 +133,30 @@ class Gallery {
         this.#runOnceAllImagesLoad(images, () => {
             this.#macy.recalculate(true, true);
             this.#isFetching = false;
+
+            if (this.#state !== this.#states.ALL_POSTS_FETCHED) {
+                this.#state = '';
+            }
         });
     }
 
     #fetchAndAddPostsByPage(page) {
+        this.#isFetching = true;
         this.#container.dataset.currentPage = page;
+
+        if (page === 0) {
+            this.#state = this.#states.FIRST_FETCH;
+        } else {
+            this.#state = this.#states.SUBSEQUENT_FETCH;
+        }
 
         this.#fetchDataByPage(page)
             .then((response) => response.json())
             .then((posts) => {
                 if (page === 0 && posts.length === 0) {
-                    document.body.classList.add(this.#bodyNoPostsClassname);
+                    this.#state = this.#states.NO_POSTS;
                     return;
                 }
-                document.body.classList.remove(this.#bodyNoPostsClassname);
-
-                this.#addPosts(posts);
 
                 const isFullPage = posts.length >= this.#postsPerPage;
                 if (!isFullPage) {
@@ -144,17 +164,17 @@ class Gallery {
                     window.removeEventListener(
                         'scroll', this.#scrollHandler, { passive: true }
                     );
-                    this.#container.classList.add('all-content-fetched')
+                    this.#state = this.#states.ALL_POSTS_FETCHED;
                 }
+
+                this.#addPosts(posts);
             });
     }
 
     reloadAll() {
-        this.#container.classList.remove('all-content-fetched')
         this.#container.innerHTML = '';
+        this.#macy.recalculate(true, true); // reset the height accordingly
         this.#fetchAndAddPostsByPage(0);
-
-        // TODO: skeleton
 
         // user might've scrolled it all, which removes the scroll handler. reset it
         window.removeEventListener('scroll', this.#scrollHandler, { passive: true });

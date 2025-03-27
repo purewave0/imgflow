@@ -10,6 +10,9 @@ body {
 
     --color-background-hover: #e1e2ff;
 
+    --color-skeleton-start: #d6dce8;
+    --color-skeleton-end:   #bfc5d0;
+
     /* TODO: figure out actual color scheme */
     --color-primary: #5a5ff2;
     --color-secondary: #0db077;

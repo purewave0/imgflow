@@ -74,6 +74,58 @@
 }
 
 #gallery[data-current-page="0"] ~ #gallery-end,
-#gallery:not(.all-content-fetched) ~ #gallery-end {
+body:not([data-gallery-state="all-posts-fetched"]) #gallery-end {
     display: none;
+}
+
+
+/* -- gallery skeleton & loading -- */
+
+#gallery-skeleton {
+    columns: 5 200px;
+    column-gap: 1rem;
+}
+
+#gallery-skeleton .post {
+    height: 256px;
+    background-color: red;
+    width: 100%;
+    margin-bottom: 16px;
+    background-color: var(--color-skeleton-start);
+    animation: skeleton-loading 1s linear infinite alternate;
+    box-shadow: none;
+}
+
+#gallery-skeleton .post:nth-child(2n) {
+    height: 320px;
+}
+
+#gallery-skeleton .post:nth-child(3n+2) {
+    height: 384px;
+}
+
+@keyframes skeleton-loading {
+  0% {
+    background-color: var(--color-skeleton-start);
+  }
+  100% {
+    background-color: var(--color-skeleton-end);
+  }
+}
+
+body:not([data-gallery-state="first-fetch"]) #gallery-skeleton {
+    display: none;
+}
+
+/* TODO: loader for subsequent fetches */
+body[data-gallery-state="subsequent-fetch"] {
+    background-color: lightgreen;
+}
+
+/* prevent user from sorting/fetching more posts while it's loading, as it could result
+ * in an inconsistent state */
+body[data-gallery-state="first-fetch"] #posts-sorting,
+body[data-gallery-state="subsequent-fetch"] #posts-sorting {
+    pointer-events: none;
+    opacity: 0.7;
 }

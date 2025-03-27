@@ -36,14 +36,12 @@ document.addEventListener('DOMContentLoaded', () => {
         Api.Preferences.setPostSorting(preferredSorting);
     }
 
-    // TODO: skeleton loading
     const gallery = new Gallery({
         containerId: 'gallery',
         postsPerPage: POSTS_PER_PAGE,
         fetchDataByPage: (page) => {
             return Api.fetchPublicPostsByPage(page, Api.Preferences.getPostSorting())
         },
-        bodyNoPostsClassname: 'no-posts',
     });
 
     let currentlySelectedSorting = null;

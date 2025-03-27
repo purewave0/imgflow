@@ -8,7 +8,6 @@
     background-color: var(--color-foreground);
     display: inline-flex;
     flex-direction: column;
-    margin-bottom: 24px;
     border-radius: 8px;
     color: initial;
     box-shadow: rgba(0, 0, 0, 0.16) 0px 1px 4px;
