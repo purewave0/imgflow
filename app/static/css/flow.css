@@ -105,12 +105,12 @@ body:not([data-gallery-state="all-posts-fetched"]) #gallery-end {
 }
 
 @keyframes skeleton-loading {
-  0% {
-    background-color: var(--color-skeleton-start);
-  }
-  100% {
-    background-color: var(--color-skeleton-end);
-  }
+    0% {
+        background-color: var(--color-skeleton-start);
+    }
+    100% {
+        background-color: var(--color-skeleton-end);
+    }
 }
 
 body:not([data-gallery-state="first-fetch"]) #gallery-skeleton {
