@@ -28,6 +28,10 @@ const Api = {
         return fetch(`/api/flows?overview=1`);
     },
 
+    fetchFlowSuggestions(partialFlowName) {
+        return fetch(`/api/flow-suggestions?name=${partialFlowName}`);
+    },
+
 
     // -- posts --
 

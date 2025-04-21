@@ -6,6 +6,8 @@
 
 {% block js %}
     <script src="/static/js/api.js"></script>
+    <script src="/static/js/lib/popper.min.js"></script>
+    <script src="/static/js/lib/tippy.min.js"></script>
     <script src="/static/js/upload.js"></script>
 {% endblock %}
 
@@ -44,11 +46,15 @@
 
                 <div>
                     <h3>Flows</h3>
-                    <label>
+                    <label for="flows-input">
                         Add up to 3 flows to categorize your post (optional)
-                        <!-- TODO: suggestions + preview + autocomplete of what is typed-->
-                        <input id="flows-input" type="text" name="flows" minlength="3" maxlength="50" pattern="[\p{L}\p{N}\-]{2,50}" title="At least 2 characters. Only letters, numbers and hyphens allowed;" placeholder="Add flows…">
                     </label>
+                    <div id="flows-input-wrapper">
+                        <input id="flows-input" type="text" name="flows" minlength="3" maxlength="50" pattern="[\p{L}\p{N}\-]{2,50}" title="At least 2 characters. Only letters, numbers and hyphens allowed;" placeholder="Add flows…">
+                        <!-- visually the suggestions come first, but placing them after
+                             the input ensures proper tabbing order -->
+                        <ul id="flow-suggestions"></ul>
+                    </div>
                     <ul id="flows"></ul>
                 </div>
 

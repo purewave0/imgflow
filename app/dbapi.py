@@ -9,6 +9,7 @@ from app.models.post import (
 POSTS_PER_PAGE = 20
 COMMENTS_PER_PAGE = 30
 FLOWS_IN_OVERVIEW = 8
+FLOW_SUGGESTIONS_LIMIT = 8
 
 
 def create_post(title, media_list, is_public, flow_names):
@@ -550,3 +551,28 @@ def get_flows_overview():
     )
 
     return overview
+
+
+def _escaped_search_text(text):
+    """Return `text` with any LIKE special characters (%, _, \) escaped."""
+    return text.replace("%", "\\%").replace("\\", "\\\\").replace("_", "\\_")
+
+
+def suggest_flows_by_name(partial_name):
+    result = db.session.execute(
+        db.select(
+            Flow.name,
+            Flow.post_count
+        ).where(
+            Flow.name.like(
+                _escaped_search_text(partial_name) + '%'
+            )
+        ).order_by(
+            Flow.post_count.desc(),
+            Flow.name.asc(),
+        ).limit(
+            FLOW_SUGGESTIONS_LIMIT
+        )
+    )
+
+    return _rows_to_dicts(result)

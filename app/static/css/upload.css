@@ -165,6 +165,61 @@ body:not(.has-uploaded) #upload-more-media {
     margin-left: 0;
 }
 
+#flows-input-wrapper {
+    position: relative;
+}
+
+
+#flow-suggestions {
+    box-sizing: border-box;
+    position: absolute;
+    padding-left: 0;
+    height: 100px;
+    width: 100%;
+    bottom: calc(100% - 8px);  /* compensate for the input's border-top */
+    margin: 0;
+    padding: 8px;
+    border-top-left-radius: 4px;
+    border-top-right-radius: 4px;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 8px;
+    height: fit-content;
+    transition: opacity 0.1s ease;
+    border: 1px solid var(--color-background-border);
+    border-bottom: none;
+    background-color: var(--color-foreground);
+    box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
+}
+
+.suggestion {
+    border: none;
+    list-style-type: none;
+    background-color: lightgreen;
+    padding: 8px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.suggestion * {
+    margin: 0;
+}
+
+.suggestion h4 {
+    font-size: 12pt;
+}
+
+.suggestion p {
+    font-size: 11pt;
+    user-select: none;
+}
+
+#flows-input-wrapper:not(.suggesting) #flow-suggestions {
+    opacity: 0;
+    pointer-events: none;
+}
+
 #flows-input {
     border: 1px solid var(--color-background-border);
     margin-top: 8px;
@@ -176,13 +231,22 @@ body:not(.has-uploaded) #upload-more-media {
     outline: none;
     width: 100%;
     box-sizing: border-box;
-    transition: background-color 0.2s ease, opacity 0.2s ease;
+    transition:
+        background-color 0.2s ease,
+        opacity 0.2s ease,
+        border-bottom-left-radius 0.1s ease,
+        border-bottom-right-radius 0.1s ease;
 }
 
 #flows-input[disabled] {
     opacity: 0.7;
     cursor: not-allowed;
     background-color: var(--color-background);
+}
+
+#flows-input-wrapper.suggesting #flows-input {
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
 }
 
 #flows {

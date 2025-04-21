@@ -145,14 +145,124 @@ document.addEventListener('DOMContentLoaded', () => {
         );
     }
 
+    function debounce(func, timeout) {
+        let timer;
+        return (...args) => {
+            clearTimeout(timer);
+            timer = setTimeout(
+                () => { func.apply(this, args); },
+                timeout
+            );
+        };
+    }
+
+    function createSuggestionsContent(flows) {
+        const contentFragment = document.createDocumentFragment();
+        for (const flow of flows) {
+            const suggestionItem = document.createElement('button');
+            suggestionItem.className = 'suggestion';
+            suggestionItem.type = 'button';
+            suggestionItem.innerHTML = `
+                <h4 class="suggestion-name"></h4>
+                <p>
+                    <span class="suggestion-post-count"></span>
+                    posts
+                </p>
+            `;
+
+            const flowName = suggestionItem.querySelector('.suggestion-name');
+            flowName.textContent = flow.name;
+
+            const flowPostCount =
+                suggestionItem.querySelector('.suggestion-post-count');
+            flowPostCount.textContent = flow.post_count;
+
+            suggestionItem.addEventListener('click', () => {
+
+                // TODO:
+                if (alreadyAddedFlow(flow.name)) {
+                    // nothing to do
+                    // TODO: temporarily highlight the already added flow?
+                    flowsInput.value = '';
+                } else {
+                    /* trigger the flow inclusion process. as it came from a suggestion,
+                       it is presumed valid */
+                    const event = new KeyboardEvent(
+                        'keydown', { key: 'Enter' }
+                    );
+                    flowsInput.value = flow.name;
+                    flowsInput.dispatchEvent(event);
+                }
+
+                /* user might've focused on the suggestion by tabbing. return focus to
+                   the input */
+                flowsInput.focus();
+
+                closeFlowSuggestions();
+            });
+
+            contentFragment.append(suggestionItem);
+        }
+        return contentFragment;
+    }
+
+    const flowsInputWrapper = document.getElementById('flows-input-wrapper');
+    const flowSuggestionsDestination = document.getElementById('flow-suggestions');
+
+    function showFlowSuggestions() {
+        flowsInputWrapper.classList.add('suggesting');
+    }
+
+    function closeFlowSuggestions() {
+        flowsInputWrapper.classList.remove('suggesting');
+        firstSuggestionElement = null;
+        lastSuggestionElement = null;
+        flowSuggestionsDestination.innerHTML = '';
+    }
+
+    function suggestFlows(flowName) {
+        // TODO: 'loading suggestions...'
+        Api.fetchFlowSuggestions(flowName)
+            .then((response) => response.json())
+            .then((suggestions) => {
+                const noSuggestionsAvailable = suggestions.length === 0;
+                if (noSuggestionsAvailable) {
+                    // TODO: new flow name, so warn 'you'll be creating a new flow'
+                    closeFlowSuggestions();
+                } else {
+                    flowSuggestionsDestination.innerHTML = '';
+                    flowSuggestionsDestination.append(
+                        createSuggestionsContent(suggestions)
+                    );
+                    firstSuggestionElement =
+                        flowSuggestionsDestination.firstElementChild;
+                    lastSuggestionElement =
+                        flowSuggestionsDestination.lastElementChild;
+                    showFlowSuggestions();
+                }
+            });
+    }
+
+    const suggestFlowsDebounced = debounce(() => {
+        if (flowsInput.value) {
+            suggestFlows(flowsInput.value);
+        }
+    }, 500);
 
     const flowsInput = document.getElementById('flows-input');
     flowsInput.addEventListener('input', (event) => {
+        if (!flowsInput.value) {
+            closeFlowSuggestions();
+            return;
+        }
+
         flowsInput.value = flowsInput.value
             .trimStart() // user is still typing, it may be a space before a word
             .replaceAll(' ', '-') // preparing it for the next step
             .replace(/-+/g, '-') // collapse hyphens into a single hyphen
             .toLowerCase();
+
+        suggestFlowsDebounced();
     });
 
     flowsInput.addEventListener('change', (event) => {
@@ -173,6 +283,58 @@ document.addEventListener('DOMContentLoaded', () => {
 
     let flowCount = 0;
     const MAX_FLOWS = 3;
+
+    function addFlow(flowName) {
+        const flow = createFlow(flowName);
+        flowsDestination.append(flow);
+        ++flowCount;
+
+        if (flowCount >= MAX_FLOWS) {
+            flowsInput.disabled = true;
+        }
+
+        flow.addEventListener('click', () => {
+            flow.remove();
+            --flowCount;
+            flowsInput.disabled = false;
+        });
+    }
+
+    let firstSuggestionElement = null;
+    let lastSuggestionElement = null;
+
+    function suggestionsFocusTrap(event) {
+        if (event.key === 'Tab') {
+            // cycle focus within the suggestions
+            if (
+                document.activeElement === firstSuggestionElement
+                && event.shiftKey
+            ) {
+                // at the first suggestion and hit shift-tab. cycle to the last one
+                event.preventDefault();
+                lastSuggestionElement.focus();
+            } else if (
+                document.activeElement === lastSuggestionElement
+                && !event.shiftKey
+            ) {
+                // at the last suggestion and hit tab. loop back to the first one
+                event.preventDefault();
+                firstSuggestionElement.focus();
+            }
+        } else if (event.key !== 'Enter' && event.key !== 'Shift') {
+            // other non-special keys should affect the input like usual
+            flowsInput.focus();
+            if (event.key === 'Escape') {
+                closeFlowSuggestions();
+            }
+        }
+    }
+
+    flowSuggestionsDestination.addEventListener('keydown', suggestionsFocusTrap);
+    flowSuggestionsDestination.addEventListener('focusin', (event) => {
+        const focusedFlowName = event.target.firstElementChild.textContent;
+        flowsInput.value = focusedFlowName;
+    });
 
     flowsInput.addEventListener('keydown', (event) => {
         if (event.key === "Enter") {
@@ -199,21 +361,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 return;
             }
 
-            const flow = createFlow(value);
-            flowsDestination.append(flow);
-            ++flowCount;
-
-            if (flowCount >= MAX_FLOWS) {
-                flowsInput.disabled = true;
-            }
-
-            flow.addEventListener('click', () => {
-                flow.remove();
-                --flowCount;
-                flowsInput.disabled = false;
-            });
+            addFlow(value);
 
             flowsInput.value = '';
+
+            closeFlowSuggestions();
+        } else if (event.key === 'Escape') {
+            closeFlowSuggestions();
         }
     });
 

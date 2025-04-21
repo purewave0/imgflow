@@ -11,7 +11,8 @@ from app.dbapi import (
     create_post, vote_post, comment_on_post, vote_comment, reply_to_comment,
     get_comment_replies, get_public_posts_by_page, get_post_media, get_post_and_media,
     get_post_comments_by_page, Vote, PostSorting, CommentSorting,
-    get_flow, get_flows_overview, get_public_posts_in_flow_by_page
+    get_flow, get_flows_overview, suggest_flows_by_name,
+    get_public_posts_in_flow_by_page
 )
 from app.models.post import Post, Flow
 
@@ -247,11 +248,21 @@ def api_comment_replies(post_id, comment_id):
 
 # -- flows --
 
+@bp.route('/flow-suggestions')
+def api_flow_suggestions():
+    partial_name = request.args.get('name')
+    if not partial_name:
+        return jsonify({'error':'missing_name'}), 400
+
+    return jsonify(suggest_flows_by_name(partial_name))
+
+
 @bp.route('/flows')
 def api_flows():
     is_overview = bool(request.args.get('overview'))
     if is_overview:
         return jsonify(get_flows_overview())
+
     # TODO: by pages
     return jsonify('TODO')
 
