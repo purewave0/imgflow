@@ -222,6 +222,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function suggestFlows(flowName) {
         // TODO: 'loading suggestions...'
+        const hadFocusedFlowBefore = (
+            document.activeElement
+            && document.activeElement.classList.contains('suggestion')
+        );
+        const oldFocusedFlowName = (hadFocusedFlowBefore)
+            ? document.activeElement.firstElementChild.textContent
+            : null;
+
         Api.fetchFlowSuggestions(flowName)
             .then((response) => response.json())
             .then((suggestions) => {
@@ -239,6 +247,18 @@ document.addEventListener('DOMContentLoaded', () => {
                     lastSuggestionElement =
                         flowSuggestionsDestination.lastElementChild;
                     showFlowSuggestions();
+
+                    if (oldFocusedFlowName) {
+                        /* suggestions were updated while a flow was focused. if the
+                           same flow pops up again, refocus on it */
+                        for (const flow of flowSuggestionsDestination.children) {
+                            const flowName = flow.firstElementChild.textContent;
+                            if (flowName === oldFocusedFlowName) {
+                                flow.focus();
+                                break;
+                            }
+                        }
+                    }
                 }
             });
     }
