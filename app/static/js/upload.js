@@ -122,6 +122,7 @@ document.addEventListener('DOMContentLoaded', () => {
             <span class="flow-name"></span>
             <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#ffffff"><path d="m256-200-56-56 224-224-224-224 56-56 224 224 224-224 56 56-224 224 224 224-56 56-224-224-224 224Z"/></svg>
         `;
+        flow.dataset.name = flowName;
         const nameElement = flow.querySelector('.flow-name');
         nameElement.textContent = flowName;
 
@@ -169,6 +170,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     posts
                 </p>
             `;
+            suggestionItem.dataset.name = flow.name;
 
             const flowName = suggestionItem.querySelector('.suggestion-name');
             flowName.textContent = flow.name;
@@ -227,7 +229,7 @@ document.addEventListener('DOMContentLoaded', () => {
             && document.activeElement.classList.contains('suggestion')
         );
         const oldFocusedFlowName = (hadFocusedFlowBefore)
-            ? document.activeElement.firstElementChild.textContent
+            ? document.activeElement.dataset.name
             : null;
 
         Api.fetchFlowSuggestions(flowName)
@@ -252,8 +254,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         /* suggestions were updated while a flow was focused. if the
                            same flow pops up again, refocus on it */
                         for (const flow of flowSuggestionsDestination.children) {
-                            const flowName = flow.firstElementChild.textContent;
-                            if (flowName === oldFocusedFlowName) {
+                            if (flow.dataset.name === oldFocusedFlowName) {
                                 flow.focus();
                                 break;
                             }
@@ -292,7 +293,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function alreadyAddedFlow(flowName) {
         for (const flow of flowsDestination.children) {
-            const name = flow.firstElementChild.textContent;
+            const name = flow.dataset.name;
             if (name === flowName) {
                 return true;
             }
@@ -352,7 +353,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     flowSuggestionsDestination.addEventListener('keydown', suggestionsFocusTrap);
     flowSuggestionsDestination.addEventListener('focusin', (event) => {
-        const focusedFlowName = event.target.firstElementChild.textContent;
+        const focusedFlowName = event.target.dataset.name;
         flowsInput.value = focusedFlowName;
     });
 
@@ -409,12 +410,12 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         }
 
-        const flows = [];
+        const flowNames = [];
         for (const flow of flowsDestination.children) {
-            flows.push(flow.firstElementChild.textContent);
+            flowNames.push(flow.dataset.name);
         }
 
-        const result = await Api.createPost(title, files, isPublic, flows);
+        const result = await Api.createPost(title, files, isPublic, flowNames);
         const newPost = await result.json();
         // TODO: notification 'post created successfully'
         document.location.href = `/posts/${newPost.post_id}`;
