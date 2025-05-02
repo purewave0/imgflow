@@ -39,6 +39,15 @@ const Api = {
         return fetch(`/api/posts?page=${page}&sort=${sorting}`);
     },
 
+    searchPublicPostsByPage(title, page, sorting) {
+        return fetch(
+            '/api/posts'
+            + `?title=${encodeURIComponent(title)}`
+            + `&page=${page}`
+            + `&sort=${sorting}`
+        );
+    },
+
     fetchPost(postId) {
         return fetch(`/api/posts/${postId}`);
     },

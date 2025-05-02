@@ -1,0 +1,89 @@
+{% extends 'base.html' %}
+
+{% block css %}
+    <link rel="stylesheet" href="/static/css/post-gallery.css">
+    <link rel="stylesheet" href="/static/css/search.css">
+{% endblock %}
+
+{% block js %}
+    <script src="/static/js/lib/macy.min.js"></script>
+    <script src="/static/js/post-gallery.js"></script>
+    <script src="/static/js/api.js"></script>
+    <script src="/static/js/search.js"></script>
+{% endblock %}
+
+{% block title %} Search {% endblock %}
+
+{% block content %}
+
+    <!--
+    <section id="flows-section" class="page">
+        <h2>Related Flows</h2>
+
+        <ul id="flows"></ul>
+
+        <ul id="flows-skeleton">
+            <li class="flow-compact"></li>
+            <li class="flow-compact"></li>
+            <li class="flow-compact"></li>
+            <li class="flow-compact"></li>
+
+            <li class="flow-compact"></li>
+            <li class="flow-compact"></li>
+            <li class="flow-compact"></li>
+            <li class="flow-compact"></li>
+        </ul>
+    </section>
+    -->
+
+    <section id="gallery-section" class="page">
+        <div id="gallery-header">
+            <h2>Results for "<span class="search-query"></span>"</h2>
+            <div id="posts-sorting">
+                <span id="sort-newest" data-sort="newest">Newest</span>
+                <span id="sort-top" data-sort="top">Top</span>
+            </div>
+        </div>
+
+        <div id="gallery-skeleton">
+            <div class="post"></div>
+            <div class="post"></div>
+            <div class="post"></div>
+            <div class="post"></div>
+            <div class="post"></div>
+
+            <div class="post"></div>
+            <div class="post"></div>
+            <div class="post"></div>
+            <div class="post"></div>
+            <div class="post"></div>
+
+            <div class="post"></div>
+            <div class="post"></div>
+            <div class="post"></div>
+            <div class="post"></div>
+            <div class="post"></div>
+        </div>
+
+        <div id="gallery"></div>
+
+        <div id="gallery-end">
+            <h3>You've scrolled through it all!</h3>
+            <p>Time for a coffee break.</p>
+        </div>
+    </section>
+
+    <div id="no-results">
+        <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e3e3e3">
+            <path d="M796-121 533-384q-30 26-69.96 40.5Q423.08-329 378-329q-108.16 0-183.08-75Q120-479 120-585t75-181q75-75 181.5-75t181 75Q632-691 632-584.85 632-542 618-502q-14 40-42 75l264 262-44 44ZM377-389q81.25 0 138.13-57.5Q572-504 572-585t-56.87-138.5Q458.25-781 377-781q-82.08 0-139.54 57.5Q180-666 180-585t57.46 138.5Q294.92-389 377-389Z"/>
+        </svg>
+        <h3>No posts found</h3>
+        <p>
+            We couldn't find any matches for "<span class="search-query"></span>".
+            <br>
+            Please <a href="#search" class="link">try again</a> with different keywords, or <a href="/" class="link">return home</a>.
+        </p>
+
+    </div>
+
+{% endblock %}

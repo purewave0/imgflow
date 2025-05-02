@@ -9,7 +9,8 @@ import regex
 from app.api import bp
 from app.dbapi import (
     create_post, vote_post, comment_on_post, vote_comment, reply_to_comment,
-    get_comment_replies, get_public_posts_by_page, get_post_media, get_post_and_media,
+    get_comment_replies, get_public_posts_by_page, search_public_posts_by_page,
+    get_post_media, get_post_and_media,
     get_post_comments_by_page, Vote, PostSorting, CommentSorting,
     get_flow, get_flows_overview, suggest_flows_by_name,
     get_public_posts_in_flow_by_page
@@ -67,7 +68,13 @@ def api_posts():
         except ValueError:
             return jsonify({'error': 'invalid_sort'}), 400
 
-        posts = get_public_posts_by_page(page, sorting)
+        title_query = request.args.get('title')
+        posts = None
+        if title_query:
+            posts = search_public_posts_by_page(title_query, page, sorting)
+        else:
+            posts = get_public_posts_by_page(page, sorting)
+
         return jsonify(posts)
 
     title = request.form.get('title')

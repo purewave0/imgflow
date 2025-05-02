@@ -192,6 +192,47 @@ def get_public_posts_by_page(page, sorting):
     return _rows_to_dicts(result)
 
 
+def search_public_posts_by_page(title, page, sorting):
+    """Return a sorted and paginated collection of Posts as dicts, filtered by title.
+
+    Attributes:
+        title: The title to search for.
+        page: The page to fetch.
+        sorting: The PostSorting option to use.
+    """
+    statement = db.select(
+            Post.post_id,
+            Post.title,
+            Post.thumbnail_url,
+            Post.created_on,
+            Post.updated_on,
+            Post.score,
+            Post.comment_count,
+            Post.views,
+        ).where(
+            Post.is_public == True,
+            Post.title.icontains(title)
+        )
+
+    match sorting:
+        case PostSorting.NEWEST:
+            statement = statement.order_by(Post.created_on.desc())
+        case PostSorting.TOP:
+            statement = statement.order_by(
+                Post.score.desc(),
+                Post.created_on.desc(),
+            )
+
+    statement = statement.limit(
+            POSTS_PER_PAGE
+        ).offset(
+            page*POSTS_PER_PAGE
+        )
+
+    result = db.session.execute(statement)
+    return _rows_to_dicts(result)
+
+
 def get_post_media(post_id):
     """Return all of a Post's media as dicts."""
     result = db.session.execute(

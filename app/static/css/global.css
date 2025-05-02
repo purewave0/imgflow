@@ -99,12 +99,23 @@ header {
     border: none;
 }
 
-#header-search svg {
+#search-button {
     position: absolute;
     top: 0;
-    right: 16px;
+    right: 0px;
     bottom: 0;
     margin: auto;
+    width: fit-content;
+    padding-left: 12px;
+    padding-right: 16px;
+    border-top-right-radius: 64px;
+    border-bottom-right-radius: 64px;
+    cursor: pointer;
+    background: none;
+    border: none;
+}
+
+#search-button svg{
     width: 32px;
     height: 32px;
     fill: var(--color-text-secondary);

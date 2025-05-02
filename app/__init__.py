@@ -33,6 +33,9 @@ def create_app(config_class=Config):
     from app.main import bp as main_bp
     app.register_blueprint(main_bp)
 
+    from app.search import bp as search_bp
+    app.register_blueprint(search_bp, url_prefix='/search')
+
     from app.posts import bp as posts_bp
     app.register_blueprint(posts_bp, url_prefix='/posts')
 
