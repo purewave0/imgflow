@@ -359,7 +359,8 @@ body:not(.no-comments) #empty-comments {
     font-weight: 500;
 }
 
-#comments[data-all-comments-fetched] ~ #comments-view-more {
+#comments[data-all-comments-fetched] ~ #comments-view-more,
+#comments.loading ~ #comments-view-more {
     display: none;
 }
 
