@@ -121,9 +121,23 @@ header {
     fill: var(--color-text-secondary);
 }
 
+#header-buttons {
+    display: flex;
+    flex-direction: row;
+    column-gap: 16px;
+}
+
 .button-new-post {
     background-color: var(--color-primary);
     color: white;
+    font-size: 14pt;
+}
+
+.button-login {
+    background-color: transparent;
+    border: 2px solid var(--color-primary);
+    color: var(--color-primary);
+    font-weight: bold;
     font-size: 14pt;
 }
 

@@ -1,0 +1,57 @@
+{% extends 'base.html' %}
+
+{% block css %}
+    <link rel="stylesheet" href="/static/css/login.css">
+{% endblock %}
+
+{% block js %}
+    <script src="/static/js/api.js"></script>
+    <script src="/static/js/login.js"></script>
+{% endblock %}
+
+{% block title %} Log in {% endblock %}
+
+{% block content %}
+    <a id="logo" href="/">
+        <!-- TODO: proper logo -->
+        <img src="/static/icons/logo-temp.svg" alt="imgflow logo">
+    </a>
+
+    <form id="login-form">
+        <div id="heading">
+            <h2>Log in</h2>
+            <p>to participate</p>
+        </div>
+
+        <div id="fields">
+            <div class="form-field">
+                <label for="username">Username</label>
+                <input id="username" type="text" minlength="2" maxlength="32" autofocus required>
+            </div>
+
+            <div class="form-field">
+                <label for="password">Password</label>
+                <div id="password-wrapper">
+                    <input id="password" type="password" maxlength="100" required>
+                    <button id="password-visibility-toggle" type="button">
+                         <svg id="show" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e3e3e3"><path d="M480-320q75 0 127.5-52.5T660-500q0-75-52.5-127.5T480-680q-75 0-127.5 52.5T300-500q0 75 52.5 127.5T480-320Zm0-72q-45 0-76.5-31.5T372-500q0-45 31.5-76.5T480-608q45 0 76.5 31.5T588-500q0 45-31.5 76.5T480-392Zm0 192q-146 0-266-81.5T40-500q54-137 174-218.5T480-800q146 0 266 81.5T920-500q-54 137-174 218.5T480-200Z"/></svg>
+                         <svg id="hide" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e3e3e3"><path d="M792-56 624-222q-35 11-70.5 16.5T480-200q-151 0-269-83.5T40-500q21-53 53-98.5t73-81.5L56-792l56-56 736 736-56 56ZM480-320q11 0 20.5-1t20.5-4L305-541q-3 11-4 20.5t-1 20.5q0 75 52.5 127.5T480-320Zm292 18L645-428q7-17 11-34.5t4-37.5q0-75-52.5-127.5T480-680q-20 0-37.5 4T408-664L306-766q41-17 84-25.5t90-8.5q151 0 269 83.5T920-500q-23 59-60.5 109.5T772-302ZM587-486 467-606q28-5 51.5 4.5T559-574q17 18 24.5 41.5T587-486Z"/></svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <button id="form-submit" class="button" type="submit">
+            <span>Log in</span>
+            <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#ffffff">
+                <path d="M647-440H160v-80h487L423-744l57-56 320 320-320 320-57-56 224-224Z"/>
+            </svg>
+        </button>
+
+        <div id="signup-invite">
+            <span>No account yet?</span>
+            <a href="/signup">Sign up</a>
+        </div>
+    </form>
+
+{% endblock %}
