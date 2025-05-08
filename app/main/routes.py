@@ -10,3 +10,7 @@ def index():
 @bp.route('/login')
 def login():
     return render_template('login/index.html')
+
+@bp.route('/signup')
+def signup():
+    return render_template('signup/index.html')
