@@ -10,6 +10,12 @@ document.addEventListener('DOMContentLoaded', () => {
         passwordVisibilityToggle.classList.toggle('visible');
     });
 
+    const urlParams = new URLSearchParams(window.location.search);
+    const redirectDestinationQuery = urlParams.get('redirect_to') || '/';
+
+    const loginLink = document.getElementById('login-link');
+    loginLink.href += `?redirect_to=${encodeURIComponent(redirectDestinationQuery)}`;
+
     const signupForm = document.getElementById('signup-form');
     signupForm.addEventListener('submit', async (event) => {
         event.preventDefault();
@@ -18,16 +24,6 @@ document.addEventListener('DOMContentLoaded', () => {
         const password = document.getElementById('password').value.trim();
 
         const response = await Api.signup(username, password); // TODO
-
-        document.location.href = '/';
-        // TODO: receive 'redirect_to' from login page
-        /*
-        const urlParams = new URLSearchParams(window.location.search);
-        const redirectDestinationQuery = urlParams.get('redirect_to');
-        if (!redirectDestinationQuery) {
-            document.location.href = '/';
-            return;
-        }
 
         const redirectDestination = (
             // ensure we always redirect to a page within imgflow
@@ -42,6 +38,5 @@ document.addEventListener('DOMContentLoaded', () => {
             // malformed 'redirect_to'
             document.location.href = '/';
         }
-        */
     });
 });

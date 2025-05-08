@@ -10,6 +10,12 @@ document.addEventListener('DOMContentLoaded', () => {
         passwordVisibilityToggle.classList.toggle('visible');
     });
 
+    const urlParams = new URLSearchParams(window.location.search);
+    const redirectDestinationQuery = urlParams.get('redirect_to') || '/';
+
+    const signupLink = document.getElementById('signup-link');
+    signupLink.href += `?redirect_to=${encodeURIComponent(redirectDestinationQuery)}`;
+
     const loginForm = document.getElementById('login-form');
     loginForm.addEventListener('submit', async (event) => {
         event.preventDefault();
@@ -18,13 +24,6 @@ document.addEventListener('DOMContentLoaded', () => {
         const password = document.getElementById('password').value.trim();
 
         const response = await Api.login(username, password); // TODO
-
-        const urlParams = new URLSearchParams(window.location.search);
-        const redirectDestinationQuery = urlParams.get('redirect_to');
-        if (!redirectDestinationQuery) {
-            document.location.href = '/';
-            return;
-        }
 
         const redirectDestination = (
             // ensure we always redirect to a page within imgflow
