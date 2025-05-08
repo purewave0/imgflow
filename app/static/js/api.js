@@ -157,5 +157,21 @@ const Api = {
 
     fetchPublicPostsInFlowByPage(flowName, page, sorting) {
         return fetch(`/api/flows/${flowName}/posts?page=${page}&sort=${sorting}`);
+    },
+
+
+    // -- login --
+
+    login(username, password) {
+        return fetch(`/api/login`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                'username': username,
+                'password': password,
+            }),
+        });
     }
 };
