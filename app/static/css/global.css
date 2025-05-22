@@ -21,6 +21,9 @@ body {
     --color-text-primary: #301f55;
     --color-text-secondary: #697599;
 
+    --color-success: #388e3c;
+    --color-error: #d32f2f;
+
     /* dimensions*/
     --content-width: 1600px;
     --content-width-narrow: 1200px;

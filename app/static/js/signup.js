@@ -16,6 +16,46 @@ document.addEventListener('DOMContentLoaded', () => {
     const loginLink = document.getElementById('login-link');
     loginLink.href += `?redirect_to=${encodeURIComponent(redirectDestinationQuery)}`;
 
+    const usernameInput = document.getElementById('username');
+    const usernameAvailabilityMessage = document.getElementById('availability-message');
+
+    const checkUsernameAvailabilityDebounced = debounce(async () => {
+        // TODO: loading below the input
+        const username = usernameInput.value;
+        if (username) {
+            const isAvailable = await Api.isUsernameAvailable(username);
+            if (isAvailable) {
+                usernameInput.setCustomValidity('');
+                usernameAvailabilityMessage.dataset.state = 'available';
+                usernameAvailabilityMessage.textContent = 'Username available!';
+            } else {
+                usernameInput.setCustomValidity('Username already taken.');
+                usernameAvailabilityMessage.dataset.state = 'taken';
+                usernameAvailabilityMessage.textContent = 'Username already taken.';
+
+                // TODO: suggest available variations of the username?
+            }
+        }
+    }, 500);
+
+    usernameInput.addEventListener('input', (event) => {
+        usernameInput.setCustomValidity('');
+        delete usernameAvailabilityMessage.dataset.state;
+        usernameAvailabilityMessage.textContent = '';
+
+        if (
+            !usernameInput.value
+            || usernameInput.validity.tooShort
+            || usernameInput.validity.tooLong
+        ) {
+            // no need to check availability if it's not even valid
+            return;
+        }
+
+        checkUsernameAvailabilityDebounced();
+    });
+
+
     const signupForm = document.getElementById('signup-form');
     signupForm.addEventListener('submit', async (event) => {
         event.preventDefault();
@@ -23,9 +63,18 @@ document.addEventListener('DOMContentLoaded', () => {
         const username = document.getElementById('username').value.trim();
         const password = document.getElementById('password').value.trim();
 
-        const response = await Api.signup(username, password); // TODO
+        const response = await Api.signup(username, password);
         if (!response.ok) {
-            // TODO:
+            const result = await response.json();
+            switch (result.error) {
+                case 'username_already_taken':
+                    checkUsernameAvailabilityDebounced();
+                    break;
+                // TODO: deal with the other possible errors
+                default:
+                    alert('TODO');
+                    break;
+            }
             return;
         }
 

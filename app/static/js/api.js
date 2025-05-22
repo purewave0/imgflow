@@ -186,5 +186,10 @@ const Api = {
                 'password': password,
             }),
         });
+    },
+
+    isUsernameAvailable(username) {
+        return fetch(`/api/usernames/${encodeURIComponent(username)}`)
+            .then(response => response.status === 404);
     }
 };

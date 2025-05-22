@@ -352,3 +352,11 @@ def api_create_user():
 
     new_user = create_user(username, password)
     return new_user
+
+
+@bp.route('/usernames/<username>')
+def api_username_exists(username):
+    if is_username_taken(username):
+        return '', 204
+
+    return '', 404

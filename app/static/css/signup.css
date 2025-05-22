@@ -52,6 +52,23 @@ header {
     border: 1px solid var(--color-background-border);
 }
 
+#availability-message {
+    opacity: 0;
+    margin: 0;
+    min-height: 18px;
+    font-size: 11pt;
+}
+
+#availability-message[data-state="available"] {
+    opacity: 1;
+    color: var(--color-success);
+}
+
+#availability-message[data-state="taken"] {
+    opacity: 1;
+    color: var(--color-error);
+}
+
 #password-wrapper {
     position: relative;
 }
