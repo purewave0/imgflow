@@ -176,7 +176,7 @@ const Api = {
     },
 
     signup(username, password) {
-        return fetch(`/api/signup`, {
+        return fetch(`/api/users`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

@@ -13,9 +13,11 @@ from app.dbapi import (
     get_post_media, get_post_and_media,
     get_post_comments_by_page, Vote, PostSorting, CommentSorting,
     get_flow, get_flows_overview, suggest_flows_by_name,
-    get_public_posts_in_flow_by_page
+    get_public_posts_in_flow_by_page,
+    create_user, is_username_taken
 )
 from app.models.post import Post, Flow
+from app.models.user import User
 
 
 flow_regex_pattern = regex.compile(r"""
@@ -25,6 +27,8 @@ flow_regex_pattern = regex.compile(r"""
         \-    # hyphen
     ]{2,50}   # between 2 to 50 characters
 """, regex.VERBOSE)
+
+# TODO: username_regex_pattern
 
 UPLOADS_MEDIA_PATH      = 'app/static/uploads/media'
 UPLOADS_THUMBNAILS_PATH = 'app/static/uploads/thumbnails'
@@ -315,3 +319,36 @@ def api_posts_in_flow(flow_name):
 
     posts = get_public_posts_in_flow_by_page(flow['id'], page, sorting)
     return jsonify(posts)
+
+
+# -- authentication --
+
+@bp.route('/users', methods=['POST'])
+def api_create_user():
+    try:
+        username = request.json['username']
+        password = request.json['password']
+    except KeyError:
+        return jsonify({'error': 'missing_username_password'}), 400
+
+    username_length = len(username)
+    if (
+        User.MIN_USERNAME_LENGTH > username_length
+        or username_length > User.MAX_USERNAME_LENGTH
+    ):
+        return jsonify({'error': 'wrong_username_length'}), 400
+
+    password_length = len(password)
+    if (
+        User.MIN_PASSWORD_LENGTH > password_length
+        or password_length > User.MAX_PASSWORD_LENGTH
+    ):
+        return jsonify({'error': 'wrong_password_length'}), 400
+
+    # TODO: validate username with regex
+
+    if is_username_taken(username):
+        return jsonify({'error': 'username_already_taken'}), 400
+
+    new_user = create_user(username, password)
+    return new_user

@@ -4,6 +4,7 @@ from app.extensions import db
 from app.models.post import (
     Post, PostMedia, PostComment, Flow, PostFlow
 )
+from app.models.user import User
 
 
 POSTS_PER_PAGE = 20
@@ -617,3 +618,43 @@ def suggest_flows_by_name(partial_name):
     )
 
     return _rows_to_dicts(result)
+
+
+# -- users --
+
+def create_user(username, password):
+    """Create a user in the database.
+
+    Args:
+        username: The username. Must be between User.MIN_USERNAME_LENGTH and
+            User.MAX_USERNAME_LENGTH characters.
+        password: The password. Must be between User.MIN_PASSWORD_LENGTH and
+            User.MAX_PASSWORD_LENGTH characters.
+
+    Returns:
+        The newly created User's username and creation date columns as a dict.
+    """
+    user = User(username, password)
+
+    db.session.add(user)
+    db.session.commit()
+
+    return {
+        'username': user.username,
+        'created_on': user.created_on,
+    }
+
+
+def is_username_taken(username):
+    """Return whether the given username is already taken."""
+    is_taken = db.session.execute(
+        db.select(
+            User.username
+        ).where(
+            User.username == username
+        )
+    ).scalar() is not None
+
+    # TODO: case-insensitive username indexing, because currently it's case-sensitive
+
+    return is_taken

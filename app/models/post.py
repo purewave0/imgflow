@@ -1,20 +1,8 @@
 import random
 import string
 
-from sqlalchemy.sql import expression, case
-from sqlalchemy.ext.compiler import compiles
-from sqlalchemy.types import Numeric
-
 from app.extensions import db
-
-
-class utcnow(expression.FunctionElement):
-    type = db.DateTime()
-    inherit_cache = True
-
-@compiles(utcnow, 'mariadb')
-def pg_utcnow(element, compiler, **kw):
-    return "UTC_TIMESTAMP"
+from app.models.util import utcnow
 
 
 _post_id_charset = string.ascii_letters + string.digits # a-z A-Z 0-9

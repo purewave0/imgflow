@@ -24,6 +24,10 @@ document.addEventListener('DOMContentLoaded', () => {
         const password = document.getElementById('password').value.trim();
 
         const response = await Api.signup(username, password); // TODO
+        if (!response.ok) {
+            // TODO:
+            return;
+        }
 
         const redirectDestination = (
             // ensure we always redirect to a page within imgflow

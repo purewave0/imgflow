@@ -24,6 +24,7 @@ def create_app(config_class=Config):
     db.init_app(app)
     with app.app_context():
         from app.models.post import Post, PostMedia, PostComment, Flow, PostFlow
+        from app.models.user import User
         db.create_all()
 
     # Blueprints
