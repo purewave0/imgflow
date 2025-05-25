@@ -10,13 +10,13 @@ from app.models.util import utcnow
 
 class User(UserMixin, db.Model):
     __tablename__ = 'User'
-    MIN_USERNAME_LENGTH = 2
-    MAX_USERNAME_LENGTH = 32
+    MIN_NAME_LENGTH = 2
+    MAX_NAME_LENGTH = 32
     MIN_PASSWORD_LENGTH = 6
     MAX_PASSWORD_LENGTH = 100
     id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(
-        db.String(MAX_USERNAME_LENGTH), nullable=False, unique=True, index=True
+    name = db.Column(
+        db.String(MAX_NAME_LENGTH), nullable=False, unique=True, index=True
     )
     password_hash = db.Column(db.String(256))
     created_on = db.Column(db.DateTime, server_default=utcnow())
@@ -25,14 +25,14 @@ class User(UserMixin, db.Model):
     # TODO: score
     # score = db.Column(db.Integer, nullable=False)
 
-    def __init__(self, username, password):
-        self.username = username
+    def __init__(self, name, password):
+        self.name = name
         self.password_hash = generate_password_hash(
             password
         )
 
     def __repr__(self):
-        return f'<User "{self.username}">'
+        return f'<User "{self.name}">'
 
 
     def set_password(self, password):

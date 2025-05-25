@@ -622,36 +622,36 @@ def suggest_flows_by_name(partial_name):
 
 # -- users --
 
-def create_user(username, password):
+def create_user(name, password):
     """Create a user in the database.
 
     Args:
-        username: The username. Must be between User.MIN_USERNAME_LENGTH and
-            User.MAX_USERNAME_LENGTH characters.
+        name: The username. Must be between User.MIN_NAME_LENGTH and
+            User.MAX_NAME_LENGTH characters.
         password: The password. Must be between User.MIN_PASSWORD_LENGTH and
             User.MAX_PASSWORD_LENGTH characters.
 
     Returns:
-        The newly created User's username and creation date columns as a dict.
+        The newly created User's name and creation date columns as a dict.
     """
-    user = User(username, password)
+    user = User(name, password)
 
     db.session.add(user)
     db.session.commit()
 
     return {
-        'username': user.username,
+        'name': user.name,
         'created_on': user.created_on,
     }
 
 
-def is_username_taken(username):
+def is_username_taken(name):
     """Return whether the given username is already taken."""
     is_taken = db.session.execute(
         db.select(
-            User.username
+            User.name
         ).where(
-            User.username == username
+            User.name == name
         )
     ).scalar() is not None
 
@@ -666,7 +666,7 @@ def get_user_by_name(name):
         db.select(
             User
         ).where(
-            User.username == name
+            User.name == name
         )
     ).scalar_one_or_none()
 

@@ -334,8 +334,8 @@ def api_create_user():
 
     username_length = len(username)
     if (
-        User.MIN_USERNAME_LENGTH > username_length
-        or username_length > User.MAX_USERNAME_LENGTH
+        User.MIN_NAME_LENGTH > username_length
+        or username_length > User.MAX_NAME_LENGTH
     ):
         return jsonify({'error': 'wrong_username_length'}), 400
 
@@ -374,8 +374,8 @@ def api_login():
     username_length = len(username)
     password_length = len(password)
     if (
-        User.MIN_USERNAME_LENGTH > username_length
-        or username_length > User.MAX_USERNAME_LENGTH
+        User.MIN_NAME_LENGTH > username_length
+        or username_length > User.MAX_NAME_LENGTH
         or User.MIN_PASSWORD_LENGTH > password_length
         or password_length > User.MAX_PASSWORD_LENGTH
     ):
