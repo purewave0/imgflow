@@ -23,7 +23,21 @@ document.addEventListener('DOMContentLoaded', () => {
         const username = document.getElementById('username').value.trim();
         const password = document.getElementById('password').value.trim();
 
-        const response = await Api.login(username, password); // TODO
+        const response = await Api.login(username, password);
+        if (!response.ok) {
+            const result = await response.json();
+            switch (result.error) {
+                case 'incorrect_login':
+                    // TODO: proper error message
+                    alert('incorrect username or password!');
+                    break;
+                // TODO: deal with the other possible errors
+                default:
+                    alert('TODO');
+                    break;
+            }
+            return;
+        }
 
         const redirectDestination = (
             // ensure we always redirect to a page within imgflow

@@ -2,6 +2,7 @@ from datetime import datetime, date
 
 from flask import Flask
 from flask.json.provider import DefaultJSONProvider
+from flask_login import LoginManager
 
 from config import Config
 from app.extensions import db
@@ -22,10 +23,19 @@ def create_app(config_class=Config):
 
     # Extensions
     db.init_app(app)
+    login_manager = LoginManager(app)
+
     with app.app_context():
         from app.models.post import Post, PostMedia, PostComment, Flow, PostFlow
         from app.models.user import User
         db.create_all()
+
+        @login_manager.user_loader
+        def load_user(user_id):
+            user = db.session.execute(
+                    db.select(User).where(User.id == int(user_id))
+                ).scalar_one_or_none()
+            return user
 
     # Blueprints
     from app.api import bp as api_bp

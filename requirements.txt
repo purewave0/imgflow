@@ -2,6 +2,7 @@ Flask
 mariadb
 SQLAlchemy
 Flask-SQLAlchemy
+flask-login
 
 Pillow
 

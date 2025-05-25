@@ -658,3 +658,16 @@ def is_username_taken(username):
     # TODO: case-insensitive username indexing, because currently it's case-sensitive
 
     return is_taken
+
+
+def get_user_by_name(name):
+    """Return the User with the given name, or None."""
+    user = db.session.execute(
+        db.select(
+            User
+        ).where(
+            User.username == name
+        )
+    ).scalar_one_or_none()
+
+    return user

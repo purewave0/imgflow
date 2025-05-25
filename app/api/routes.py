@@ -2,6 +2,7 @@ import os
 import uuid
 
 from flask import jsonify, request
+from flask_login import current_user, login_user
 from werkzeug.utils import secure_filename
 from PIL import Image
 import regex
@@ -14,7 +15,7 @@ from app.dbapi import (
     get_post_comments_by_page, Vote, PostSorting, CommentSorting,
     get_flow, get_flows_overview, suggest_flows_by_name,
     get_public_posts_in_flow_by_page,
-    create_user, is_username_taken
+    create_user, is_username_taken, get_user_by_name
 )
 from app.models.post import Post, Flow
 from app.models.user import User
@@ -360,3 +361,33 @@ def api_username_exists(username):
         return '', 204
 
     return '', 404
+
+
+@bp.route('/login', methods=['POST'])
+def api_login():
+    try:
+        username = request.json['username']
+        password = request.json['password']
+    except KeyError:
+        return jsonify({'error': 'missing_username_password'}), 400
+
+    username_length = len(username)
+    password_length = len(password)
+    if (
+        User.MIN_USERNAME_LENGTH > username_length
+        or username_length > User.MAX_USERNAME_LENGTH
+        or User.MIN_PASSWORD_LENGTH > password_length
+        or password_length > User.MAX_PASSWORD_LENGTH
+    ):
+        return jsonify({'error': 'incorrect_login'}), 401
+
+    if current_user.is_authenticated:
+        # already logged in
+        return '', 204
+
+    user = get_user_by_name(username)
+    if user is None or not user.check_password(password):
+        return jsonify({'error': 'incorrect_login'}), 401
+
+    login_user(user, remember=True)
+    return '', 204

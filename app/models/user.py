@@ -1,13 +1,14 @@
 import random
 import string
 
-from werkzeug.security import generate_password_hash
+from werkzeug.security import generate_password_hash, check_password_hash
+from flask_login import UserMixin
 
 from app.extensions import db
 from app.models.util import utcnow
 
 
-class User(db.Model):
+class User(UserMixin, db.Model):
     __tablename__ = 'User'
     MIN_USERNAME_LENGTH = 2
     MAX_USERNAME_LENGTH = 32
@@ -32,3 +33,10 @@ class User(db.Model):
 
     def __repr__(self):
         return f'<User "{self.username}">'
+
+
+    def set_password(self, password):
+        self.password_hash = generate_password_hash(password)
+
+    def check_password(self, password):
+        return check_password_hash(self.password_hash, password)
