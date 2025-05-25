@@ -97,7 +97,7 @@ def api_posts():
         for flow_name in raw_flows:
             name_length = len(flow_name)
             if (
-                Flow.MIN_NAME_LENGTH > name_length
+                name_length < Flow.MIN_NAME_LENGTH
                 or name_length > Flow.MAX_NAME_LENGTH
             ):
                 return jsonify({'error': 'wrong_flow_name_length'}), 400
@@ -309,7 +309,7 @@ def api_posts_in_flow(flow_name):
 
     name_length = len(flow_name)
     if (
-        Flow.MIN_NAME_LENGTH > name_length
+        name_length < Flow.MIN_NAME_LENGTH
         or name_length > Flow.MAX_NAME_LENGTH
     ):
         return jsonify(None), 404
@@ -334,14 +334,14 @@ def api_create_user():
 
     username_length = len(username)
     if (
-        User.MIN_NAME_LENGTH > username_length
+        username_length < User.MIN_NAME_LENGTH
         or username_length > User.MAX_NAME_LENGTH
     ):
         return jsonify({'error': 'wrong_username_length'}), 400
 
     password_length = len(password)
     if (
-        User.MIN_PASSWORD_LENGTH > password_length
+        password_length < User.MIN_PASSWORD_LENGTH
         or password_length > User.MAX_PASSWORD_LENGTH
     ):
         return jsonify({'error': 'wrong_password_length'}), 400
@@ -374,9 +374,9 @@ def api_login():
     username_length = len(username)
     password_length = len(password)
     if (
-        User.MIN_NAME_LENGTH > username_length
+        username_length < User.MIN_NAME_LENGTH
         or username_length > User.MAX_NAME_LENGTH
-        or User.MIN_PASSWORD_LENGTH > password_length
+        or password_length < User.MIN_PASSWORD_LENGTH
         or password_length > User.MAX_PASSWORD_LENGTH
     ):
         return jsonify({'error': 'incorrect_login'}), 401
