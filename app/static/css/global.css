@@ -144,6 +144,19 @@ header {
     font-size: 14pt;
 }
 
+#header-profile {
+    border: 2px solid var(--color-primary);
+    border-radius: 100%;
+    height: 46px;
+    width: 46px;
+}
+
+#header-profile img {
+    height: 100%;
+    width: 100%;
+    border-radius: 100%;
+}
+
 .content {
     margin-top: 32px;
 }

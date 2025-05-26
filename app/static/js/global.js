@@ -24,6 +24,8 @@ searchForm.addEventListener('submit', (event) => {
     document.location.href = `/search?title=${encodeURIComponent(titleQuery)}`;
 });
 
-const currentPage = document.location.pathname;
 const loginButton = document.getElementById('header-login');
-loginButton.href = `/login?redirect_to=${encodeURIComponent(currentPage)}`;
+if (loginButton) {
+    const currentPage = document.location.pathname;
+    loginButton.href = `/login?redirect_to=${encodeURIComponent(currentPage)}`;
+}

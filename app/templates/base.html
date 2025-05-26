@@ -31,9 +31,17 @@
                     <span>New post</span>
                 </a>
 
-                <a id="header-login" class="button button-login" href="/login">
-                    <span>Log in</span>
-                </a>
+                {% if current_user.is_authenticated %}
+                    <!-- TODO: verify usernames with slashes or other special characters -->
+                    <a id="header-profile" href="/users/{{ current_user.name | urlencode | replace("/", "%2F") }}">
+                        <!-- TODO: pull avatar -->
+                        <img src="/static/img/avatar-default.jpg" alt="{{ current_user.name }}">
+                    </a>
+                {% else %}
+                    <a id="header-login" class="button button-login" href="/login">
+                        <span>Log in</span>
+                    </a>
+                {% endif %}
             </div>
         </div>
     </header>
