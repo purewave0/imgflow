@@ -352,7 +352,12 @@ def api_create_user():
         return jsonify({'error': 'username_already_taken'}), 400
 
     new_user = create_user(username, password)
-    return new_user
+    login_user(new_user, remember=True)
+
+    return jsonify({
+        'name': new_user.name,
+        'created_on': new_user.created_on,
+    }), 201
 
 
 @bp.route('/usernames/<username>')

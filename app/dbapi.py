@@ -632,17 +632,14 @@ def create_user(name, password):
             User.MAX_PASSWORD_LENGTH characters.
 
     Returns:
-        The newly created User's name and creation date columns as a dict.
+        The newly created User object.
     """
     user = User(name, password)
 
     db.session.add(user)
     db.session.commit()
 
-    return {
-        'name': user.name,
-        'created_on': user.created_on,
-    }
+    return user
 
 
 def is_username_taken(name):
