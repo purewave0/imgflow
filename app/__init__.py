@@ -56,15 +56,5 @@ def create_app(config_class=Config):
     from app.flows import bp as flows_bp
     app.register_blueprint(flows_bp, url_prefix='/flows')
 
-    from app.contact import bp as contact_bp
-    app.register_blueprint(contact_bp, url_prefix='/contact')
-
-    from app.about import bp as about_bp
-    app.register_blueprint(about_bp, url_prefix='/about')
-
-
-    @app.route('/test/')
-    def test_page():
-        return '<h1>Hello, World!</h1> <p>Hello</p>'
 
     return app
