@@ -451,7 +451,7 @@ def remove_upvote_from_post(post_id, user_id):
                 PostUpvote.post_id == post_id,
                 PostUpvote.user_id == user_id
             )
-    ).mappings().one_or_none()
+    ).scalars().one_or_none()
 
     if not upvote:
         return
@@ -504,7 +504,7 @@ def remove_upvote_from_comment(post_id, comment_id, user_id):
                 CommentUpvote.comment_id == comment_id,
                 CommentUpvote.user_id == user_id
             )
-    ).mappings().one_or_none()
+    ).scalars().one_or_none()
 
     if not upvote:
         return

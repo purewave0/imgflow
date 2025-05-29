@@ -14,9 +14,16 @@ document.addEventListener('DOMContentLoaded', () => {
     const upvotePostButton = document.getElementById('upvote-post');
     if (currentUser.isLoggedIn) {
         upvotePostButton.addEventListener('click', () => {
-            // 'currentPost' holds this post's info. comes from the page template.
-            Api.upvotePost(currentPost.post_id);
-            postScore.textContent = Number(postScore.textContent) + 1;
+            const hasUpvotedPost =
+                upvotePostButton.classList.contains('upvoted');
+            if (hasUpvotedPost) {
+                Api.removeUpvoteFromPost(currentPost.post_id);
+                postScore.textContent = Number(postScore.textContent) - 1;
+            } else {
+                Api.upvotePost(currentPost.post_id);
+                postScore.textContent = Number(postScore.textContent) + 1;
+            }
+            upvotePostButton.classList.toggle('upvoted');
         });
     } else {
         upvotePostButton.addEventListener('click', () => {
@@ -151,9 +158,18 @@ document.addEventListener('DOMContentLoaded', () => {
         const upvoteButton = commentWrapper.querySelector('.action-upvote');
         if (currentUser.isLoggedIn) {
             upvoteButton.addEventListener('click', () => {
-                Api.upvoteComment(currentPost.post_id, commentId);
-                scoreElement.textContent =
-                    Number(scoreElement.textContent) + 1;
+                const hasUpvotedComment =
+                    upvoteButton.classList.contains('upvoted');
+                if (hasUpvotedComment) {
+                    Api.removeUpvoteFromComment(currentPost.post_id, commentId);
+                    scoreElement.textContent =
+                        Number(scoreElement.textContent) - 1;
+                } else {
+                    Api.upvoteComment(currentPost.post_id, commentId);
+                    scoreElement.textContent =
+                        Number(scoreElement.textContent) + 1;
+                }
+                upvoteButton.classList.toggle('upvoted')
             });
         } else {
             upvoteButton.addEventListener('click', () => {

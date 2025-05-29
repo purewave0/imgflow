@@ -103,7 +103,7 @@ const Api = {
         );
     },
 
-    removeUpvoteFromPost(postId, commentId) {
+    removeUpvoteFromComment(postId, commentId) {
         return fetch(
             `/api/posts/${postId}/comments/${commentId}/vote`,
             { method: 'DELETE' }
