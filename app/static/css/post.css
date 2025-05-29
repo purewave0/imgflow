@@ -271,12 +271,8 @@
     column-gap: 4px;
 }
 
-.action-upvote, .action-downvote {
+.action-upvote {
     cursor: pointer;
-}
-
-.action-downvote {
-    transform: rotate(180deg);
 }
 
 .action-reply {

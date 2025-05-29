@@ -18,12 +18,6 @@ document.addEventListener('DOMContentLoaded', () => {
         postScore.textContent = Number(postScore.textContent) + 1;
     });
 
-    const downvotePostButton = document.getElementById('downvote-post');
-    downvotePostButton.addEventListener('click', () => {
-        Api.downvotePost(currentPost.post_id);
-        postScore.textContent = Number(postScore.textContent) - 1;
-    });
-
     // Sorting
     let preferredSorting = Api.Preferences.getCommentSorting();
     if (preferredSorting === null) {
@@ -107,7 +101,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     <div class="action-section">
                         <svg class="action-upvote" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e8eaed"><path d="M320-120v-320H120l360-440 360 440H640v320H320Z"/></svg>
                         <span class="comment-score"></span>
-                        <svg class="action-downvote" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e8eaed"><path d="M320-120v-320H120l360-440 360 440H640v320H320Z"/></svg>
                     </div>
 
                     <div class="action-section action-reply">
@@ -153,13 +146,6 @@ document.addEventListener('DOMContentLoaded', () => {
             Api.upvoteComment(currentPost.post_id, commentId);
             scoreElement.textContent =
                 Number(scoreElement.textContent) + 1;
-        });
-
-        const downvoteButton = commentWrapper.querySelector('.action-downvote');
-        downvoteButton.addEventListener('click', () => {
-            Api.downvoteComment(currentPost.post_id, commentId);
-            scoreElement.textContent =
-                Number(scoreElement.textContent) - 1;
         });
 
         function createShowRepliesButton() {

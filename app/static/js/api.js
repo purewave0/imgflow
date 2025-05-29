@@ -88,18 +88,6 @@ const Api = {
         });
     },
 
-    downvotePost(postId) {
-        return fetch(`/api/posts/${postId}/votes`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                'vote': 'downvote'
-            }),
-        });
-    },
-
     commentOnPost(postId, content) {
         return fetch(`/api/posts/${postId}/comments`, {
             method: 'POST',
@@ -120,18 +108,6 @@ const Api = {
             },
             body: JSON.stringify({
                 'vote': 'upvote'
-            }),
-        });
-    },
-
-    downvoteComment(postId, commentId) {
-        return fetch(`/api/posts/${postId}/comments/${commentId}/votes`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                'vote': 'downvote'
             }),
         });
     },

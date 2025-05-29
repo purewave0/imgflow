@@ -419,7 +419,6 @@ def _increment_comment_reply_count(post_id, comment_id):
 class Vote(Enum):
     """Type of vote."""
     UPVOTE = 1
-    DOWNVOTE = -1
 
 
 def vote_post(post_id, vote):

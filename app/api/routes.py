@@ -159,13 +159,13 @@ def api_vote_post(post_id):
     except KeyError:
         return jsonify({'error': 'missing_vote'}), 400
 
-    if vote not in ('upvote', 'downvote'):
+    if vote != 'upvote':
         return jsonify({'error': 'invalid_vote'}), 400
 
     # TODO: check if post and comment id exist
     vote_post(
         post_id,
-        Vote.UPVOTE if vote == 'upvote' else Vote.DOWNVOTE
+        Vote.UPVOTE
     )
     return '', 204
 
@@ -217,14 +217,14 @@ def api_vote_comment(post_id, comment_id):
     except KeyError:
         return jsonify({'error': 'missing_vote'}), 400
 
-    if vote not in ('upvote', 'downvote'):
+    if vote != 'upvote':
         return jsonify({'error': 'invalid_vote'}), 400
 
     # TODO: check if post and comment id exist
     vote_comment(
         post_id,
         comment_id,
-        Vote.UPVOTE if vote == 'upvote' else Vote.DOWNVOTE
+        Vote.UPVOTE
     )
     return '', 204
 
