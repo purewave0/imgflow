@@ -2,7 +2,7 @@ from enum import Enum
 
 from app.extensions import db
 from app.models.post import (
-    Post, PostMedia, PostComment, Flow, PostFlow
+    Post, PostMedia, PostComment, Flow, PostUpvote, CommentUpvote, PostFlow
 )
 from app.models.user import User
 
@@ -416,51 +416,109 @@ def _increment_comment_reply_count(post_id, comment_id):
     )
 
 
-class Vote(Enum):
-    """Type of vote."""
-    UPVOTE = 1
+def upvote_post(post_id, user_id):
+    """Record the user's upvote on a post, if not already upvoted."""
 
+    already_upvoted = db.session.execute(
+        db.select(PostUpvote.user_id)
+            .where(
+                PostUpvote.post_id == post_id,
+                PostUpvote.user_id == user_id
+            )
+    ).mappings().one_or_none() is not None
 
-def vote_post(post_id, vote):
-    """Vote on a post.
+    if already_upvoted:
+        return
 
-    Args:
-        post_id: The ID of the post
-        vote: The type of vote
-    """
-    if vote not in Vote:
-        raise TypeError('vote must be of Vote type.')
-
-    # TODO: check if already voted, and if so, undo vote
+    post_upvote = PostUpvote(post_id, user_id)
+    db.session.add(post_upvote)
 
     db.session.execute(
         db.update(Post)
             .where(Post.post_id == post_id)
-            .values(score=Post.score + vote.value)
+            .values(score=Post.score + 1)
     )
+
     db.session.commit()
 
 
-def vote_comment(post_id, comment_id, vote):
-    """Vote on a comment.
+def remove_upvote_from_post(post_id, user_id):
+    """Remove the user's upvote on a post, if upvoted."""
 
-    Args:
-        post_id: The ID of the post
-        comment_id: The ID of the comment
-        vote: The type of vote
-    """
-    if vote not in Vote:
-        raise TypeError('vote must be of Vote type.')
+    upvote = db.session.execute(
+        db.select(PostUpvote)
+            .where(
+                PostUpvote.post_id == post_id,
+                PostUpvote.user_id == user_id
+            )
+    ).mappings().one_or_none()
 
-    # TODO: check if already voted, and if so, undo vote
+    if not upvote:
+        return
+
+    db.session.delete(upvote)
+
+    db.session.execute(
+        db.update(Post)
+            .where(Post.post_id == post_id)
+            .values(score=Post.score - 1)
+    )
+
+    db.session.commit()
+
+
+def upvote_comment(post_id, comment_id, user_id):
+    """Record the user's upvote on a comment, if not already upvoted."""
+
+    already_upvoted = db.session.execute(
+        db.select(CommentUpvote.user_id)
+            .where(
+                CommentUpvote.comment_id == comment_id,
+                CommentUpvote.user_id == user_id
+            )
+    ).mappings().one_or_none() is not None
+
+    if already_upvoted:
+        return
+
+    comment_upvote = CommentUpvote(comment_id, user_id)
+    db.session.add(comment_upvote)
 
     db.session.execute(
         db.update(PostComment)
             .where(
-                PostComment.post_id == post_id,
                 PostComment.id == comment_id,
-            ).values(score=PostComment.score + vote.value)
+                PostComment.post_id == post_id,
+            ).values(score=PostComment.score + 1)
     )
+
+    db.session.commit()
+
+
+def remove_upvote_from_comment(post_id, comment_id, user_id):
+    """Remove the user's upvote on a comment, if upvoted."""
+
+    upvote = db.session.execute(
+        db.select(CommentUpvote)
+            .where(
+                CommentUpvote.comment_id == comment_id,
+                CommentUpvote.user_id == user_id
+            )
+    ).mappings().one_or_none()
+
+    if not upvote:
+        return
+
+    db.session.delete(upvote)
+
+    db.session.execute(
+        db.update(PostComment)
+            .where(
+                PostComment.id == comment_id,
+                PostComment.post_id == post_id,
+            ).values(score=PostComment.score - 1)
+    )
+
     db.session.commit()
 
 

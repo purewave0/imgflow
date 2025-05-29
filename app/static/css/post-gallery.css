@@ -2,7 +2,7 @@
  * gallery.css - card-style image posts organized in a masonry layout.
  */
 
- 
+
 .post {
     overflow: hidden;
     background-color: var(--color-foreground);

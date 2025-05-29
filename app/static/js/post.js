@@ -12,11 +12,18 @@ document.addEventListener('DOMContentLoaded', () => {
     const postScore = document.getElementById('post-score');
 
     const upvotePostButton = document.getElementById('upvote-post');
-    upvotePostButton.addEventListener('click', () => {
-        // 'currentPost' holds this post's info. comes from the page template.
-        Api.upvotePost(currentPost.post_id);
-        postScore.textContent = Number(postScore.textContent) + 1;
-    });
+    if (currentUser.isLoggedIn) {
+        upvotePostButton.addEventListener('click', () => {
+            // 'currentPost' holds this post's info. comes from the page template.
+            Api.upvotePost(currentPost.post_id);
+            postScore.textContent = Number(postScore.textContent) + 1;
+        });
+    } else {
+        upvotePostButton.addEventListener('click', () => {
+            // TODO: proper tooltip or redirection
+            alert('You must be logged in to upvote this post.');
+        });
+    }
 
     // Sorting
     let preferredSorting = Api.Preferences.getCommentSorting();
@@ -142,11 +149,18 @@ document.addEventListener('DOMContentLoaded', () => {
         scoreElement.textContent = score;
 
         const upvoteButton = commentWrapper.querySelector('.action-upvote');
-        upvoteButton.addEventListener('click', () => {
-            Api.upvoteComment(currentPost.post_id, commentId);
-            scoreElement.textContent =
-                Number(scoreElement.textContent) + 1;
-        });
+        if (currentUser.isLoggedIn) {
+            upvoteButton.addEventListener('click', () => {
+                Api.upvoteComment(currentPost.post_id, commentId);
+                scoreElement.textContent =
+                    Number(scoreElement.textContent) + 1;
+            });
+        } else {
+            upvoteButton.addEventListener('click', () => {
+                // TODO: proper tooltip or redirection
+                alert('You must be logged in to upvote this comment.');
+            });
+        }
 
         function createShowRepliesButton() {
             const showReplies = document.createElement('div');

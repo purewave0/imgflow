@@ -78,6 +78,32 @@ class PostComment(db.Model):
         return f'<Comment id:{self.id} post_id:{self.post_id} score:{self.score}'
 
 
+class PostUpvote(db.Model):
+    __tablename__ = 'PostUpvote'
+    post_id = db.Column(db.String(Post.POST_ID_LENGTH), db.ForeignKey('Post.post_id'), primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('User.id'), primary_key=True)
+
+    def __init__(self, post_id, user_id):
+        self.post_id = post_id
+        self.user_id = user_id
+
+    def __repr__(self):
+        return f'<post_id:{self.post_id} upvoted by user_id:{self.user_id}>'
+
+
+class CommentUpvote(db.Model):
+    __tablename__ = 'CommentUpvote'
+    comment_id = db.Column(db.Integer, db.ForeignKey('PostComment.id'), primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('User.id'), primary_key=True)
+
+    def __init__(self, comment_id, user_id):
+        self.comment_id = comment_id
+        self.user_id = user_id
+
+    def __repr__(self):
+        return f'<comment_id:{self.comment_id} upvoted by user_id:{self.user_id}>'
+
+
 class Flow(db.Model):
     __tablename__ = 'Flow'
     MIN_NAME_LENGTH = 2

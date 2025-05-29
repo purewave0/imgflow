@@ -9,10 +9,12 @@ import regex
 
 from app.api import bp
 from app.dbapi import (
-    create_post, vote_post, comment_on_post, vote_comment, reply_to_comment,
+    create_post, comment_on_post, reply_to_comment,
+    upvote_post, remove_upvote_from_post,
+    upvote_comment, remove_upvote_from_comment,
     get_comment_replies, get_public_posts_by_page, search_public_posts_by_page,
     get_post_media, get_post_and_media,
-    get_post_comments_by_page, Vote, PostSorting, CommentSorting,
+    get_post_comments_by_page, PostSorting, CommentSorting,
     get_flow, get_flows_overview, suggest_flows_by_name,
     get_public_posts_in_flow_by_page,
     create_user, is_username_taken, get_user_by_name
@@ -149,27 +151,19 @@ def api_post(post_id):
     return jsonify(post)
 
 
-@bp.route('/posts/<post_id>/votes', methods=['POST'])
+@bp.route('/posts/<post_id>/upvote', methods=['POST', 'DELETE'])
 def api_vote_post(post_id):
     if len(post_id) != Post.POST_ID_LENGTH:
         return '', 404
 
-    try:
-        vote = request.json['vote']
-    except KeyError:
-        return jsonify({'error': 'missing_vote'}), 400
+    # TODO: check if post id exists
 
-    if vote != 'upvote':
-        return jsonify({'error': 'invalid_vote'}), 400
+    if request.method == 'POST':
+        upvote_post(post_id, current_user.id)
+    elif request.method == 'DELETE':
+        remove_upvote_from_post(post_id, current_user.id)
 
-    # TODO: check if post and comment id exist
-    vote_post(
-        post_id,
-        Vote.UPVOTE
-    )
     return '', 204
-
-
 
 
 @bp.route('/posts/<post_id>/comments', methods=['GET', 'POST'])
@@ -207,25 +201,18 @@ def api_post_comments(post_id):
     return jsonify(comment), 201
 
 
-@bp.route('/posts/<post_id>/comments/<comment_id>/votes', methods=['POST'])
+@bp.route('/posts/<post_id>/comments/<comment_id>/vote', methods=['POST', 'DELETE'])
 def api_vote_comment(post_id, comment_id):
     if len(post_id) != Post.POST_ID_LENGTH:
         return '', 404
 
-    try:
-        vote = request.json['vote']
-    except KeyError:
-        return jsonify({'error': 'missing_vote'}), 400
+    # TODO: check if post id and comment id exist
 
-    if vote != 'upvote':
-        return jsonify({'error': 'invalid_vote'}), 400
+    if request.method == 'POST':
+        upvote_comment(post_id, comment_id, current_user.id)
+    elif request.method == 'DELETE':
+        remove_upvote_from_comment(post_id, comment_id, current_user.id)
 
-    # TODO: check if post and comment id exist
-    vote_comment(
-        post_id,
-        comment_id,
-        Vote.UPVOTE
-    )
     return '', 204
 
 
@@ -252,7 +239,6 @@ def api_comment_replies(post_id, comment_id):
     content = content.strip()
     if not content or len(content) > MAX_COMMENT_LENGTH:
         return jsonify({'error': 'wrong_content_length'}), 400
-
 
     reply = reply_to_comment(post_id, comment_id, content)
     return jsonify(reply), 201

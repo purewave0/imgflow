@@ -50,6 +50,12 @@
         {% block content %} {% endblock %}
     </div>
 
+    <script>
+        const currentUser = {
+            isLoggedIn: {{ current_user.is_authenticated|tojson }},
+        }
+    </script>
+
     <script src="/static/js/global.js"></script>
 
 </body>

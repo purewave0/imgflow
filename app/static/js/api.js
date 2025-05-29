@@ -77,15 +77,11 @@ const Api = {
     },
 
     upvotePost(postId) {
-        return fetch(`/api/posts/${postId}/votes`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                'vote': 'upvote'
-            }),
-        });
+        return fetch(`/api/posts/${postId}/upvote`, { method: 'POST' });
+    },
+
+    removeUpvoteFromPost(postId) {
+        return fetch(`/api/posts/${postId}/upvote`, { method: 'DELETE' });
     },
 
     commentOnPost(postId, content) {
@@ -101,15 +97,17 @@ const Api = {
     },
 
     upvoteComment(postId, commentId) {
-        return fetch(`/api/posts/${postId}/comments/${commentId}/votes`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                'vote': 'upvote'
-            }),
-        });
+        return fetch(
+            `/api/posts/${postId}/comments/${commentId}/vote`,
+            { method: 'POST' }
+        );
+    },
+
+    removeUpvoteFromPost(postId, commentId) {
+        return fetch(
+            `/api/posts/${postId}/comments/${commentId}/vote`,
+            { method: 'DELETE' }
+        );
     },
 
     replyToComment(postId, commentId, content) {

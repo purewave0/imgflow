@@ -11,7 +11,7 @@
     flex-direction: column;
     row-gap: 8px;
     position: sticky;
-    top: calc(100vh/2 - 100px);
+    top: calc(100vh/2 - 52px);
     height: fit-content;
     font-size: 18pt;
     text-align: center;
