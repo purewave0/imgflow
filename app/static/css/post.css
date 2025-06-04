@@ -255,7 +255,7 @@
 .comment-footer {
     display: flex;
     flex-direction: row;
-    column-gap: 16px;
+    column-gap: 8px;
     color: var(--color-text-secondary);
     font-weight: 500;
 }
@@ -266,6 +266,7 @@
 
 .comment-score {
     user-select: none;
+    min-width: 16px;
 }
 
 .action-section {
