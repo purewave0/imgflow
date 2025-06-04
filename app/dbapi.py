@@ -345,6 +345,57 @@ def get_post_comments_by_page(post_id, page, sorting):
     return _rows_to_dicts(result)
 
 
+def get_post_comments_with_upvote_info_by_page(post_id, user_id, page, sorting):
+    """Return a sorted and paginated collection of a Post's comments as dicts, including
+    whether they were upvoted or not.
+
+    Only top-level comments are included; replies are not.
+
+    Args:
+        post_id: The ID of the Post.
+        page: The page to fetch.
+        user_id: The current logged in user's ID.
+        sorting: The CommentSorting option to use.
+    """
+    statement = db.select(
+            PostComment.id,
+            PostComment.content,
+            PostComment.parent_id,
+            PostComment.reply_count,
+            PostComment.score,
+            PostComment.created_on,
+            db.exists().where(
+                (CommentUpvote.comment_id == PostComment.id)
+                & (CommentUpvote.user_id == user_id)
+            ).label('has_upvote')
+        ).where(
+            PostComment.post_id == post_id,
+            PostComment.parent_id == None, # don't include replies
+        )
+
+    match sorting:
+        case CommentSorting.NEWEST:
+            statement = statement.order_by(PostComment.created_on.desc())
+        case CommentSorting.MOST_LIKED:
+            statement = statement.order_by(
+                PostComment.score.desc(),
+                PostComment.created_on.desc(),
+            )
+        case CommentSorting.OLDEST:
+            statement = statement.order_by(
+                PostComment.created_on.asc(),
+            )
+
+    statement = statement.limit(
+            COMMENTS_PER_PAGE
+        ).offset(
+            page*COMMENTS_PER_PAGE
+        )
+
+    result = db.session.execute(statement)
+    return _rows_to_dicts(result)
+
+
 def get_comment_replies(post_id, comment_id, sorting):
     """Return a sorted collection of a comment's replies as dicts.
 
@@ -467,7 +518,7 @@ def remove_upvote_from_post(post_id, user_id):
     db.session.commit()
 
 
-def upvote_comment(post_id, comment_id, user_id):
+def upvote_comment(comment_id, user_id):
     """Record the user's upvote on a comment, if not already upvoted."""
 
     already_upvoted = db.session.execute(
@@ -488,7 +539,6 @@ def upvote_comment(post_id, comment_id, user_id):
         db.update(PostComment)
             .where(
                 PostComment.id == comment_id,
-                PostComment.post_id == post_id,
             ).values(score=PostComment.score + 1)
     )
 

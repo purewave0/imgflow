@@ -14,7 +14,8 @@ from app.dbapi import (
     upvote_comment, remove_upvote_from_comment,
     get_comment_replies, get_public_posts_by_page, search_public_posts_by_page,
     get_post_media, get_post_and_media,
-    get_post_comments_by_page, PostSorting, CommentSorting,
+    get_post_comments_by_page, get_post_comments_with_upvote_info_by_page,
+    PostSorting, CommentSorting,
     get_flow, get_flows_overview, suggest_flows_by_name,
     get_public_posts_in_flow_by_page,
     create_user, is_username_taken, get_user_by_name
@@ -184,7 +185,14 @@ def api_post_comments(post_id):
         except ValueError:
             return jsonify({'error': 'invalid_sort'}), 400
 
-        comments = get_post_comments_by_page(post_id, page, sorting)
+        comments = None
+        if not current_user.is_authenticated:
+            comments = get_post_comments_by_page(post_id, page, sorting)
+        else:
+            comments = get_post_comments_with_upvote_info_by_page(
+                post_id, current_user.id, page, sorting,
+            )
+
         return jsonify(comments)
 
     try:
@@ -209,7 +217,7 @@ def api_vote_comment(post_id, comment_id):
     # TODO: check if post id and comment id exist
 
     if request.method == 'POST':
-        upvote_comment(post_id, comment_id, current_user.id)
+        upvote_comment(comment_id, current_user.id)
     elif request.method == 'DELETE':
         remove_upvote_from_comment(post_id, comment_id, current_user.id)
 

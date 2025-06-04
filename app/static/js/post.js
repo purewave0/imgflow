@@ -101,6 +101,7 @@ document.addEventListener('DOMContentLoaded', () => {
         content,
         score,
         repliesCount,
+        hasUpvote,
     ) {
         const commentStructure = `
             <div class="comment">
@@ -157,6 +158,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const upvoteButton = commentWrapper.querySelector('.action-upvote');
         if (currentUser.isLoggedIn) {
+            if (hasUpvote) {
+                upvoteButton.classList.add('upvoted');
+            }
             upvoteButton.addEventListener('click', () => {
                 const hasUpvotedComment =
                     upvoteButton.classList.contains('upvoted');
@@ -391,6 +395,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 comment.content,
                 comment.score,
                 comment.reply_count,
+                comment.has_upvote,
             );
             fragment.append(commentElement);
         }
