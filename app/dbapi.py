@@ -179,7 +179,7 @@ def get_public_posts_by_page(user_id, page, sorting):
 
     if user_id is None:
         statement = statement.add_columns(
-            False.label('has_upvote')
+            db.literal(False).label('has_upvote')
         )
     else:
         statement = statement.add_columns(
@@ -405,7 +405,7 @@ def get_post_comments_by_page(post_id, user_id, page, sorting):
 
     if user_id is None:
         statement = statement.add_columns(
-            False.label('has_upvote')
+            db.literal(False).label('has_upvote')
         )
     else:
         statement = statement.add_columns(
