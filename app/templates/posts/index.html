@@ -23,7 +23,7 @@
 {% block content %}
     <div id="post-wrapper">
         <div id="post-actions">
-            <svg id="upvote-post" class="action-upvote" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e8eaed">
+            <svg id="upvote-post" class="action-upvote {{ 'upvoted' if has_upvote else '' }}" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e8eaed">
                 <path d="M320-120v-320H120l360-440 360 440H640v320H320Z"/>
             </svg>
             <span id="post-score">{{ post_score }}</span>

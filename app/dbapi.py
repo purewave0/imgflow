@@ -245,17 +245,34 @@ def get_post_media(post_id):
     return _rows_to_dicts(result)
 
 
-def get_post_and_media(post_id):
-    """Return a Post and all of its media (their URL and description) as dicts."""
+def get_post_and_media(post_id, user_id):
+    """Return a Post and all of its media (their URL and description) as dicts,
+    including whether it was upvoted by the logged in user of the given ID.
+    """
+
     post = db.session.execute(
-        db.select(Post)
-        .options(
+        db.select(
+            Post
+        ).options(
             db.selectinload(Post.media)
-        ).where(Post.post_id == post_id)
+        ).where(
+            Post.post_id == post_id
+        )
     ).scalars().one_or_none()
 
     if not post:
         return None
+
+    has_upvote = False
+    if user_id is not None:
+        has_upvote = db.session.execute(
+            db.select(
+                db.exists().where(
+                    (PostUpvote.post_id == post_id) &
+                    (PostUpvote.user_id == user_id)
+                )
+            )
+        ).scalar()
 
     media = tuple(
         {
@@ -283,6 +300,7 @@ def get_post_and_media(post_id):
         'media': media,
         'thumbnail_url': post.thumbnail_url,
         'flows': flows,
+        'has_upvote': has_upvote,
     }
     return result
 
