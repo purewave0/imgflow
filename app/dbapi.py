@@ -345,7 +345,7 @@ def get_post_comments_by_page(post_id, page, sorting):
     return _rows_to_dicts(result)
 
 
-def get_post_comments_with_upvote_info_by_page(post_id, user_id, page, sorting):
+def get_post_comments_by_page(post_id, user_id, page, sorting):
     """Return a sorted and paginated collection of a Post's comments as dicts, including
     whether they were upvoted or not.
 
@@ -354,7 +354,8 @@ def get_post_comments_with_upvote_info_by_page(post_id, user_id, page, sorting):
     Args:
         post_id: The ID of the Post.
         page: The page to fetch.
-        user_id: The current logged in user's ID.
+        user_id: The current logged in user's ID. If None, upvote states will always be
+            False.
         sorting: The CommentSorting option to use.
     """
     statement = db.select(
@@ -364,13 +365,21 @@ def get_post_comments_with_upvote_info_by_page(post_id, user_id, page, sorting):
             PostComment.reply_count,
             PostComment.score,
             PostComment.created_on,
+        ).where(
+            PostComment.post_id == post_id,
+            PostComment.parent_id == None, # don't include replies
+        )
+
+    if user_id is None:
+        statement = statement.add_columns(
+            False.label('has_upvote')
+        )
+    else:
+        statement = statement.add_columns(
             db.exists().where(
                 (CommentUpvote.comment_id == PostComment.id)
                 & (CommentUpvote.user_id == user_id)
             ).label('has_upvote')
-        ).where(
-            PostComment.post_id == post_id,
-            PostComment.parent_id == None, # don't include replies
         )
 
     match sorting:

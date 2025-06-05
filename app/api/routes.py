@@ -14,8 +14,7 @@ from app.dbapi import (
     upvote_comment, remove_upvote_from_comment,
     get_comment_replies, get_public_posts_by_page, search_public_posts_by_page,
     get_post_media, get_post_and_media,
-    get_post_comments_by_page, get_post_comments_with_upvote_info_by_page,
-    PostSorting, CommentSorting,
+    get_post_comments_by_page, PostSorting, CommentSorting,
     get_flow, get_flows_overview, suggest_flows_by_name,
     get_public_posts_in_flow_by_page,
     create_user, is_username_taken, get_user_by_name
@@ -185,14 +184,12 @@ def api_post_comments(post_id):
         except ValueError:
             return jsonify({'error': 'invalid_sort'}), 400
 
-        comments = None
-        if not current_user.is_authenticated:
-            comments = get_post_comments_by_page(post_id, page, sorting)
-        else:
-            comments = get_post_comments_with_upvote_info_by_page(
-                post_id, current_user.id, page, sorting,
-            )
-
+        comments = get_post_comments_by_page(
+            post_id,
+            current_user.id if current_user.is_authenticated else None,
+            page,
+            sorting
+        )
         return jsonify(comments)
 
     try:
