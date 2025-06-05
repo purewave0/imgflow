@@ -438,14 +438,17 @@ def get_post_comments_by_page(post_id, user_id, page, sorting):
     return _rows_to_dicts(result)
 
 
-def get_comment_replies(post_id, comment_id, sorting):
-    """Return a sorted collection of a comment's replies as dicts.
+def get_comment_replies(post_id, comment_id, user_id, sorting):
+    """Return a sorted collection of a comment's replies as dicts, including upvote
+    states.
 
     Only top-level replies are included; replies to those replies are not.
 
     Args:
         post_id: The ID of the post.
         comment_id: The ID of the comment.
+        user_id: The current logged in user's ID. If None, upvote states will always be
+            False.
         sorting: The CommentSorting option to use.
     """
     statement = db.select(
@@ -459,6 +462,19 @@ def get_comment_replies(post_id, comment_id, sorting):
             PostComment.post_id == post_id,
             PostComment.parent_id == comment_id,
         )
+
+    if user_id is None:
+        statement = statement.add_columns(
+            db.literal(False).label('has_upvote')
+        )
+    else:
+        statement = statement.add_columns(
+            db.exists().where(
+                (CommentUpvote.comment_id == PostComment.id)
+                & (CommentUpvote.user_id == user_id)
+            ).label('has_upvote')
+        )
+
 
     match sorting:
         case CommentSorting.NEWEST:

@@ -237,7 +237,12 @@ def api_comment_replies(post_id, comment_id):
         except ValueError:
             return jsonify({'error': 'invalid_sort'}), 400
 
-        replies = get_comment_replies(post_id, comment_id, sorting)
+        replies = get_comment_replies(
+            post_id,
+            comment_id,
+            current_user.id if current_user.is_authenticated else None,
+            sorting
+        )
         return jsonify(replies)
 
     try:

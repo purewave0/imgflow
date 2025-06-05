@@ -274,6 +274,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     reply.content,
                     reply.score,
                     reply.reply_count,
+                    reply.has_upvote,
                 );
 
                 commentRepliesElement.append(replyElement);
