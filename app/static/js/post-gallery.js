@@ -61,7 +61,7 @@ class Gallery {
     }
 
     #createPostCard(
-        postId, thumbnailUrl, title, upvotes, commentCount, views
+        postId, thumbnailUrl, title, upvotes, commentCount, views, hasUpvote
     ) {
         const post = document.createElement('a');
         post.className = 'post';
@@ -85,6 +85,9 @@ class Gallery {
         upvotesContainer.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e8eaed"><path d="M320-120v-320H120l360-440 360 440H640v320H320Z"/></svg>';
         const upvotesValue = document.createElement('span');
         upvotesValue.textContent = upvotes;
+        if (hasUpvote) {
+            upvotesContainer.firstElementChild.classList.add('upvoted');
+        }
 
         const commentsContainer = document.createElement('div');
         commentsContainer.className = 'post-stat';
@@ -119,7 +122,8 @@ class Gallery {
                 post.title,
                 post.score,
                 post.comment_count,
-                post.views
+                post.views,
+                post.has_upvote,
             );
 
             const image = postCard.firstElementChild;

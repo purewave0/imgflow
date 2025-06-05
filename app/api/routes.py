@@ -80,7 +80,11 @@ def api_posts():
         if title_query:
             posts = search_public_posts_by_page(title_query, page, sorting)
         else:
-            posts = get_public_posts_by_page(page, sorting)
+            posts = get_public_posts_by_page(
+                current_user.id if current_user.is_authenticated else None,
+                page,
+                sorting,
+            )
 
         return jsonify(posts)
 

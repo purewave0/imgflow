@@ -154,10 +154,13 @@ class PostSorting(Enum):
     TOP = 'top'
 
 
-def get_public_posts_by_page(page, sorting):
-    """Return a sorted and paginated collection of Posts as dicts.
+def get_public_posts_by_page(user_id, page, sorting):
+    """Return a sorted and paginated collection of Posts as dicts, including upvote
+    state.
 
     Attributes:
+        user_id: The current logged in user's ID. If None, upvote states will always be
+            False.
         page: The page to fetch.
         sorting: The PostSorting option to use.
     """
@@ -172,6 +175,18 @@ def get_public_posts_by_page(page, sorting):
             Post.views,
         ).where(
             Post.is_public == True
+        )
+
+    if user_id is None:
+        statement = statement.add_columns(
+            False.label('has_upvote')
+        )
+    else:
+        statement = statement.add_columns(
+            db.exists().where(
+                (PostUpvote.post_id == Post.post_id)
+                & (PostUpvote.user_id == user_id)
+            ).label('has_upvote')
         )
 
     match sorting:
