@@ -333,51 +333,6 @@ class CommentSorting(Enum):
     OLDEST = 'oldest'
 
 
-def get_post_comments_by_page(post_id, page, sorting):
-    """Return a sorted and paginated collection of a Post's comments as dicts.
-
-    Only top-level comments are included; replies are not.
-
-    Args:
-        post_id: The ID of the Post.
-        page: The page to fetch.
-        sorting: The CommentSorting option to use.
-    """
-    statement = db.select(
-            PostComment.id,
-            PostComment.content,
-            PostComment.parent_id,
-            PostComment.reply_count,
-            PostComment.score,
-            PostComment.created_on,
-        ).where(
-            PostComment.post_id == post_id,
-            PostComment.parent_id == None, # don't include replies
-        )
-
-    match sorting:
-        case CommentSorting.NEWEST:
-            statement = statement.order_by(PostComment.created_on.desc())
-        case CommentSorting.MOST_LIKED:
-            statement = statement.order_by(
-                PostComment.score.desc(),
-                PostComment.created_on.desc(),
-            )
-        case CommentSorting.OLDEST:
-            statement = statement.order_by(
-                PostComment.created_on.asc(),
-            )
-
-    statement = statement.limit(
-            COMMENTS_PER_PAGE
-        ).offset(
-            page*COMMENTS_PER_PAGE
-        )
-
-    result = db.session.execute(statement)
-    return _rows_to_dicts(result)
-
-
 def get_post_comments_by_page(post_id, user_id, page, sorting):
     """Return a sorted and paginated collection of a Post's comments as dicts, including
     whether they were upvoted or not.
