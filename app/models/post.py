@@ -62,6 +62,7 @@ class PostMedia(db.Model):
 class PostComment(db.Model):
     __tablename__ = 'PostComment'
     id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('User.id'))
     content = db.Column(db.Text, nullable=False)
     parent_id = db.Column(db.Integer, nullable=True)
     reply_count = db.Column(db.Integer, nullable=False)
@@ -69,10 +70,13 @@ class PostComment(db.Model):
     created_on = db.Column(db.DateTime, server_default=utcnow())
     post_id = db.Column(db.String(Post.POST_ID_LENGTH), db.ForeignKey('Post.post_id'))
 
-    def __init__(self, content):
+    def __init__(self, user_id, content, parent_id, post_id):
+        self.user_id = user_id
         self.content = content
+        self.parent_id = parent_id
         self.reply_count = 0
         self.score = 0
+        self.post_id = post_id
 
     def __repr__(self):
         return f'<Comment id:{self.id} post_id:{self.post_id} score:{self.score}'

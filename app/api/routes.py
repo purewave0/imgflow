@@ -1,7 +1,7 @@
 import os
 import uuid
 
-from flask import jsonify, request
+from flask import jsonify, request, current_app
 from flask_login import current_user, login_user
 from werkzeug.utils import secure_filename
 from PIL import Image
@@ -196,6 +196,9 @@ def api_post_comments(post_id):
         )
         return jsonify(comments)
 
+    if not current_user.is_authenticated:
+        return current_app.login_manager.unauthorized()
+
     try:
         content = request.json['content']
     except KeyError:
@@ -205,8 +208,7 @@ def api_post_comments(post_id):
     if not content or len(content) > MAX_COMMENT_LENGTH:
         return jsonify({'error': 'wrong_content_length'}), 400
 
-
-    comment = comment_on_post(post_id, content)
+    comment = comment_on_post(post_id, current_user.id, content)
     return jsonify(comment), 201
 
 
@@ -254,7 +256,10 @@ def api_comment_replies(post_id, comment_id):
     if not content or len(content) > MAX_COMMENT_LENGTH:
         return jsonify({'error': 'wrong_content_length'}), 400
 
-    reply = reply_to_comment(post_id, comment_id, content)
+    if not current_user.is_authenticated:
+        return current_app.login_manager.unauthorized()
+
+    reply = reply_to_comment(post_id, comment_id, current_user.id, content)
     return jsonify(reply), 201
 
 

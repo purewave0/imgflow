@@ -269,7 +269,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const replyElement = createComment(
                     reply.id,
                     '/static/img/cat.png',
-                    'Guest',
+                    reply.username,
                     reply.created_on,
                     reply.content,
                     reply.score,
@@ -284,100 +284,107 @@ document.addEventListener('DOMContentLoaded', () => {
         const commentReplies = commentWrapper.querySelector('.comment-replies');
 
         const replyButton = commentWrapper.querySelector('.action-reply');
-        replyButton.addEventListener('click', () => {
-            if (replyForm) {
-                const isReplyingToThisComment =
-                    replyForm.dataset.replyingTo === String(commentId);
+        if (!currentUser.isLoggedIn) {
+            replyButton.addEventListener('click', () => {
+                // TODO: proper tooltip or redirection
+                alert('You must be logged in to reply to this comment.');
+            });
+        } else {
+            replyButton.addEventListener('click', () => {
+                if (replyForm) {
+                    const isReplyingToThisComment =
+                        replyForm.dataset.replyingTo === String(commentId);
 
-                if (isReplyingToThisComment) {
-                    replyForm.elements[0].focus();
-                    return;
+                    if (isReplyingToThisComment) {
+                        replyForm.elements[0].focus();
+                        return;
+                    }
+
+                    replyForm.remove();
                 }
 
-                replyForm.remove();
-            }
+                replyForm = document.createElement('form');
+                replyForm.id = 'reply-form';
+                replyForm.className = 'comment-form';
+                replyForm.dataset.replyingTo = commentId;
+                replyForm.innerHTML = `
+                    <textarea id="reply-input" class="comment-input" rows="6" maxlength="2000" placeholder="Text a reply…"></textarea>
 
-            replyForm = document.createElement('form');
-            replyForm.id = 'reply-form';
-            replyForm.className = 'comment-form';
-            replyForm.dataset.replyingTo = commentId;
-            replyForm.innerHTML = `
-                <textarea id="reply-input" class="comment-input" rows="6" maxlength="2000" placeholder="Text a reply…"></textarea>
+                    <div id="reply-footer">
+                        <button id="reply-cancel" class="cancel-comment" type="button">
+                            Cancel
+                        </button>
 
-                <div id="reply-footer">
-                    <button id="reply-cancel" class="cancel-comment" type="button">
-                        Cancel
-                    </button>
+                        <button id="reply-submit" class="submit-comment" type="submit">
+                            Reply
+                        </button>
+                    </div>
+                `;
 
-                    <button id="reply-submit" class="submit-comment" type="submit">
-                        Reply
-                    </button>
-                </div>
-            `;
+                const replyInput = replyForm.querySelector('#reply-input');
+                replyInput.addEventListener('input', () => {
+                    if (!replyInput.value.trim()) {
+                        replyInput.setCustomValidity('Reply should not be empty.');
+                        replyInput.reportValidity();
+                    } else {
+                        replyInput.setCustomValidity('');
+                    }
+                });
+                const replyCancel = replyForm.querySelector('#reply-cancel');
+                replyCancel.addEventListener('click', () => {
+                    replyForm.remove();
+                    replyForm = null;
+                });
 
-            const replyInput = replyForm.querySelector('#reply-input');
-            replyInput.addEventListener('input', () => {
-                if (!replyInput.value.trim()) {
-                    replyInput.setCustomValidity('Reply should not be empty.');
-                    replyInput.reportValidity();
-                } else {
-                    replyInput.setCustomValidity('');
-                }
-            });
-            const replyCancel = replyForm.querySelector('#reply-cancel');
-            replyCancel.addEventListener('click', () => {
-                replyForm.remove();
-                replyForm = null;
-            });
+                replyForm.addEventListener('submit', async (event) => {
+                    event.preventDefault();
+                    const response = await Api.replyToComment(
+                        currentPost.post_id,
+                        commentId,
+                        replyInput.value.trim()
+                    );
 
-            replyForm.addEventListener('submit', async (event) => {
-                event.preventDefault();
-                const response = await Api.replyToComment(
-                    currentPost.post_id,
-                    commentId,
-                    replyInput.value.trim()
-                );
+                    commentsCountValue.textContent =
+                        Number(commentsCountValue.textContent) + 1;
 
-                commentsCountValue.textContent =
-                    Number(commentsCountValue.textContent) + 1;
+                    let showRepliesButton =
+                        commentWrapper.querySelector('.show-replies');
 
-                let showRepliesButton =
-                    commentWrapper.querySelector('.show-replies');
+                    replyForm.remove();
+                    replyForm = null;
 
-                replyForm.remove();
-                replyForm = null;
+                    delete commentWrapper.dataset.hasFetchedReplies;
 
-                delete commentWrapper.dataset.hasFetchedReplies;
-
-                if (!showRepliesButton) {
-                    // now there *is* a reply. need to add the button
-                    showRepliesButton = createShowRepliesButton();
-                    commentElement.append(showRepliesButton);
-                    showRepliesButton.click();
-                } else {
-                    const isShowingReplies =
-                        commentWrapper.classList.contains('showing-replies');
-                    if (!isShowingReplies) {
+                    if (!showRepliesButton) {
+                        // now there *is* a reply. need to add the button
+                        showRepliesButton = createShowRepliesButton();
+                        commentElement.append(showRepliesButton);
                         showRepliesButton.click();
                     } else {
-                        // showing current replies, so hide and show them again
-                        // to trigger a re-update
-                        showRepliesButton.click();
-                        showRepliesButton.click();
+                        const isShowingReplies =
+                            commentWrapper.classList.contains('showing-replies');
+                        if (!isShowingReplies) {
+                            showRepliesButton.click();
+                        } else {
+                            // showing current replies, so hide and show them again
+                            // to trigger a re-update
+                            showRepliesButton.click();
+                            showRepliesButton.click();
+                        }
                     }
+                });
+
+                const showRepliesButton =
+                    commentElement.querySelector('.show-replies');
+                if (showRepliesButton) {
+                    showRepliesButton.before(replyForm);
+                } else {
+                    commentElement.append(replyForm);
                 }
+
+                replyInput.focus();
             });
-
-            const showRepliesButton =
-                commentElement.querySelector('.show-replies');
-            if (showRepliesButton) {
-                showRepliesButton.before(replyForm);
-            } else {
-                commentElement.append(replyForm);
-            }
-
-            replyInput.focus();
-        });
+        }
 
         return commentWrapper;
     }
@@ -391,7 +398,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const commentElement = createComment(
                 comment.id,
                 '/static/img/cat.png',
-                'Guest',
+                comment.username,
                 comment.created_on,
                 comment.content,
                 comment.score,
@@ -450,32 +457,40 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    commentForm.addEventListener('submit', (event) => {
-        event.preventDefault();
+    if (!currentUser.isLoggedIn) {
+        commentForm.addEventListener('submit', (event) => {
+            event.preventDefault();
+            // TODO: proper tooltip or redirection
+            alert('You must be logged in to comment on this post.');
+        });
+    } else {
+        commentForm.addEventListener('submit', (event) => {
+            event.preventDefault();
 
-        Api.commentOnPost(currentPost.post_id, commentInput.value.trim())
-            .then((response) => response.json())
-            .then((new_comment) => {
-                const commentElement = createComment(
-                    new_comment.id,
-                    '/static/img/cat.png',
-                    'Guest',
-                    new_comment.created_on,
-                    new_comment.content,
-                    new_comment.score,
-                    new_comment.reply_count,
-                );
-                commentsDestination.prepend(commentElement);
+            Api.commentOnPost(currentPost.post_id, commentInput.value.trim())
+                .then((response) => response.json())
+                .then((new_comment) => {
+                    const commentElement = createComment(
+                        new_comment.id,
+                        '/static/img/cat.png',
+                        new_comment.username,
+                        new_comment.created_on,
+                        new_comment.content,
+                        new_comment.score,
+                        new_comment.reply_count,
+                    );
+                    commentsDestination.prepend(commentElement);
 
-                commentsCountValue.textContent =
-                    Number(commentsCountValue.textContent) + 1;
-            });
+                    commentsCountValue.textContent =
+                        Number(commentsCountValue.textContent) + 1;
+                });
 
-        if (document.body.classList.contains('no-comments')) {
-            document.body.classList.remove('no-comments');
-        }
-        commentForm.reset();
-    });
+            if (document.body.classList.contains('no-comments')) {
+                document.body.classList.remove('no-comments');
+            }
+            commentForm.reset();
+        });
+    }
 
     fetchAndAddComments(0, preferredSorting);
 });

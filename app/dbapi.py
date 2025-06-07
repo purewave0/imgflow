@@ -76,59 +76,65 @@ def create_post(title, media_list, is_public, flow_names):
     }
 
 
-def comment_on_post(post_id, content):
+def comment_on_post(post_id, user_id, content):
     """Comment on a post.
 
     Args:
         post_id: The ID of the post.
+        user_id: The ID of the user who's commenting.
         content: The comment's content. Supports Markdown.
 
     Returns:
         The newly created PostComment's columns as a dict.
     """
-    comment = PostComment(content)
-    comment.post_id = post_id
-    comment.parent_id = None
+    comment = PostComment(user_id, content, None, post_id)
 
     db.session.add(comment)
     _increment_post_comment_count(post_id)
     db.session.commit()
 
+    username = get_username_by_id(user_id)
+
     return {
         # TODO: return PK id or an uuid?
         'id': comment.id,
+        'user_id': comment.user_id,
+        'username': username,
+        'content': comment.content,
         'parent_id': comment.parent_id,
         'reply_count': comment.reply_count,
-        'content': comment.content,
         'score': comment.score,
         'created_on': comment.created_on,
         'post_id': comment.post_id,
     }
 
 
-def reply_to_comment(post_id, comment_id, content):
+def reply_to_comment(post_id, comment_id, user_id, content):
     """Reply to a comment on a post.
 
     Args:
         post_id: The ID of the post.
         comment_id: The ID of the comment.
+        user_id: The ID of the user who's replying.
         content: The reply's content. Supports Markdown.
 
     Returns:
         The newly created PostComment's columns as a dict.
     """
-    reply = PostComment(content)
-    reply.post_id = post_id
-    reply.parent_id = comment_id
+    reply = PostComment(user_id, content, comment_id, post_id)
+
 
     db.session.add(reply)
     _increment_post_comment_count(post_id)
     _increment_comment_reply_count(post_id, comment_id)
     db.session.commit()
 
+    username = get_username_by_id(user_id)
+
     return {
         # TODO: return PK id or an uuid?
         'id': reply.id,
+        'username': username,
         'parent_id': reply.parent_id,
         'reply_count': reply.reply_count,
         'content': reply.content,
@@ -348,11 +354,15 @@ def get_post_comments_by_page(post_id, user_id, page, sorting):
     """
     statement = db.select(
             PostComment.id,
+            User.name.label('username'),
             PostComment.content,
             PostComment.parent_id,
             PostComment.reply_count,
             PostComment.score,
             PostComment.created_on,
+        ).join(
+            User,
+            User.id == PostComment.user_id
         ).where(
             PostComment.post_id == post_id,
             PostComment.parent_id == None, # don't include replies
@@ -408,11 +418,15 @@ def get_comment_replies(post_id, comment_id, user_id, sorting):
     """
     statement = db.select(
             PostComment.id,
+            User.name.label('username'),
             PostComment.content,
             PostComment.parent_id,
             PostComment.reply_count,
             PostComment.score,
             PostComment.created_on,
+        ).join(
+            User,
+            User.id == PostComment.user_id
         ).where(
             PostComment.post_id == post_id,
             PostComment.parent_id == comment_id,
@@ -788,3 +802,16 @@ def get_user_by_name(name):
     ).scalar_one_or_none()
 
     return user
+
+
+def get_username_by_id(user_id):
+    """Return the name of the User with the given ID, or None."""
+    name = db.session.execute(
+        db.select(
+            User.name
+        ).where(
+            User.id == user_id
+        )
+    ).scalar_one_or_none()
+
+    return name
