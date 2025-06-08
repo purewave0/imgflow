@@ -645,8 +645,9 @@ def _increment_flow_post_count(flow_id):
     )
 
 
-def get_public_posts_in_flow_by_page(flow_id, page, sorting):
-    """Return a sorted and paginated collection of posts in a flow as dicts.
+def get_public_posts_in_flow_by_page(flow_id, user_id, page, sorting):
+    """Return a sorted and paginated collection of posts in a flow as dicts, including
+    upvote state.
 
     All returned posts are public, as private posts can't be added to flows.
     """
@@ -663,6 +664,18 @@ def get_public_posts_in_flow_by_page(flow_id, page, sorting):
             Post.flows
         ).where(
             Flow.id == flow_id,
+        )
+
+    if user_id is None:
+        statement = statement.add_columns(
+            db.literal(False).label('has_upvote')
+        )
+    else:
+        statement = statement.add_columns(
+            db.exists().where(
+                (PostUpvote.post_id == Post.post_id)
+                & (PostUpvote.user_id == user_id)
+            ).label('has_upvote')
         )
 
     match sorting:

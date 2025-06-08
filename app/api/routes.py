@@ -326,7 +326,12 @@ def api_posts_in_flow(flow_name):
     if not flow:
         return jsonify(None), 404
 
-    posts = get_public_posts_in_flow_by_page(flow['id'], page, sorting)
+    posts = get_public_posts_in_flow_by_page(
+        flow['id'],
+        current_user.id if current_user.is_authenticated else None,
+        page,
+        sorting
+    )
     return jsonify(posts)
 
 
