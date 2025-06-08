@@ -18,6 +18,7 @@ def show_post(post_id):
     return render_template(
         'posts/index.html',
         post_id=full_post['post_id'],
+        post_username=full_post['username'],
         post_title=full_post['title'],
         post_score=full_post['score'],
         post_comment_count=full_post['comment_count'],

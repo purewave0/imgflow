@@ -49,6 +49,10 @@
     margin: 0;
 }
 
+#post-username {
+    font-size: 12pt;
+}
+
 #media {
     display: flex;
     flex-direction: column;

@@ -32,6 +32,10 @@
         <section id="post-section">
             <h2 id="post-title"> {{ post_title }} </h2>
             <div id="post-stats">
+                <a href="/users/{{ post_username }}">
+                    <b id="post-username">{{ post_username }}</b>
+                </a>
+                <span>·</span>
                 <p id="post-views"> {{ post_views }} views </p>
                 <span>·</span>
                 <p id="post-created-on"> {{ post_created_on }} </p>

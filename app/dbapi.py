@@ -13,10 +13,11 @@ FLOWS_IN_OVERVIEW = 8
 FLOW_SUGGESTIONS_LIMIT = 8
 
 
-def create_post(title, media_list, is_public, flow_names):
+def create_post(user_id, title, media_list, is_public, flow_names):
     """Create a post in the database.
 
     Args:
+        user_id: The ID of the creator of the post.
         title: The title of the post. Must not exceed Post.MAX_NAME_LENGTH
             characters.
         media_list: Collection of dicts containing the media's URL
@@ -57,7 +58,7 @@ def create_post(title, media_list, is_public, flow_names):
             flows.append(flow)
 
     # TODO: check if failed because of post_id collision
-    post = Post(title, media, media_list[0]['thumbnail_url'], is_public, flows)
+    post = Post(user_id, title, media, media_list[0]['thumbnail_url'], is_public, flows)
 
     db.session.add(post)
     db.session.commit()
@@ -310,8 +311,11 @@ def get_post_and_media(post_id, user_id):
         } for flow in post.flows
     )
 
+    username = get_username_by_id(post.user_id)
+
     result = {
         'post_id': post.post_id,
+        'username': username,
         'title': post.title,
         'created_on': post.created_on,
         'updated_on': post.updated_on,

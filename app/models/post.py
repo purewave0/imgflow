@@ -20,6 +20,7 @@ class Post(db.Model):
     MAX_FLOWS_PER_POST = 3
     id = db.Column(db.Integer, primary_key=True)
     post_id = db.Column(db.String(POST_ID_LENGTH), unique=True, nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('User.id'))
     title = db.Column(db.String(MAX_TITLE_LENGTH), nullable=True)
     media = db.relationship('PostMedia', backref='post')
     thumbnail_url = db.Column(db.String(128), nullable=False)
@@ -32,8 +33,9 @@ class Post(db.Model):
     is_public = db.Column(db.Boolean, nullable=False, default=False)
     flows = db.relationship('Flow', secondary='PostFlow', backref='posts')
 
-    def __init__(self, title, media, thumbnail_url, is_public, flows):
+    def __init__(self, user_id, title, media, thumbnail_url, is_public, flows):
         self.post_id = _random_post_id()
+        self.user_id = user_id
         self.title = title
         self.media = media
         self.thumbnail_url = thumbnail_url

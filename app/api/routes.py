@@ -88,6 +88,9 @@ def api_posts():
 
         return jsonify(posts)
 
+    if not current_user.is_authenticated:
+        return current_app.login_manager.unauthorized()
+
     title = request.form.get('title')
     if len(title) > Post.MAX_TITLE_LENGTH:
         return jsonify({'error': 'wrong_title_length'}), 400
@@ -143,7 +146,7 @@ def api_posts():
         else:
             return jsonify({'error': 'wrong_filetype'}), 400
 
-    new_post = create_post(title, post_media_list, is_public, flows)
+    new_post = create_post(current_user.id, title, post_media_list, is_public, flows)
     return jsonify(new_post)
 
 
