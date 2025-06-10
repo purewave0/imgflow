@@ -78,7 +78,12 @@ def api_posts():
         title_query = request.args.get('title')
         posts = None
         if title_query:
-            posts = search_public_posts_by_page(title_query, page, sorting)
+            posts = search_public_posts_by_page(
+                title_query,
+                current_user.id if current_user.is_authenticated else None,
+                page,
+                sorting
+            )
         else:
             posts = get_public_posts_by_page(
                 current_user.id if current_user.is_authenticated else None,

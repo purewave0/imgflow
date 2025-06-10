@@ -215,11 +215,14 @@ def get_public_posts_by_page(user_id, page, sorting):
     return _rows_to_dicts(result)
 
 
-def search_public_posts_by_page(title, page, sorting):
-    """Return a sorted and paginated collection of Posts as dicts, filtered by title.
+def search_public_posts_by_page(title, user_id, page, sorting):
+    """Return a sorted and paginated collection of Posts as dicts, filtered by title,
+    including whether they were upvoted or not.
 
     Attributes:
         title: The title to search for.
+        user_id: The current logged in user's ID. If None, upvote states will always be
+            False.
         page: The page to fetch.
         sorting: The PostSorting option to use.
     """
@@ -235,6 +238,18 @@ def search_public_posts_by_page(title, page, sorting):
         ).where(
             Post.is_public == True,
             Post.title.icontains(title)
+        )
+
+    if user_id is None:
+        statement = statement.add_columns(
+            db.literal(False).label('has_upvote')
+        )
+    else:
+        statement = statement.add_columns(
+            db.exists().where(
+                (PostUpvote.post_id == Post.post_id)
+                & (PostUpvote.user_id == user_id)
+            ).label('has_upvote')
         )
 
     match sorting:
