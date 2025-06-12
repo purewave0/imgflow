@@ -32,10 +32,13 @@
         <section id="post-section">
             <h2 id="post-title"> {{ post_title }} </h2>
             <div id="post-stats">
-                <a href="/users/{{ post_username }}">
-                    <b id="post-username">{{ post_username }}</b>
-                </a>
-                <span>·</span>
+                <!-- TODO: a small indicator (a padlock?) when the post is private -->
+                {% if post_username is not none %}
+                    <a href="/users/{{ post_username }}">
+                        <b id="post-username">{{ post_username }}</b>
+                    </a>
+                    <span>·</span>
+                {% endif %}
                 <p id="post-views"> {{ post_views }} views </p>
                 <span>·</span>
                 <p id="post-created-on"> {{ post_created_on }} </p>

@@ -165,6 +165,18 @@ body:not(.has-uploaded) #upload-more-media {
     margin-left: 0;
 }
 
+#visibility-label.login-required {
+    opacity: 0.7;
+}
+
+#visibility-login-required {
+    margin: 8px 0;
+}
+
+#visibility-login-link {
+    color: var(--color-primary);
+}
+
 #flows-input-wrapper {
     position: relative;
 }

@@ -38,10 +38,19 @@
                 <input id="title" name="title" placeholder="Add your title" maxlength="128" autofocus>
                 <div>
                     <h3>Visibility</h3>
-                    <label>
-                        <input id="visibility-checkbox" type="checkbox" name="is_public" checked>
-                        Make post public
-                    </label>
+
+                    {% if current_user.is_authenticated %}
+                        <label>
+                            <input id="visibility-checkbox" type="checkbox" name="is_public" checked>
+                            Make post public
+                        </label>
+                    {% else %}
+                        <label id="visibility-label" class="login-required">
+                            <input id="visibility-checkbox" type="checkbox" name="is_public" disabled>
+                            Make post public
+                        </label>
+                        <p id="visibility-login-required">You must be <a id="visibility-login-link" href="/login">logged in</a> to make public posts.</p>
+                    {% endif %}
                 </div>
 
                 <div>

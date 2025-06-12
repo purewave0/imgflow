@@ -20,7 +20,7 @@ class Post(db.Model):
     MAX_FLOWS_PER_POST = 3
     id = db.Column(db.Integer, primary_key=True)
     post_id = db.Column(db.String(POST_ID_LENGTH), unique=True, nullable=False)
-    user_id = db.Column(db.Integer, db.ForeignKey('User.id'))
+    user_id = db.Column(db.Integer, db.ForeignKey('User.id'), nullable=True)
     title = db.Column(db.String(MAX_TITLE_LENGTH), nullable=True)
     media = db.relationship('PostMedia', backref='post')
     thumbnail_url = db.Column(db.String(128), nullable=False)

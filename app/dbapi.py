@@ -17,7 +17,8 @@ def create_post(user_id, title, media_list, is_public, flow_names):
     """Create a post in the database.
 
     Args:
-        user_id: The ID of the creator of the post.
+        user_id: The ID of the creator of the post. If None, the post was created by a
+            user who's not logged in (therefore it's never public).
         title: The title of the post. Must not exceed Post.MAX_NAME_LENGTH
             characters.
         media_list: Collection of dicts containing the media's URL
