@@ -106,8 +106,10 @@ document.addEventListener('DOMContentLoaded', () => {
         const commentStructure = `
             <div class="comment">
                 <div class="comment-info">
-                    <img class="commenter-avatar">
-                    <span class="commenter-username"></span>
+                    <a class="commenter-profile-link" href="">
+                        <img class="commenter-avatar">
+                        <span class="commenter-username"></span>
+                    </a>
                     <span class="comment-info-separator">·</span>
                     <span class="comment-datetime"></span>
                 </div>
@@ -132,6 +134,9 @@ document.addEventListener('DOMContentLoaded', () => {
         commentWrapper.dataset.commentId = commentId;
 
         const commentElement = commentWrapper.querySelector('.comment');
+
+        const profileLink = commentWrapper.querySelector('.commenter-profile-link');
+        profileLink.href = `/users/${encodeURIComponent(commenterUsername)}`;
 
         const avatarElement = commentWrapper.querySelector('.commenter-avatar');
         avatarElement.src = avatarUrl;
