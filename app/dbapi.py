@@ -1,4 +1,6 @@
+from collections.abc import Iterable, Sequence
 from enum import Enum
+from typing import Any
 
 from app.extensions import db
 from app.models.post import (
@@ -13,14 +15,20 @@ FLOWS_IN_OVERVIEW = 8
 FLOW_SUGGESTIONS_LIMIT = 8
 
 
-def create_post(user_id, title, media_list, is_public, flow_names):
+def create_post(
+    user_id: int | None,
+    title: str | None,
+    media_list: Sequence[dict[str, str]],
+    is_public: bool,
+    flow_names: Iterable[str]
+) -> dict[str, Any]:
     """Create a post in the database.
 
     Args:
         user_id: The ID of the creator of the post. If None, the post was created by a
             user who's not logged in (therefore it's never public).
         title: The title of the post. Must not exceed Post.MAX_NAME_LENGTH
-            characters.
+            characters. If None, no title will be added.
         media_list: Collection of dicts containing the media's URL
             ('media_url') and a description ('description') of optional value.
         is_public: If True, the post will show up on public feeds.
@@ -31,9 +39,8 @@ def create_post(user_id, title, media_list, is_public, flow_names):
         The newly created Post's columns as a dict; the 'flows' column,
         however, will be 'flow_names' instead, containing the names of the
         Flows this post is in.
-
     """
-    media = []
+    media: list[PostMedia] = []
     for media_item in media_list:
         description = media_item['description']
 
@@ -44,7 +51,7 @@ def create_post(user_id, title, media_list, is_public, flow_names):
             )
         )
 
-    flows = []
+    flows: list[Flow] = []
     if is_public:
         for flow_name in flow_names:
             flow = _get_flow(flow_name)
@@ -78,7 +85,7 @@ def create_post(user_id, title, media_list, is_public, flow_names):
     }
 
 
-def comment_on_post(post_id, user_id, content):
+def comment_on_post(post_id: str, user_id: int, content: str) -> dict[str, Any]:
     """Comment on a post.
 
     Args:
@@ -111,7 +118,9 @@ def comment_on_post(post_id, user_id, content):
     }
 
 
-def reply_to_comment(post_id, comment_id, user_id, content):
+def reply_to_comment(
+    post_id: str, comment_id: int, user_id: int, content: str
+) -> dict[str, Any]:
     """Reply to a comment on a post.
 
     Args:
@@ -124,7 +133,6 @@ def reply_to_comment(post_id, comment_id, user_id, content):
         The newly created PostComment's columns as a dict.
     """
     reply = PostComment(user_id, content, comment_id, post_id)
-
 
     db.session.add(reply)
     _increment_post_comment_count(post_id)
@@ -146,29 +154,30 @@ def reply_to_comment(post_id, comment_id, user_id, content):
     }
 
 
-def _rows_to_dicts(rows):
+def _rows_to_dicts(rows: Iterable) -> tuple[dict[str, Any], ...]:
     """Convert the given Rows from a SQLAlchemy query into a tuple of dicts."""
     return tuple(row._asdict() for row in rows)
 
 
 class PostSorting(Enum):
-    """Sorting options when fetching posts.
-
-    Attributes:
-        NEWEST: Sorts posts by most recently created first.
-        TOP: Sorts posts by highest score first.
-    """
+    """Sorting options when fetching posts."""
     NEWEST = 'newest'
+    """Sorts posts by most recently created first."""
     TOP = 'top'
+    """Sorts posts by highest score first."""
 
 
-def get_public_posts_by_page(user_id, page, sorting):
+def get_public_posts_by_page(
+    current_user_id: int | None,
+    page: int,
+    sorting: PostSorting
+) -> tuple[dict[str, Any], ...]:
     """Return a sorted and paginated collection of Posts as dicts, including upvote
     state.
 
     Attributes:
-        user_id: The current logged in user's ID. If None, upvote states will always be
-            False.
+        current_user_id: The current logged in user's ID. If None (logged out), upvote
+            states will always be False.
         page: The page to fetch.
         sorting: The PostSorting option to use.
     """
@@ -185,7 +194,7 @@ def get_public_posts_by_page(user_id, page, sorting):
             Post.is_public == True
         )
 
-    if user_id is None:
+    if current_user_id is None:
         statement = statement.add_columns(
             db.literal(False).label('has_upvote')
         )
@@ -193,7 +202,7 @@ def get_public_posts_by_page(user_id, page, sorting):
         statement = statement.add_columns(
             db.exists().where(
                 (PostUpvote.post_id == Post.post_id)
-                & (PostUpvote.user_id == user_id)
+                & (PostUpvote.user_id == current_user_id)
             ).label('has_upvote')
         )
 
@@ -216,14 +225,19 @@ def get_public_posts_by_page(user_id, page, sorting):
     return _rows_to_dicts(result)
 
 
-def search_public_posts_by_page(title, user_id, page, sorting):
+def search_public_posts_by_page(
+    title: str,
+    current_user_id: int | None,
+    page: int,
+    sorting: PostSorting
+) -> tuple[dict[str, Any], ...]:
     """Return a sorted and paginated collection of Posts as dicts, filtered by title,
     including whether they were upvoted or not.
 
     Attributes:
         title: The title to search for.
-        user_id: The current logged in user's ID. If None, upvote states will always be
-            False.
+        current_user_id: The current logged in user's ID. If None (logged out), upvote
+            states will always be False.
         page: The page to fetch.
         sorting: The PostSorting option to use.
     """
@@ -241,7 +255,7 @@ def search_public_posts_by_page(title, user_id, page, sorting):
             Post.title.icontains(title)
         )
 
-    if user_id is None:
+    if current_user_id is None:
         statement = statement.add_columns(
             db.literal(False).label('has_upvote')
         )
@@ -249,7 +263,7 @@ def search_public_posts_by_page(title, user_id, page, sorting):
         statement = statement.add_columns(
             db.exists().where(
                 (PostUpvote.post_id == Post.post_id)
-                & (PostUpvote.user_id == user_id)
+                & (PostUpvote.user_id == current_user_id)
             ).label('has_upvote')
         )
 
@@ -272,7 +286,7 @@ def search_public_posts_by_page(title, user_id, page, sorting):
     return _rows_to_dicts(result)
 
 
-def get_post_media(post_id):
+def get_post_media(post_id: str) -> tuple[dict[str, str], ...]:
     """Return all of a Post's media as dicts."""
     result = db.session.execute(
         db.select(
@@ -283,11 +297,10 @@ def get_post_media(post_id):
     return _rows_to_dicts(result)
 
 
-def get_post_and_media(post_id, user_id):
+def get_post_and_media(post_id: str, current_user_id: int | None) -> dict[str, Any]:
     """Return a Post and all of its media (their URL and description) as dicts,
-    including whether it was upvoted by the logged in user of the given ID.
+    including whether it was upvoted by the logged in user of the given current ID.
     """
-
     post = db.session.execute(
         db.select(
             Post
@@ -302,12 +315,12 @@ def get_post_and_media(post_id, user_id):
         return None
 
     has_upvote = False
-    if user_id is not None:
+    if current_user_id is not None:
         has_upvote = db.session.execute(
             db.select(
                 db.exists().where(
                     (PostUpvote.post_id == post_id) &
-                    (PostUpvote.user_id == user_id)
+                    (PostUpvote.user_id == current_user_id)
                 )
             )
         ).scalar()
@@ -347,19 +360,18 @@ def get_post_and_media(post_id, user_id):
 
 
 class CommentSorting(Enum):
-    """Sorting options when fetching comments.
-
-    Attributes:
-        NEWEST: Sorts comments by most recently created first.
-        MOST-LIKED: Sorts posts by highest score first.
-        OLDEST: Sorts comments by most recently created last.
-    """
+    """Sorting options when fetching comments."""
     NEWEST = 'newest'
+    """Sorts comments by most recently created first."""
     MOST_LIKED = 'most-liked'
+    """Sorts posts by highest score first."""
     OLDEST = 'oldest'
+    """Sorts comments by most recently created last."""
 
 
-def get_post_comments_by_page(post_id, user_id, page, sorting):
+def get_post_comments_by_page(
+    post_id: str, current_user_id: int | None, page: int, sorting: PostSorting
+) -> tuple[dict[str, Any], ...]:
     """Return a sorted and paginated collection of a Post's comments as dicts, including
     whether they were upvoted or not.
 
@@ -368,8 +380,8 @@ def get_post_comments_by_page(post_id, user_id, page, sorting):
     Args:
         post_id: The ID of the Post.
         page: The page to fetch.
-        user_id: The current logged in user's ID. If None, upvote states will always be
-            False.
+        current_user_id: The current logged in user's ID. If None, upvote states will
+            always be False.
         sorting: The CommentSorting option to use.
     """
     statement = db.select(
@@ -388,7 +400,7 @@ def get_post_comments_by_page(post_id, user_id, page, sorting):
             PostComment.parent_id == None, # don't include replies
         )
 
-    if user_id is None:
+    if current_user_id is None:
         statement = statement.add_columns(
             db.literal(False).label('has_upvote')
         )
@@ -396,7 +408,7 @@ def get_post_comments_by_page(post_id, user_id, page, sorting):
         statement = statement.add_columns(
             db.exists().where(
                 (CommentUpvote.comment_id == PostComment.id)
-                & (CommentUpvote.user_id == user_id)
+                & (CommentUpvote.user_id == current_user_id)
             ).label('has_upvote')
         )
 
@@ -423,7 +435,9 @@ def get_post_comments_by_page(post_id, user_id, page, sorting):
     return _rows_to_dicts(result)
 
 
-def get_comment_replies(post_id, comment_id, user_id, sorting):
+def get_comment_replies(
+    post_id: str, comment_id: int, current_user_id: int | None, sorting: PostSorting
+) -> tuple[dict[str, Any], ...]:
     """Return a sorted collection of a comment's replies as dicts, including upvote
     states.
 
@@ -432,8 +446,8 @@ def get_comment_replies(post_id, comment_id, user_id, sorting):
     Args:
         post_id: The ID of the post.
         comment_id: The ID of the comment.
-        user_id: The current logged in user's ID. If None, upvote states will always be
-            False.
+        current_user_id: The current logged in user's ID. If None, upvote states will
+            always be False.
         sorting: The CommentSorting option to use.
     """
     statement = db.select(
@@ -452,7 +466,7 @@ def get_comment_replies(post_id, comment_id, user_id, sorting):
             PostComment.parent_id == comment_id,
         )
 
-    if user_id is None:
+    if current_user_id is None:
         statement = statement.add_columns(
             db.literal(False).label('has_upvote')
         )
@@ -460,7 +474,7 @@ def get_comment_replies(post_id, comment_id, user_id, sorting):
         statement = statement.add_columns(
             db.exists().where(
                 (CommentUpvote.comment_id == PostComment.id)
-                & (CommentUpvote.user_id == user_id)
+                & (CommentUpvote.user_id == current_user_id)
             ).label('has_upvote')
         )
 
@@ -482,7 +496,7 @@ def get_comment_replies(post_id, comment_id, user_id, sorting):
     return _rows_to_dicts(result)
 
 
-def increment_post_views(post_id):
+def increment_post_views(post_id: str) -> None:
     """Increase a post's view count by 1."""
     db.session.execute(
         db.update(Post)
@@ -492,7 +506,7 @@ def increment_post_views(post_id):
     db.session.commit()
 
 
-def _increment_post_comment_count(post_id):
+def _increment_post_comment_count(post_id: str) -> None:
     """Increase a post's comment count by 1."""
     db.session.execute(
         db.update(Post)
@@ -501,7 +515,7 @@ def _increment_post_comment_count(post_id):
     )
 
 
-def _increment_comment_reply_count(post_id, comment_id):
+def _increment_comment_reply_count(post_id: str, comment_id: int) -> None:
     """Increase a comment's reply count by 1."""
     db.session.execute(
         db.update(PostComment)
@@ -514,11 +528,10 @@ def _increment_comment_reply_count(post_id, comment_id):
     )
 
 
-def upvote_post(post_id, upvoter_user_id):
+def upvote_post(post_id: str, upvoter_user_id: int) -> None:
     """Record the user's upvote on a post, if not already upvoted, and increase the
     poster's score.
     """
-
     already_upvoted = db.session.execute(
         db.select(PostUpvote.user_id)
             .where(
@@ -553,11 +566,10 @@ def upvote_post(post_id, upvoter_user_id):
     db.session.commit()
 
 
-def remove_upvote_from_post(post_id, upvoter_user_id):
+def remove_upvote_from_post(post_id: str, upvoter_user_id: int) -> None:
     """Remove the user's upvote on a post, if upvoted, and decrease the poster's
     score.
     """
-
     upvote = db.session.execute(
         db.select(PostUpvote)
             .where(
@@ -590,7 +602,7 @@ def remove_upvote_from_post(post_id, upvoter_user_id):
     db.session.commit()
 
 
-def upvote_comment(comment_id, upvoter_user_id):
+def upvote_comment(comment_id: int, upvoter_user_id: int) -> None:
     """Record the user's upvote on a comment, if not already upvoted, and increase the
     commenter's score.
     """
@@ -629,7 +641,9 @@ def upvote_comment(comment_id, upvoter_user_id):
     db.session.commit()
 
 
-def remove_upvote_from_comment(post_id, comment_id, upvoter_user_id):
+def remove_upvote_from_comment(
+    post_id: str, comment_id: int, upvoter_user_id: int
+) -> None:
     """Remove the user's upvote on a comment, if upvoted, and decrease the commenter's
     score."""
 
@@ -669,7 +683,7 @@ def remove_upvote_from_comment(post_id, comment_id, upvoter_user_id):
 
 # -- flows --
 
-def _get_flow(name):
+def _get_flow(name: str) -> Flow:
     """Return a Flow object by name."""
     result = db.session.execute(
         db.select(
@@ -682,7 +696,7 @@ def _get_flow(name):
     return result
 
 
-def get_flow(name):
+def get_flow(name: str) -> dict[str, Any]:
     """Return a Flow as a dict by name."""
     result = db.session.execute(
         db.select(
@@ -700,7 +714,7 @@ def get_flow(name):
     return dict(result)
 
 
-def _increment_flow_post_count(flow_id):
+def _increment_flow_post_count(flow_id: int) -> None:
     """Increase a flow's post count by 1."""
     db.session.execute(
         db.update(Flow)
@@ -709,7 +723,9 @@ def _increment_flow_post_count(flow_id):
     )
 
 
-def get_public_posts_in_flow_by_page(flow_id, user_id, page, sorting):
+def get_public_posts_in_flow_by_page(
+    flow_id: int, current_user_id: int, page: int, sorting: PostSorting
+) -> tuple[dict[str, Any], ...]:
     """Return a sorted and paginated collection of posts in a flow as dicts, including
     upvote state.
 
@@ -730,7 +746,7 @@ def get_public_posts_in_flow_by_page(flow_id, user_id, page, sorting):
             Flow.id == flow_id,
         )
 
-    if user_id is None:
+    if current_user_id is None:
         statement = statement.add_columns(
             db.literal(False).label('has_upvote')
         )
@@ -738,7 +754,7 @@ def get_public_posts_in_flow_by_page(flow_id, user_id, page, sorting):
         statement = statement.add_columns(
             db.exists().where(
                 (PostUpvote.post_id == Post.post_id)
-                & (PostUpvote.user_id == user_id)
+                & (PostUpvote.user_id == current_user_id)
             ).label('has_upvote')
         )
 
@@ -761,10 +777,10 @@ def get_public_posts_in_flow_by_page(flow_id, user_id, page, sorting):
     return _rows_to_dicts(result)
 
 
-def thumbnail_by_flow(flow):
+def thumbnail_by_flow(flow: Flow) -> str:
     """Return the thumbnail URL of a flow.
 
-    The thumbnail of a flow is the thumbnail of the highest-scored post in that
+    The thumbnail of a flow is always the thumbnail of the highest-scored post in that
     flow.
     """
     top_post_thumbnail_from_flow = db.session.execute(
@@ -783,8 +799,8 @@ def thumbnail_by_flow(flow):
     return top_post_thumbnail_from_flow
 
 
-def get_flows_overview():
-    """Return FLOWS_IN_OVERVIEW flows, ordered by highest post count first.
+def get_flows_overview() -> tuple[dict[str, str], ...]:
+    """Return `FLOWS_IN_OVERVIEW` flows, ordered by highest post count first.
 
     Returns:
         A collection of dicts, each with the flow's name ('name') and its
@@ -810,12 +826,12 @@ def get_flows_overview():
     return overview
 
 
-def _escaped_search_text(text):
+def _escaped_search_text(text: str) -> str:
     """Return `text` with any LIKE special characters (%, _, \) escaped."""
     return text.replace("%", "\\%").replace("\\", "\\\\").replace("_", "\\_")
 
 
-def suggest_flows_by_name(partial_name):
+def suggest_flows_by_name(partial_name: str) -> tuple[dict[str, Any], ...]:
     result = db.session.execute(
         db.select(
             Flow.name,
@@ -837,7 +853,7 @@ def suggest_flows_by_name(partial_name):
 
 # -- users --
 
-def create_user(name, password):
+def create_user(name: str, password: str) -> User:
     """Create a user in the database.
 
     Args:
@@ -857,7 +873,7 @@ def create_user(name, password):
     return user
 
 
-def is_username_taken(name):
+def is_username_taken(name: str) -> bool:
     """Return whether the given username is already taken."""
     is_taken = db.session.execute(
         db.select(
@@ -872,7 +888,7 @@ def is_username_taken(name):
     return is_taken
 
 
-def get_user_by_name(name):
+def get_user_by_name(name: str) -> User | None:
     """Return the User with the given name, or None."""
     user = db.session.execute(
         db.select(
@@ -885,7 +901,7 @@ def get_user_by_name(name):
     return user
 
 
-def get_username_by_id(user_id):
+def get_username_by_id(user_id: int) -> str | None:
     """Return the name of the User with the given ID, or None."""
     name = db.session.execute(
         db.select(
@@ -898,7 +914,9 @@ def get_username_by_id(user_id):
     return name
 
 
-def get_public_posts_from_user_by_page(user_id, current_user_id, page, sorting):
+def get_public_posts_from_user_by_page(
+    user_id: int, current_user_id: int, page: int, sorting: PostSorting
+) -> tuple[dict[str, Any], ...]:
     """Return a sorted and paginated collection of public posts made by the given user,
     including upvote state.
     """
