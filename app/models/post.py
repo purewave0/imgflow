@@ -1,3 +1,4 @@
+from collections.abc import Iterable
 import random
 import string
 
@@ -33,7 +34,15 @@ class Post(db.Model):
     is_public = db.Column(db.Boolean, nullable=False, default=False)
     flows = db.relationship('Flow', secondary='PostFlow', backref='posts')
 
-    def __init__(self, user_id, title, media, thumbnail_url, is_public, flows):
+    def __init__(
+        self,
+        user_id: int | None,
+        title: str | None,
+        media: Iterable['PostMedia'],
+        thumbnail_url: str,
+        is_public: bool,
+        flows: Iterable['Flow']
+    ):
         self.post_id = _random_post_id()
         self.user_id = user_id
         self.title = title
@@ -72,7 +81,13 @@ class PostComment(db.Model):
     created_on = db.Column(db.DateTime, server_default=utcnow())
     post_id = db.Column(db.String(Post.POST_ID_LENGTH), db.ForeignKey('Post.post_id'))
 
-    def __init__(self, user_id, content, parent_id, post_id):
+    def __init__(
+        self,
+        user_id: int,
+        content: str,
+        parent_id: int | None,
+        post_id: str
+    ):
         self.user_id = user_id
         self.content = content
         self.parent_id = parent_id
@@ -89,7 +104,7 @@ class PostUpvote(db.Model):
     post_id = db.Column(db.String(Post.POST_ID_LENGTH), db.ForeignKey('Post.post_id'), primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('User.id'), primary_key=True)
 
-    def __init__(self, post_id, user_id):
+    def __init__(self, post_id: str, user_id: int):
         self.post_id = post_id
         self.user_id = user_id
 
@@ -102,7 +117,7 @@ class CommentUpvote(db.Model):
     comment_id = db.Column(db.Integer, db.ForeignKey('PostComment.id'), primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('User.id'), primary_key=True)
 
-    def __init__(self, comment_id, user_id):
+    def __init__(self, comment_id: int, user_id: int):
         self.comment_id = comment_id
         self.user_id = user_id
 
@@ -118,7 +133,7 @@ class Flow(db.Model):
     name = db.Column(db.String(MAX_NAME_LENGTH), unique=True, nullable=False, index=True)
     post_count = db.Column(db.Integer, nullable=False)
 
-    def __init__(self, name):
+    def __init__(self, name: str):
         self.name = name
         self.post_count = 0
 

@@ -24,7 +24,11 @@ class User(UserMixin, db.Model):
     # TODO: profile picture (avatar)
     # avatar_url = db.Column(db.String(128), nullable=True)
 
-    def __init__(self, name, password):
+    def __init__(
+        self,
+        name: str,
+        password: str
+    ):
         self.name = name
         self.password_hash = generate_password_hash(
             password
@@ -35,8 +39,8 @@ class User(UserMixin, db.Model):
         return f'<User "{self.name}">'
 
 
-    def set_password(self, password):
+    def set_password(self, password: str):
         self.password_hash = generate_password_hash(password)
 
-    def check_password(self, password):
+    def check_password(self, password: str) -> bool:
         return check_password_hash(self.password_hash, password)
