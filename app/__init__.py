@@ -56,5 +56,7 @@ def create_app(config_class=Config):
     from app.flows import bp as flows_bp
     app.register_blueprint(flows_bp, url_prefix='/flows')
 
+    from app.user import bp as user_bp
+    app.register_blueprint(user_bp, url_prefix='/users')
 
     return app
