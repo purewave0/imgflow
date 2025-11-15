@@ -20,16 +20,16 @@ class User(UserMixin, db.Model):
     )
     password_hash = db.Column(db.String(256))
     created_on = db.Column(db.DateTime, server_default=utcnow())
+    score = db.Column(db.Integer, nullable=False, default=0)
     # TODO: profile picture (avatar)
     # avatar_url = db.Column(db.String(128), nullable=True)
-    # TODO: score
-    # score = db.Column(db.Integer, nullable=False)
 
     def __init__(self, name, password):
         self.name = name
         self.password_hash = generate_password_hash(
             password
         )
+        self.score = 0
 
     def __repr__(self):
         return f'<User "{self.name}">'
