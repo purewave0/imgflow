@@ -2,6 +2,9 @@
 document.addEventListener('DOMContentLoaded', () => {
     const POSTS_PER_PAGE = 20;
 
+    const createdOn = document.getElementById('created-on');
+    createdOn.textContent = new Date(createdOn.textContent).toLocaleDateString();
+
     let currentlySelectedSorting = document.getElementById('sort-newest');
 
     const gallery = new Gallery({
