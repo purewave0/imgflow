@@ -1,0 +1,65 @@
+{% extends 'base.html' %}
+
+{% block css %}
+    <link rel="stylesheet" href="/static/css/post-gallery.css">
+    <link rel="stylesheet" href="/static/css/user.css">
+{% endblock %}
+
+{% block js %}
+    <script src="/static/js/lib/macy.min.js"></script>
+    <script src="/static/js/api.js"></script>
+    <script src="/static/js/post-gallery.js"></script>
+    <script src="/static/js/user.js"></script>
+    <script>
+        const thisUser = {
+            username: {{ username | tojson }},
+        };
+    </script>
+{% endblock %}
+
+{% block title %} {{ username }} {% endblock %}
+
+{% block content %}
+
+    <div id="profile-banner">
+        <div id="banner-content">
+            <div id="avatar">
+                <!-- TODO: pull avatar -->
+                <img src="/static/img/cat.png">
+            </div>
+
+            <div id="profile-text">
+                <!-- very basic design for now -->
+                <h2>{{ username }}</h2>
+                <div id="profile-info">
+                    <span>
+                        <span id="score">123</span> points
+                    </span>
+                    <span>
+                        <span id="score">20</span> posts
+                    </span>
+                    <span>
+                        Member since <span id="created-on">01/02/2034</span>
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <section id="gallery-section" class="page">
+        <div id="gallery-header">
+            <div id="posts-sorting">
+                <span id="sort-newest" class="selected" data-sort="newest">Newest</span>
+                <span id="sort-top" data-sort="top">Top</span>
+            </div>
+        </div>
+
+        <div id="gallery"></div>
+
+        <div id="gallery-end">
+            <h3>You've scrolled through it all!</h3>
+            <p>Time for a coffee break.</p>
+        </div>
+    </section>
+
+{% endblock %}

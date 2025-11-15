@@ -1,0 +1,150 @@
+.content {
+    margin: 0;
+}
+
+#profile-banner {
+    background-color: #0b092d;
+    padding: 36px 0;
+}
+
+#banner-content {
+    margin: 0 auto;
+    width: var(--content-width);
+    display: flex;
+    flex-direction: row;
+}
+
+#avatar img {
+    height: 256px;
+    width: 256px;
+    border-radius: 100%;
+}
+
+#profile-text {
+    margin-left: 32px;
+    color: white;
+    font-size: 16pt;
+}
+
+#profile-info {
+    display: flex;
+    flex-direction: column;
+}
+
+#flow-name {
+    font-size: 36pt;
+    margin-bottom: 24px;
+}
+
+#flow-page-count {
+    margin-top: 0;
+    font-size: 14pt;
+}
+
+
+/* -- gallery -- */
+
+#gallery-section {
+    max-width: var(--content-width);
+    margin: 0 auto;
+}
+
+#gallery-header {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    margin: 24px 0;
+}
+
+#posts-sorting {
+    display: flex;
+    flex-direction: row;
+    column-gap: 16px;
+}
+
+#posts-sorting span {
+    cursor: pointer;
+    user-select: none;
+}
+
+#posts-sorting span.selected {
+    color: var(--color-secondary);
+    font-weight: bold;
+}
+
+#gallery-end {
+    display: flex;
+    flex-direction: column;
+    color: var(--color-text-secondary);
+    align-items: center;
+    margin: 64px 0;
+    user-select: none;
+}
+
+#gallery-end h3 {
+    font-size: 16pt;
+    margin: 0;
+}
+
+#gallery-end p {
+    margin-top: 16px;
+}
+
+#gallery[data-current-page="0"] ~ #gallery-end,
+body:not([data-gallery-state="all-posts-fetched"]) #gallery-end {
+    display: none;
+}
+
+
+/* -- gallery skeleton & loading -- */
+
+#gallery-skeleton {
+    columns: 5 200px;
+    column-gap: 1rem;
+}
+
+#gallery-skeleton .post {
+    height: 256px;
+    background-color: red;
+    width: 100%;
+    margin-bottom: 16px;
+    background-color: var(--color-skeleton-start);
+    animation: skeleton-loading 1s linear infinite alternate;
+    box-shadow: none;
+}
+
+#gallery-skeleton .post:nth-child(2n) {
+    height: 320px;
+}
+
+#gallery-skeleton .post:nth-child(3n+2) {
+    height: 384px;
+}
+
+@keyframes skeleton-loading {
+    0% {
+        background-color: var(--color-skeleton-start);
+    }
+    100% {
+        background-color: var(--color-skeleton-end);
+    }
+}
+
+body:not([data-gallery-state="first-fetch"]) #gallery-skeleton {
+    display: none;
+}
+
+/* TODO: loader for subsequent fetches */
+body[data-gallery-state="subsequent-fetch"] {
+    background-color: lightgreen;
+}
+
+/* prevent user from sorting/fetching more posts while it's loading, as it could result
+ * in an inconsistent state */
+body[data-gallery-state="first-fetch"] #posts-sorting,
+body[data-gallery-state="subsequent-fetch"] #posts-sorting {
+    pointer-events: none;
+    opacity: 0.7;
+}
+

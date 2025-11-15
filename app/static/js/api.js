@@ -48,6 +48,10 @@ const Api = {
         );
     },
 
+    fetchUserPublicPostsByPage(username, page, sorting) {
+        return fetch(`/api/users/${username}/posts?page=${page}&sort=${sorting}`);
+    },
+
     fetchPost(postId) {
         return fetch(`/api/posts/${postId}`);
     },
