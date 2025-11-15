@@ -15,5 +15,6 @@ def show_user(username):
         'user/index.html',
         username=user.name,
         user_created_on=user.created_on,
-        # TODO: avatar, score...
+        user_score=user.score,
+        # TODO: avatar
     )
