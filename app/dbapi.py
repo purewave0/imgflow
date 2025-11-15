@@ -514,21 +514,23 @@ def _increment_comment_reply_count(post_id, comment_id):
     )
 
 
-def upvote_post(post_id, user_id):
-    """Record the user's upvote on a post, if not already upvoted."""
+def upvote_post(post_id, upvoter_user_id):
+    """Record the user's upvote on a post, if not already upvoted, and increase the
+    poster's score.
+    """
 
     already_upvoted = db.session.execute(
         db.select(PostUpvote.user_id)
             .where(
                 PostUpvote.post_id == post_id,
-                PostUpvote.user_id == user_id
+                PostUpvote.user_id == upvoter_user_id
             )
     ).mappings().one_or_none() is not None
 
     if already_upvoted:
         return
 
-    post_upvote = PostUpvote(post_id, user_id)
+    post_upvote = PostUpvote(post_id, upvoter_user_id)
     db.session.add(post_upvote)
 
     db.session.execute(
@@ -537,17 +539,30 @@ def upvote_post(post_id, user_id):
             .values(score=Post.score + 1)
     )
 
+    poster_id = db.session.execute(
+        db.select(Post.user_id)
+            .where(Post.post_id == post_id)
+    ).scalar_one()
+    db.session.execute(
+        db.update(User)
+            .where(User.id == poster_id)
+            .values(score=User.score + 1)
+    )
+    print(poster_id)
+
     db.session.commit()
 
 
-def remove_upvote_from_post(post_id, user_id):
-    """Remove the user's upvote on a post, if upvoted."""
+def remove_upvote_from_post(post_id, upvoter_user_id):
+    """Remove the user's upvote on a post, if upvoted, and decrease the poster's
+    score.
+    """
 
     upvote = db.session.execute(
         db.select(PostUpvote)
             .where(
                 PostUpvote.post_id == post_id,
-                PostUpvote.user_id == user_id
+                PostUpvote.user_id == upvoter_user_id
             )
     ).scalars().one_or_none()
 
@@ -562,24 +577,36 @@ def remove_upvote_from_post(post_id, user_id):
             .values(score=Post.score - 1)
     )
 
+    poster_id = db.session.execute(
+        db.select(Post.user_id)
+            .where(Post.post_id == post_id)
+    ).scalar_one()
+    db.session.execute(
+        db.update(User)
+            .where(User.id == poster_id)
+            .values(score=User.score - 1)
+    )
+
     db.session.commit()
 
 
-def upvote_comment(comment_id, user_id):
-    """Record the user's upvote on a comment, if not already upvoted."""
+def upvote_comment(comment_id, upvoter_user_id):
+    """Record the user's upvote on a comment, if not already upvoted, and increase the
+    commenter's score.
+    """
 
     already_upvoted = db.session.execute(
         db.select(CommentUpvote.user_id)
             .where(
                 CommentUpvote.comment_id == comment_id,
-                CommentUpvote.user_id == user_id
+                CommentUpvote.user_id == upvoter_user_id
             )
     ).mappings().one_or_none() is not None
 
     if already_upvoted:
         return
 
-    comment_upvote = CommentUpvote(comment_id, user_id)
+    comment_upvote = CommentUpvote(comment_id, upvoter_user_id)
     db.session.add(comment_upvote)
 
     db.session.execute(
@@ -589,17 +616,28 @@ def upvote_comment(comment_id, user_id):
             ).values(score=PostComment.score + 1)
     )
 
+    commenter_id = db.session.execute(
+        db.select(PostComment.user_id)
+            .where(PostComment.id == comment_id)
+    ).scalar_one()
+    db.session.execute(
+        db.update(User)
+            .where(User.id == commenter_id)
+            .values(score=User.score + 1)
+    )
+
     db.session.commit()
 
 
-def remove_upvote_from_comment(post_id, comment_id, user_id):
-    """Remove the user's upvote on a comment, if upvoted."""
+def remove_upvote_from_comment(post_id, comment_id, upvoter_user_id):
+    """Remove the user's upvote on a comment, if upvoted, and decrease the commenter's
+    score."""
 
     upvote = db.session.execute(
         db.select(CommentUpvote)
             .where(
                 CommentUpvote.comment_id == comment_id,
-                CommentUpvote.user_id == user_id
+                CommentUpvote.user_id == upvoter_user_id
             )
     ).scalars().one_or_none()
 
@@ -614,6 +652,16 @@ def remove_upvote_from_comment(post_id, comment_id, user_id):
                 PostComment.id == comment_id,
                 PostComment.post_id == post_id,
             ).values(score=PostComment.score - 1)
+    )
+
+    commenter_id = db.session.execute(
+        db.select(PostComment.user_id)
+            .where(PostComment.id == comment_id)
+    ).scalar_one()
+    db.session.execute(
+        db.update(User)
+            .where(User.id == commenter_id)
+            .values(score=User.score - 1)
     )
 
     db.session.commit()
