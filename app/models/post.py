@@ -8,7 +8,8 @@ from app.models.util import utcnow
 
 _post_id_charset = string.ascii_letters + string.digits # a-z A-Z 0-9
 
-def _random_post_id():
+def _random_post_id() -> str:
+    """Return a new random post ID with `Post.POST_ID_LENGTH` characters."""
     return ''.join(
         random.choices(_post_id_charset, k=Post.POST_ID_LENGTH)
     )
