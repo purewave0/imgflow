@@ -17,7 +17,8 @@ from app.dbapi import (
     get_post_comments_by_page, PostSorting, CommentSorting,
     get_flow, get_flows_overview, suggest_flows_by_name,
     get_public_posts_in_flow_by_page,
-    create_user, is_username_taken, get_user_by_name
+    create_user, is_username_taken, get_user_by_name,
+    get_public_posts_from_user_by_page,
 )
 from app.models.post import Post, Flow
 from app.models.user import User
@@ -382,6 +383,39 @@ def api_create_user():
         'name': new_user.name,
         'created_on': new_user.created_on,
     }), 201
+
+
+@bp.route('/users/<username>/posts')
+def api_user_posts(username):
+    page = request.args.get('page') or 0
+    try:
+        page = int(page)
+    except ValueError:
+        return jsonify({'error': 'invalid_page'}), 400
+
+    try:
+        sorting = PostSorting(request.args.get('sort'))
+    except ValueError:
+        return jsonify({'error': 'invalid_sort'}), 400
+
+    username_length = len(username)
+    if (
+        username_length < User.MIN_NAME_LENGTH
+        or username_length > User.MAX_NAME_LENGTH
+    ):
+        return jsonify({'error': 'user_not_found'}), 404
+
+    user = get_user_by_name(username)
+    if not user:
+        return jsonify({'error': 'user_not_found'}), 404
+
+    posts = get_public_posts_from_user_by_page(
+        user.id,
+        current_user.id if current_user.is_authenticated else None,
+        page,
+        sorting
+    )
+    return jsonify(posts)
 
 
 @bp.route('/usernames/<username>')

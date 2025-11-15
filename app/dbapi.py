@@ -848,3 +848,52 @@ def get_username_by_id(user_id):
     ).scalar_one_or_none()
 
     return name
+
+
+def get_public_posts_from_user_by_page(user_id, current_user_id, page, sorting):
+    """Return a sorted and paginated collection of public posts made by the given user,
+    including upvote state.
+    """
+    statement = db.select(
+            Post.post_id,
+            Post.title,
+            Post.thumbnail_url,
+            Post.created_on,
+            Post.updated_on,
+            Post.score,
+            Post.comment_count,
+            Post.views,
+        ).where(
+            Post.user_id == user_id,
+            Post.is_public == True
+        )
+
+    if current_user_id is None:
+        statement = statement.add_columns(
+            db.literal(False).label('has_upvote')
+        )
+    else:
+        statement = statement.add_columns(
+            db.exists().where(
+                (PostUpvote.post_id == Post.post_id)
+                & (PostUpvote.user_id == current_user_id)
+            ).label('has_upvote')
+        )
+
+    match sorting:
+        case PostSorting.NEWEST:
+            statement = statement.order_by(Post.created_on.desc())
+        case PostSorting.TOP:
+            statement = statement.order_by(
+                Post.score.desc(),
+                Post.created_on.desc(),
+            )
+
+    statement = statement.limit(
+            POSTS_PER_PAGE
+        ).offset(
+            page*POSTS_PER_PAGE
+        )
+
+    result = db.session.execute(statement)
+    return _rows_to_dicts(result)
