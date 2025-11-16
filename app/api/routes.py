@@ -147,6 +147,9 @@ def api_posts():
         ):
             return jsonify({'error': 'wrong_description_length'}), 400
 
+        if not file.filename:
+            return jsonify({'error': 'file_missing_filename'}), 400
+
         if is_file_allowed(file.filename):
             filename = secure_filename(randomise_filename(file.filename))
 
