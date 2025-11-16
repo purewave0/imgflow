@@ -60,7 +60,7 @@ def is_file_allowed(filename: str) -> bool:
     )
 
 
-def randomize_filename(filename: str) -> str:
+def randomise_filename(filename: str) -> str:
     """Return a randomised filename with the extension from the given filename."""
     _, extension = os.path.splitext(filename)
     return uuid.uuid4().hex + extension
@@ -148,7 +148,7 @@ def api_posts():
             return jsonify({'error': 'wrong_description_length'}), 400
 
         if is_file_allowed(file.filename):
-            filename = secure_filename(randomize_filename(file.filename))
+            filename = secure_filename(randomise_filename(file.filename))
 
             media_destination = os.path.join(UPLOADS_MEDIA_PATH, filename)
             file.save(media_destination)
