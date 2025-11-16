@@ -94,8 +94,9 @@ def api_posts():
 
         return jsonify(posts)
 
-    title = request.form.get('title')
-    if len(title) > Post.MAX_TITLE_LENGTH:
+    raw_title = request.form.get('title')
+    title = (raw_title.strip() or None) if raw_title else None
+    if title and len(title) > Post.MAX_TITLE_LENGTH:
         return jsonify({'error': 'wrong_title_length'}), 400
 
     is_public = request.form.get('is_public') == 'true'
