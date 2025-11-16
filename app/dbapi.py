@@ -370,7 +370,7 @@ class CommentSorting(Enum):
 
 
 def get_post_comments_by_page(
-    post_id: str, current_user_id: int | None, page: int, sorting: PostSorting
+    post_id: str, current_user_id: int | None, page: int, sorting: CommentSorting
 ) -> tuple[dict[str, Any], ...]:
     """Return a sorted and paginated collection of a Post's comments as dicts, including
     whether they were upvoted or not.
@@ -436,7 +436,7 @@ def get_post_comments_by_page(
 
 
 def get_comment_replies(
-    post_id: str, comment_id: int, current_user_id: int | None, sorting: PostSorting
+    post_id: str, comment_id: int, current_user_id: int | None, sorting: CommentSorting
 ) -> tuple[dict[str, Any], ...]:
     """Return a sorted collection of a comment's replies as dicts, including upvote
     states.
