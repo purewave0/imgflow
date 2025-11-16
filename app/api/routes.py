@@ -182,7 +182,7 @@ def api_posts():
 def api_post(post_id):
     if len(post_id) != Post.POST_ID_LENGTH:
         return '', 404;
-    post = get_post_and_media(post_id)
+    post = get_post_and_media(post_id, current_user.id)
     return jsonify(post)
 
 
