@@ -39,7 +39,10 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     const urlParams = new URLSearchParams(window.location.search);
-    const titleQuery = urlParams.get('title');
+    const titleQuery = urlParams.get('title').trim();
+    if (!titleQuery) {
+        document.location.href = '/';
+    }
 
     const searchInput = document.getElementById('search');
     searchInput.value = titleQuery;
