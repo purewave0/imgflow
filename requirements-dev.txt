@@ -1,0 +1,11 @@
+pytest
+
+Flask
+SQLAlchemy
+Flask-SQLAlchemy
+flask-login
+
+Pillow
+
+python-dotenv
+regex
