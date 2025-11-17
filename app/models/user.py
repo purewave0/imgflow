@@ -40,10 +40,10 @@ class User(UserMixin, db.Model):
         )
         self.score = 0
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return f'<User "{self.name}">'
 
-    def set_password(self, password: str):
+    def set_password(self, password: str) -> None:
         """Set the password."""
         self.password_hash = generate_password_hash(password)
 
